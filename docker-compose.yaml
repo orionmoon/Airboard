@@ -17,8 +17,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5433:5432"
+    expose:
+      - "5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U airboard"]
       interval: 10s
@@ -40,8 +40,8 @@ services:
       - DB_NAME=airboard
       - JWT_SECRET=airboard-super-secret-key-2024
       - GIN_MODE=release
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     depends_on:
       postgres:
         condition: service_healthy
@@ -54,8 +54,8 @@ services:
       dockerfile: Dockerfile
       network: host
     container_name: airboard-frontend
-    ports:
-      - "3000:80"
+    expose:
+      - "80"
     depends_on:
       - backend
     restart: unless-stopped
