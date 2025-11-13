@@ -15,8 +15,6 @@ services:
       - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5433:5432"
-    networks:
-      - coolify
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U airboard"]
       interval: 10s
@@ -42,8 +40,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    networks:
-      - coolify
     restart: unless-stopped
 
   # Frontend Vue.js
@@ -56,13 +52,7 @@ services:
       - "3000:80"
     depends_on:
       - backend
-    networks:
-      - coolify
     restart: unless-stopped
 
 volumes:
   postgres_data:
-
-networks:
-  coolify:
-    external: true
