@@ -26,6 +26,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      network: host
     container_name: airboard-backend
     environment:
       - DB_HOST=postgres
@@ -47,6 +48,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      network: host
     container_name: airboard-frontend
     ports:
       - "3000:80"
