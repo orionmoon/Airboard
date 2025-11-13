@@ -32,7 +32,7 @@
 
 <script setup>
 import { computed, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
 
@@ -45,6 +45,7 @@ import NotificationContainer from '@/components/ui/NotificationContainer.vue'
 const authStore = useAuthStore()
 const appStore = useAppStore()
 const route = useRoute()
+const router = useRouter()
 
 // Computed
 const isAuthenticated = computed(() => authStore.isAuthenticated)
@@ -70,6 +71,13 @@ onMounted(async () => {
       const ssoResult = await authStore.autoLoginSSO()
       if (ssoResult) {
         console.log('✅ SSO auto-login réussi')
+
+        // Rediriger vers le dashboard si on est sur une page d'auth ou à la racine
+        if (route.path.startsWith('/auth') || route.path === '/') {
+          console.log('🚀 Redirection vers le dashboard après SSO')
+          const redirectPath = route.query.redirect || '/dashboard'
+          await router.push(redirectPath)
+        }
       }
     } catch (error) {
       // Échec SSO silencieux (mode classique)
