@@ -16,7 +16,7 @@ services:
     ports:
       - "5433:5432"
     networks:
-      - airboard-network
+      - coolify
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U airboard"]
       interval: 10s
@@ -43,7 +43,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - airboard-network
+      - coolify
     restart: unless-stopped
 
   # Frontend Vue.js
@@ -57,12 +57,12 @@ services:
     depends_on:
       - backend
     networks:
-      - airboard-network
+      - coolify
     restart: unless-stopped
 
 volumes:
   postgres_data:
 
 networks:
-  airboard-network:
-    driver: bridge
+  coolify:
+    external: true
