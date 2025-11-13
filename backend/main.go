@@ -43,6 +43,7 @@ func main() {
 
 	// Initialisation des middlewares
 	authMiddleware := middleware.NewAuthMiddleware(cfg)
+	ssoMiddleware := middleware.NewSSOMiddleware(db, cfg)
 
 	// Initialisation des handlers
 	authHandler := handlers.NewAuthHandler(db, authMiddleware)
@@ -56,6 +57,9 @@ func main() {
 	// Middleware CORS
 	router.Use(middleware.SetupCORS(cfg))
 
+	// Middleware SSO (détection des headers Authentik)
+	router.Use(ssoMiddleware.DetectSSO())
+
 	// Routes publiques
 	api := router.Group("/api/v1")
 	{
@@ -64,6 +68,12 @@ func main() {
 			auth.POST("/login", authHandler.Login)
 			auth.POST("/register", authHandler.Register)
 			auth.POST("/refresh", authHandler.RefreshToken)
+
+			// Route SSO auto-login (accessible publiquement mais nécessite headers Authentik)
+			sso := auth.Group("/sso")
+			{
+				sso.GET("/auto-login", authHandler.SSOAutoLogin)
+			}
 		}
 	}
 

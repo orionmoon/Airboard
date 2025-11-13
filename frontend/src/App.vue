@@ -61,12 +61,25 @@ const mainContentClasses = computed(() => {
 // Lifecycle
 onMounted(async () => {
   // Charger les préférences depuis le localStorage
-  authStore.loadFromStorage()
+  const hasStoredAuth = authStore.loadFromStorage()
   appStore.loadFromStorage()
-  
+
+  // Si pas d'authentification stockée, tenter SSO auto-login
+  if (!hasStoredAuth) {
+    try {
+      const ssoResult = await authStore.autoLoginSSO()
+      if (ssoResult) {
+        console.log('✅ SSO auto-login réussi')
+      }
+    } catch (error) {
+      // Échec SSO silencieux (mode classique)
+      console.log('ℹ️ SSO non disponible, mode classique activé')
+    }
+  }
+
   // Initialiser le watcher du thème système
   const cleanupThemeWatcher = appStore.initSystemThemeWatcher()
-  
+
   // Charger les settings de l'application (admin uniquement)
   if (authStore.isAuthenticated && authStore.isAdmin) {
     try {
@@ -75,7 +88,7 @@ onMounted(async () => {
       console.error('Failed to load app settings on startup:', error)
     }
   }
-  
+
   // Nettoyer au démontage
   onUnmounted(() => {
     if (cleanupThemeWatcher) {

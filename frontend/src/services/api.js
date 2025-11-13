@@ -127,6 +127,11 @@ export const authService = {
     localStorage.removeItem('airboard_token')
     localStorage.removeItem('airboard_refresh_token')
     localStorage.removeItem('airboard_user')
+  },
+
+  async ssoAutoLogin() {
+    const response = await api.get('/auth/sso/auto-login')
+    return response.data
   }
 }
 

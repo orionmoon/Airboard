@@ -428,3 +428,100 @@ func (h *AuthHandler) ChangePassword(c *gin.Context) {
 		Message: "Mot de passe changé avec succès",
 	})
 }
+
+// @Summary Auto-login SSO
+// @Description Authentifie automatiquement un utilisateur via les headers Authentik
+// @Tags Auth
+// @Produce json
+// @Success 200 {object} models.LoginResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 503 {object} models.ErrorResponse
+// @Router /auth/sso/auto-login [get]
+func (h *AuthHandler) SSOAutoLogin(c *gin.Context) {
+	// Vérifier si SSO est actif dans le contexte (injecté par le middleware SSO)
+	ssoActive, exists := c.Get("sso_active")
+	if !exists || !ssoActive.(bool) {
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
+			Error:   "Unauthorized",
+			Message: "SSO non disponible ou non configuré",
+			Code:    http.StatusUnauthorized,
+		})
+		return
+	}
+
+	// Récupérer l'utilisateur SSO du contexte
+	ssoUserInterface, exists := c.Get("sso_user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
+			Error:   "Unauthorized",
+			Message: "Utilisateur SSO non trouvé dans le contexte",
+			Code:    http.StatusUnauthorized,
+		})
+		return
+	}
+
+	ssoUser, ok := ssoUserInterface.(*models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Error:   "Internal Server Error",
+			Message: "Erreur lors de la récupération des informations SSO",
+			Code:    http.StatusInternalServerError,
+		})
+		return
+	}
+
+	// Vérifier que le compte est actif
+	if !ssoUser.IsActive {
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
+			Error:   "Unauthorized",
+			Message: "Compte désactivé",
+			Code:    http.StatusUnauthorized,
+		})
+		return
+	}
+
+	// Générer les tokens JWT pour l'utilisateur SSO
+	token, err := h.authMiddleware.GenerateToken(ssoUser)
+	if err != nil {
+		log.Printf("[SSO] Erreur lors de la génération du token: %v", err)
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Error:   "Internal Server Error",
+			Message: "Erreur lors de la génération du token",
+			Code:    http.StatusInternalServerError,
+		})
+		return
+	}
+
+	refreshToken, err := h.authMiddleware.GenerateRefreshToken(ssoUser)
+	if err != nil {
+		log.Printf("[SSO] Erreur lors de la génération du refresh token: %v", err)
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Error:   "Internal Server Error",
+			Message: "Erreur lors de la génération du refresh token",
+			Code:    http.StatusInternalServerError,
+		})
+		return
+	}
+
+	// Recharger l'utilisateur avec les groupes
+	var user models.User
+	if err := h.db.Preload("Groups").First(&user, ssoUser.ID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Error:   "Internal Server Error",
+			Message: "Erreur lors de la récupération des informations utilisateur",
+			Code:    http.StatusInternalServerError,
+		})
+		return
+	}
+
+	// Masquer le mot de passe (même si vide pour SSO)
+	user.Password = ""
+
+	log.Printf("[SSO] Auto-login réussi pour: %s (%s)", user.Email, user.Username)
+
+	c.JSON(http.StatusOK, models.LoginResponse{
+		Token:        token,
+		RefreshToken: refreshToken,
+		User:         user,
+	})
+}

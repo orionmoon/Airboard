@@ -8,17 +8,19 @@ import (
 
 // User représente un utilisateur du système
 type User struct {
-	ID        uint           `json:"id" gorm:"primaryKey"`
-	Username  string         `json:"username" gorm:"unique;not null"`
-	Email     string         `json:"email" gorm:"unique;not null"`
-	Password  string         `json:"-" gorm:"not null"`
-	FirstName string         `json:"first_name"`
-	LastName  string         `json:"last_name"`
-	Role      string         `json:"role" gorm:"default:'user'"` // admin, user
-	IsActive  bool           `json:"is_active" gorm:"default:true"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+	ID          uint           `json:"id" gorm:"primaryKey"`
+	Username    string         `json:"username" gorm:"unique;not null"`
+	Email       string         `json:"email" gorm:"unique;not null"`
+	Password    string         `json:"-"` // Nullable pour les users SSO
+	FirstName   string         `json:"first_name"`
+	LastName    string         `json:"last_name"`
+	Role        string         `json:"role" gorm:"default:'user'"` // admin, user
+	IsActive    bool           `json:"is_active" gorm:"default:true"`
+	SSOProvider string         `json:"sso_provider,omitempty"` // authentik, azure, etc.
+	SSOID       string         `json:"sso_id,omitempty"`       // ID utilisateur externe
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`
 
 	// Relations
 	Groups []Group `json:"groups,omitempty" gorm:"many2many:user_groups;"`

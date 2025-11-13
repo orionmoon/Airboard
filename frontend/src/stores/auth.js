@@ -142,6 +142,39 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('airboard_refresh_token', newRefreshToken)
   }
 
+  const autoLoginSSO = async () => {
+    try {
+      isLoading.value = true
+
+      // Appeler la route SSO auto-login
+      const response = await authService.ssoAutoLogin()
+
+      // Stocker les données
+      token.value = response.token
+      refreshToken.value = response.refresh_token
+      user.value = response.user
+
+      // Persistance locale
+      localStorage.setItem('airboard_token', response.token)
+      localStorage.setItem('airboard_refresh_token', response.refresh_token)
+      localStorage.setItem('airboard_user', JSON.stringify(response.user))
+
+      console.log('🔐 SSO Auto-login success:', {
+        user: user.value?.username,
+        email: user.value?.email,
+        provider: user.value?.sso_provider
+      })
+
+      return response
+    } catch (error) {
+      // Si SSO échoue, ne pas afficher d'erreur (mode classique)
+      console.log('ℹ️ SSO non disponible, passage en mode classique')
+      return null
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     // État
     user,
@@ -163,5 +196,6 @@ export const useAuthStore = defineStore('auth', () => {
     updateProfile,
     setUser,
     updateTokens,
+    autoLoginSSO,
   }
 })

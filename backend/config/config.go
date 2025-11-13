@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -13,6 +14,7 @@ type Config struct {
 	Database DatabaseConfig
 	JWT      JWTConfig
 	Server   ServerConfig
+	SSO      SSOConfig
 }
 
 type DatabaseConfig struct {
@@ -34,6 +36,15 @@ type ServerConfig struct {
 	Port    string
 	Mode    string // debug, release
 	Origins []string
+}
+
+type SSOConfig struct {
+	Enabled        bool
+	AutoProvision  bool
+	DefaultRole    string
+	DefaultGroup   string
+	GroupMapping   map[string]string // map[AuthentikGroup]AirboardGroup
+	AdminGroups    []string          // Groupes Authentik qui ont le rôle admin
 }
 
 func LoadConfig() *Config {
@@ -59,6 +70,18 @@ func LoadConfig() *Config {
 		refreshExp = 7
 	}
 
+	// Configuration SSO
+	ssoEnabled := getEnv("SSO_ENABLED", "false") == "true"
+	ssoAutoProvision := getEnv("SSO_AUTO_PROVISION", "true") == "true"
+
+	// Parse admin groups (comma-separated)
+	adminGroups := []string{}
+	if adminGroupsStr := getEnv("SSO_ADMIN_GROUPS", "airboard-admins"); adminGroupsStr != "" {
+		for _, group := range splitAndTrim(adminGroupsStr, ",") {
+			adminGroups = append(adminGroups, group)
+		}
+	}
+
 	return &Config{
 		Database: DatabaseConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
@@ -82,6 +105,14 @@ func LoadConfig() *Config {
 				"http://localhost:8080", // Swagger
 			},
 		},
+		SSO: SSOConfig{
+			Enabled:       ssoEnabled,
+			AutoProvision: ssoAutoProvision,
+			DefaultRole:   getEnv("SSO_DEFAULT_ROLE", "user"),
+			DefaultGroup:  getEnv("SSO_DEFAULT_GROUP", "Common"),
+			GroupMapping:  make(map[string]string), // Sera peuplé par les groupes Authentik
+			AdminGroups:   adminGroups,
+		},
 	}
 }
 
@@ -102,4 +133,14 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+func splitAndTrim(s, sep string) []string {
+	var result []string
+	for _, item := range strings.Split(s, sep) {
+		if trimmed := strings.TrimSpace(item); trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
 }
