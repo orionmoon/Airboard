@@ -1,0 +1,32 @@
+# Binaires
+backend
+backend-test
+main
+*.exe
+
+# Fichiers de développement
+.env
+.env.local
+*.log
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Documentation
+*.md
+README.md
+
+# Tests
+*_test.go
+
+# Autres
+.DS_Store
+Thumbs.db

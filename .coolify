@@ -1,0 +1,21 @@
+# Configuration Coolify pour Airboard
+# Ce fichier permet à Coolify de détecter automatiquement la configuration
+
+# Type de build - Docker Compose (tout-en-un avec PostgreSQL)
+type=docker-compose
+
+# Fichier docker-compose à utiliser
+docker_compose_file=docker-simple/docker-compose.yaml
+
+# Port exposé
+port=80
+
+# Health check
+healthcheck_path=/health
+healthcheck_method=GET
+healthcheck_interval=30s
+
+# Variables d'environnement optionnelles (avec valeurs par défaut)
+# DB_PASSWORD (défaut: airboard123) - Changer en production !
+# JWT_SECRET (défaut: généré) - Changer en production !
+# GIN_MODE (défaut: release)
