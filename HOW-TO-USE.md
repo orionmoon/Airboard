@@ -504,13 +504,77 @@ The "Order" field determines the display order on the dashboard:
 
 ### Issue: SSO Not Working
 
-**Symptoms**: Login page shows instead of automatic SSO login
+**Symptoms**: Login page shows instead of automatic SSO login, or users are redirected back to login after Authentik authentication
 
-**Solutions:**
-1. Verify SSO is enabled (`SSO_ENABLED=true`)
-2. Check Nginx Proxy Manager configuration
-3. Verify Authentik headers are being forwarded
-4. Check backend logs: `docker-compose logs backend`
+**Common Causes:**
+
+#### 1. SSO is Disabled in Configuration
+
+**Check:** Is `SSO_ENABLED=true` in your environment?
+
+**For Coolify Deployment:**
+- Go to your Airboard project in Coolify
+- Navigate to "Environment Variables" section
+- Verify `SSO_ENABLED=true` is set
+- If missing or set to `false`, add/change it to `true`
+- Redeploy the application
+
+**For Docker Compose:**
+- Check your `.env` file (if you have one)
+- Ensure `SSO_ENABLED=true`
+- Or don't define it (defaults to `true` in docker-compose.yaml)
+
+**Verification:**
+Check backend logs for SSO messages:
+```bash
+docker-compose logs backend | grep "\[SSO\]"
+```
+
+You should see:
+```
+[SSO] Headers Authentik détectés pour: username (email@domain.com)
+[SSO] Utilisateur SSO synchronisé: email@domain.com (ID: X, Role: user)
+[SSO] Auto-login réussi pour: email@domain.com (username)
+```
+
+If you see **NO** `[SSO]` messages, SSO is likely disabled.
+
+#### 2. Authentik Headers Not Being Forwarded
+
+**Check:** Are Nginx Proxy Manager and frontend Nginx forwarding headers?
+
+**NPM Configuration:** Verify your NPM Advanced configuration includes:
+```nginx
+proxy_set_header X-authentik-username $authentik_username;
+proxy_set_header X-authentik-email $authentik_email;
+proxy_set_header X-authentik-groups $authentik_groups;
+```
+
+**Frontend Nginx:** Already fixed in latest version (forwards headers to backend)
+
+#### 3. User Not Auto-Provisioned
+
+**Check:** Is `SSO_AUTO_PROVISION=true`?
+
+If `SSO_AUTO_PROVISION=false`, users must be created manually before they can login via SSO.
+
+#### 4. Database or Group Issues
+
+**Check logs for:**
+```bash
+docker-compose logs backend | grep "Error\|error"
+```
+
+Common issues:
+- Default group `Common` cannot be created
+- Database connection issues
+- Unique constraint violations (username/email already exists)
+
+**Quick Fixes:**
+1. Ensure `SSO_ENABLED=true` in Coolify environment variables
+2. Redeploy after changing environment variables
+3. Check backend logs for `[SSO]` debug messages
+4. Verify NPM is forwarding Authentik headers
 5. See [README.md - Troubleshooting](README.md#-troubleshooting) for detailed SSO debugging
 
 ---

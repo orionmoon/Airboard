@@ -396,13 +396,17 @@ All variables can be configured via:
 
 #### SSO Configuration (Authentik)
 
+**IMPORTANT:** SSO is **enabled by default** (`SSO_ENABLED=true`). If you're not using Authentik, set `SSO_ENABLED=false` in your environment variables.
+
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
-| `SSO_ENABLED` | Enable SSO authentication | `true` | No |
+| `SSO_ENABLED` | Enable SSO authentication | `true` | **Yes (disable if not using SSO)** |
 | `SSO_AUTO_PROVISION` | Auto-create users from SSO | `true` | No |
 | `SSO_DEFAULT_ROLE` | Default role for new SSO users | `user` | No |
 | `SSO_DEFAULT_GROUP` | Default group for new SSO users | `Common` | No |
 | `SSO_ADMIN_GROUPS` | Authentik groups for admin role (comma-separated) | `airboard-admins` | No |
+
+**Note:** When SSO is enabled but Authentik headers are not present, the application automatically falls back to classic login/password mode.
 
 #### Application Configuration
 
