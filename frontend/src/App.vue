@@ -66,7 +66,10 @@ onMounted(async () => {
   appStore.loadFromStorage()
 
   // Si pas d'authentification stockée, tenter SSO auto-login
-  if (!hasStoredAuth) {
+  // SAUF si on est sur un callback OAuth (Microsoft/Google)
+  const isOAuthCallback = route.path.includes('/auth/oauth/') && route.query.code
+
+  if (!hasStoredAuth && !isOAuthCallback) {
     try {
       const ssoResult = await authStore.autoLoginSSO()
       if (ssoResult) {
