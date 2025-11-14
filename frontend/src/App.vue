@@ -72,11 +72,15 @@ onMounted(async () => {
       if (ssoResult) {
         console.log('✅ SSO auto-login réussi')
 
-        // Rediriger vers le dashboard si on est sur une page d'auth ou à la racine
-        if (route.path.startsWith('/auth') || route.path === '/') {
+        // Rediriger vers le dashboard après SSO réussi
+        // Toujours rediriger si on est sur une page d'auth
+        if (route.path.startsWith('/auth')) {
           console.log('🚀 Redirection vers le dashboard après SSO')
           const redirectPath = route.query.redirect || '/dashboard'
           await router.push(redirectPath)
+        } else if (route.path === '/') {
+          // Si on est à la racine, rediriger vers dashboard
+          await router.push('/dashboard')
         }
       }
     } catch (error) {
