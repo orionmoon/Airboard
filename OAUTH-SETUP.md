@@ -150,8 +150,22 @@ Vous devez créer des applications OAuth chez :
    - **Client ID** : collez l'Application (client) ID
    - **Client Secret** : collez le secret créé
    - **Redirect URI** : (déjà rempli)
-5. **Advanced Settings** (si single tenant) :
+5. **Advanced Settings** :
+
+   **IMPORTANT - Configuration Single Tenant vs Multi-tenant** :
+
+   **Si vous avez choisi "Single tenant"** (recommandé pour une organisation) :
    - Remplacez `/common/` par `/[YOUR_TENANT_ID]/` dans les URLs
+   - Exemple avec le Tenant ID `abc123-...` :
+     ```
+     https://login.microsoftonline.com/abc123-def4-5678-90ab-cdef12345678/oauth2/v2.0/authorize
+     https://login.microsoftonline.com/abc123-def4-5678-90ab-cdef12345678/oauth2/v2.0/token
+     ```
+   - Pour trouver votre Tenant ID : Azure Portal > Azure AD > Overview > Tenant ID
+
+   **Si vous avez choisi "Multitenant" ou "Personal + Work accounts"** :
+   - Gardez `/common/` dans les URLs (pas de modification nécessaire)
+
 6. Cliquez sur **Save**
 
 ---
@@ -223,6 +237,26 @@ Airboard peut gérer les 3 méthodes simultanément :
    ```
 2. Pas d'espace, pas de `/` à la fin
 3. HTTPS obligatoire (pas HTTP)
+
+### Erreur Microsoft "AADSTS700016: Application not found in directory"
+
+Cette erreur signifie que vous utilisez un **Single Tenant** mais que les URLs utilisent `/common/` :
+
+**Symptôme** : Message d'erreur Azure indiquant que l'application n'a pas été trouvée dans le répertoire.
+
+**Solution** :
+1. Allez dans **Administration > OAuth**
+2. Éditez le provider Microsoft
+3. Dans **Advanced Settings**, remplacez `/common/` par votre **Tenant ID** :
+   ```
+   https://login.microsoftonline.com/[VOTRE_TENANT_ID]/oauth2/v2.0/authorize
+   https://login.microsoftonline.com/[VOTRE_TENANT_ID]/oauth2/v2.0/token
+   ```
+4. Pour trouver votre Tenant ID :
+   - Azure Portal > Azure Active Directory > Overview
+   - Copiez le **Tenant ID** (format UUID : `abc12345-...`)
+
+**Alternative** : Changez votre App Registration en **Multitenant** dans Azure Portal si vous voulez accepter tous les comptes Microsoft.
 
 ### Erreur après le callback
 
