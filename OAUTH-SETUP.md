@@ -155,16 +155,22 @@ Vous devez créer des applications OAuth chez :
    **IMPORTANT - Configuration Single Tenant vs Multi-tenant** :
 
    **Si vous avez choisi "Single tenant"** (recommandé pour une organisation) :
-   - Remplacez `/common/` par `/[YOUR_TENANT_ID]/` dans les URLs
-   - Exemple avec le Tenant ID `abc123-...` :
+   - Remplacez `/common/` par `/[YOUR_TENANT_ID]/` dans **Authorization URL** et **Token URL** uniquement
+   - Exemple avec le Tenant ID `abc123-def4-5678-90ab-cdef12345678` :
      ```
+     Authorization URL:
      https://login.microsoftonline.com/abc123-def4-5678-90ab-cdef12345678/oauth2/v2.0/authorize
+
+     Token URL:
      https://login.microsoftonline.com/abc123-def4-5678-90ab-cdef12345678/oauth2/v2.0/token
+
+     User Info URL: (ne pas modifier, gardez graph.microsoft.com)
+     https://graph.microsoft.com/v1.0/me
      ```
    - Pour trouver votre Tenant ID : Azure Portal > Azure AD > Overview > Tenant ID
 
    **Si vous avez choisi "Multitenant" ou "Personal + Work accounts"** :
-   - Gardez `/common/` dans les URLs (pas de modification nécessaire)
+   - Gardez `/common/` dans Authorization URL et Token URL (pas de modification nécessaire)
 
 6. Cliquez sur **Save**
 
@@ -247,10 +253,16 @@ Cette erreur signifie que vous utilisez un **Single Tenant** mais que les URLs u
 **Solution** :
 1. Allez dans **Administration > OAuth**
 2. Éditez le provider Microsoft
-3. Dans **Advanced Settings**, remplacez `/common/` par votre **Tenant ID** :
+3. Dans **Advanced Settings**, remplacez `/common/` par votre **Tenant ID** dans les **2 URLs** suivantes :
    ```
+   Authorization URL:
    https://login.microsoftonline.com/[VOTRE_TENANT_ID]/oauth2/v2.0/authorize
+
+   Token URL:
    https://login.microsoftonline.com/[VOTRE_TENANT_ID]/oauth2/v2.0/token
+
+   User Info URL: (ne pas toucher)
+   https://graph.microsoft.com/v1.0/me
    ```
 4. Pour trouver votre Tenant ID :
    - Azure Portal > Azure Active Directory > Overview
