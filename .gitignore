@@ -94,7 +94,23 @@ test-*.sh
 fix-*.sh
 quick-*.sh
 dev-*.sh
+*.sh
 
 # Documentation temporaire
 TEMP-*.md
 DEBUG-*.md
+CHANGELOG.md
+COOLIFY-*.md
+DEPLOIEMENT-*.md
+DEPLOYMENT-*.md
+DOCKER-*.md
+GITHUB-*.md
+PROJECT-*.md
+QUICK-START-*.md
+RESUME-*.md
+
+# Répertoires temporaires
+docker-simple/
+releases/
+.coolify
+.cursor-free-vip/
