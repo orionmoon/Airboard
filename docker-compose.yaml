@@ -10,9 +10,9 @@ services:
     image: postgres:15-alpine
     container_name: airboard-postgres
     environment:
-      POSTGRES_DB: airboard
-      POSTGRES_USER: airboard
-      POSTGRES_PASSWORD: airboard123
+      POSTGRES_DB: ${DB_NAME:-airboard}
+      POSTGRES_USER: ${DB_USER:-airboard}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-airboard123}
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -20,7 +20,7 @@ services:
     expose:
       - "5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U airboard"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-airboard}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,16 +35,16 @@ services:
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_USER=airboard
-      - DB_PASSWORD=airboard123
-      - DB_NAME=airboard
-      - JWT_SECRET=airboard-super-secret-key-2024
+      - DB_USER=${DB_USER:-airboard}
+      - DB_PASSWORD=${DB_PASSWORD:-airboard123}
+      - DB_NAME=${DB_NAME:-airboard}
+      - JWT_SECRET=${JWT_SECRET:-airboard-super-secret-key-2024}
       - GIN_MODE=release
-      - SSO_ENABLED=true
-      - SSO_AUTO_PROVISION=true
-      - SSO_DEFAULT_ROLE=user
-      - SSO_DEFAULT_GROUP=Common
-      - SSO_ADMIN_GROUPS=airboard-admins
+      - SSO_ENABLED=${SSO_ENABLED:-true}
+      - SSO_AUTO_PROVISION=${SSO_AUTO_PROVISION:-true}
+      - SSO_DEFAULT_ROLE=${SSO_DEFAULT_ROLE:-user}
+      - SSO_DEFAULT_GROUP=${SSO_DEFAULT_GROUP:-Common}
+      - SSO_ADMIN_GROUPS=${SSO_ADMIN_GROUPS:-airboard-admins}
     expose:
       - "8080"
     depends_on:
