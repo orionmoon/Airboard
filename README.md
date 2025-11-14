@@ -10,9 +10,34 @@
 
 *A modern, secure application portal with user management, SSO integration, and Docker support*
 
-[🚀 Quick Start](#-quick-start) • [📖 Features](#-features) • [🔧 Installation](#-installation-methods) • [🔐 SSO Setup](#-sso-integration-authentik) • [⚙️ Configuration](#-configuration)
+[🚀 Quick Start](#-quick-start) • [📖 About](#-about) • [✨ Features](#-features) • [🔧 Installation](#-installation-methods) • [📘 How to Use](#-how-to-use) • [🔐 SSO Setup](#-sso-integration-authentik)
 
 </div>
+
+---
+
+## 📖 About
+
+**Airboard** is an application portal platform designed to enable organizations to centralize and share links to their main applications and tools with their staff.
+
+### Main Objective
+
+In a modern professional environment, employees use many applications daily: management tools, communication platforms, business systems, etc. **Airboard** addresses this need by offering:
+
+- **🎯 Single Access Point** - A centralized dashboard where all important links are accessible
+- **👥 Group Management** - Organize applications by department, function, or project
+- **🔐 Role-Based Access Control** - Each user sees only the applications relevant to their group
+- **🔄 SSO Synchronization** - Seamless integration with your authentication system (Microsoft 365, LDAP, etc.)
+- **⚡ Simple Deployment** - Docker-ready, deployable in minutes on your infrastructure
+
+### Use Cases
+
+- **SMB/SME**: Centralize access to management tools (ERP, CRM, HR, accounting)
+- **IT Services**: Technical tools portal for teams (monitoring, CI/CD, documentation)
+- **Departments**: Customized dashboards per service (HR, Finance, Sales, Production)
+- **Projects**: Collaborative spaces with access to project tools (Jira, Confluence, GitLab, etc.)
+
+Airboard simplifies access to your organization's digital resources while maintaining granular control over permissions.
 
 ---
 
@@ -213,6 +238,39 @@ Internet → Nginx Proxy Manager (+ Authentik) → Coolify → Airboard
    Set `SSO_ENABLED=true` in Coolify environment variables
 
 **Result:** Users authenticated via Microsoft 365 → Authentik → Automatic login to Airboard
+
+---
+
+## 📘 How to Use
+
+**New to Airboard?** Check out our comprehensive getting started guide: **[HOW-TO-USE.md](HOW-TO-USE.md)**
+
+This guide covers:
+- 🔐 **First Login** - Default credentials and security setup
+- 📊 **Understanding the Dashboard** - Layout and navigation
+- 👥 **User Management** - Creating and managing users (admin)
+- 🏢 **Group Management** - Organizing by departments/projects (admin)
+- 📱 **Application Management** - Adding and configuring applications (admin)
+- 🧑‍💼 **Regular User Workflow** - Daily usage for end users
+- ✅ **Common Tasks** - Step-by-step scenarios and examples
+- 💡 **Best Practices** - Tips for administrators and users
+- 🔧 **Troubleshooting** - Solutions to common issues
+
+**Quick Start for Admins:**
+1. Login with `admin@airboard.com` / `admin123`
+2. Change the default password immediately
+3. Create groups (e.g., "IT", "Sales", "Common")
+4. Add applications with icons and URLs
+5. Create user accounts and assign to groups
+6. Test with a regular user account
+
+**Quick Start for Users:**
+1. Login with your credentials
+2. Browse applications on your dashboard
+3. Click an application card to open it
+4. Use the search bar for quick access
+
+👉 **[Read the full guide →](HOW-TO-USE.md)**
 
 ---
 
