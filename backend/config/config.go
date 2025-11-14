@@ -33,9 +33,10 @@ type JWTConfig struct {
 }
 
 type ServerConfig struct {
-	Port    string
-	Mode    string // debug, release
-	Origins []string
+	Port       string
+	Mode       string // debug, release
+	Origins    []string
+	PublicURL  string // URL publique de l'application (ex: https://tools.marocpme.gov.ma)
 }
 
 type SSOConfig struct {
@@ -97,8 +98,9 @@ func LoadConfig() *Config {
 			RefreshExpirationDays: refreshExp,
 		},
 		Server: ServerConfig{
-			Port: getEnv("PORT", "8080"),
-			Mode: getEnv("GIN_MODE", "debug"),
+			Port:      getEnv("PORT", "8080"),
+			Mode:      getEnv("GIN_MODE", "debug"),
+			PublicURL: getEnv("PUBLIC_URL", "http://localhost:5173"),
 			Origins: []string{
 				getEnv("FRONTEND_URL", "http://localhost:3000"),
 				"http://localhost:5173", // Vite dev server

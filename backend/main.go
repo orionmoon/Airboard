@@ -34,12 +34,13 @@ func main() {
 		&models.AppGroup{},
 		&models.Application{},
 		&models.AppSettings{},
+		&models.OAuthProvider{},
 	); err != nil {
 		log.Fatal("Erreur lors des migrations:", err)
 	}
 
 	// Créer les données initiales
-	createInitialData(db)
+	createInitialData(db, cfg)
 
 	// Initialisation des middlewares
 	authMiddleware := middleware.NewAuthMiddleware(cfg)
@@ -50,6 +51,7 @@ func main() {
 	dashboardHandler := handlers.NewDashboardHandler(db)
 	adminHandler := handlers.NewAdminHandler(db)
 	settingsHandler := handlers.NewSettingsHandler(db)
+	oauthHandler := handlers.NewOAuthHandler(db, authMiddleware)
 
 	// Configuration du routeur
 	router := gin.Default()
@@ -73,6 +75,14 @@ func main() {
 			sso := auth.Group("/sso")
 			{
 				sso.GET("/auto-login", authHandler.SSOAutoLogin)
+			}
+
+			// Routes OAuth publiques
+			oauth := auth.Group("/oauth")
+			{
+				oauth.GET("/providers", oauthHandler.GetEnabledProviders)
+				oauth.GET("/:provider/initiate", oauthHandler.InitiateOAuth)
+				oauth.GET("/:provider/callback", oauthHandler.OAuthCallback)
 			}
 		}
 	}
@@ -121,6 +131,10 @@ func main() {
 			admin.PUT("/settings", settingsHandler.UpdateAppSettings)
 			admin.POST("/settings/reset", settingsHandler.ResetAppSettings)
 
+			// Gestion des fournisseurs OAuth
+			admin.GET("/oauth/providers", oauthHandler.GetAllProviders)
+			admin.PUT("/oauth/providers/:id", oauthHandler.UpdateProvider)
+
 			// Gestion de la base de données
 			admin.POST("/database/reset", adminHandler.ResetDatabase)
 		}
@@ -145,7 +159,7 @@ func main() {
 	router.Run(":" + cfg.Server.Port)
 }
 
-func createInitialData(db *gorm.DB) {
+func createInitialData(db *gorm.DB, cfg *config.Config) {
 	// Créer ou réinitialiser un utilisateur admin par défaut
 	var adminUser models.User
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
@@ -298,5 +312,69 @@ func createInitialData(db *gorm.DB) {
 		db.Model(&demoGroup).Association("AppGroups").Append(&prodGroup)
 
 		log.Println("✅ Groupe d'utilisateurs Développeurs créé avec permissions")
+	}
+
+	// Créer les fournisseurs OAuth par défaut
+	createDefaultOAuthProviders(db, cfg)
+}
+
+func createDefaultOAuthProviders(db *gorm.DB, cfg *config.Config) {
+	// Construire les redirect URIs basées sur PUBLIC_URL
+	publicURL := cfg.Server.PublicURL
+
+	// Google OAuth
+	var googleProvider models.OAuthProvider
+	err := db.Where("provider_name = ?", "google").First(&googleProvider).Error
+	if err != nil {
+		// Créer si n'existe pas
+		googleProvider = models.OAuthProvider{
+			ProviderName: "google",
+			DisplayName:  "Google",
+			Icon:         "mdi:google",
+			IsEnabled:    false,
+			AuthURL:      "https://accounts.google.com/o/oauth2/v2/auth",
+			TokenURL:     "https://oauth2.googleapis.com/token",
+			UserInfoURL:  "https://www.googleapis.com/oauth2/v2/userinfo",
+			Scopes:       "openid email profile",
+			RedirectURI:  publicURL + "/auth/oauth/google/callback",
+		}
+		db.Create(&googleProvider)
+		log.Printf("✅ Google OAuth provider créé (désactivé par défaut) - Redirect: %s", googleProvider.RedirectURI)
+	} else {
+		// Mettre à jour le redirect URI si différent
+		newRedirectURI := publicURL + "/auth/oauth/google/callback"
+		if googleProvider.RedirectURI != newRedirectURI {
+			googleProvider.RedirectURI = newRedirectURI
+			db.Save(&googleProvider)
+			log.Printf("🔄 Google OAuth redirect URI mis à jour: %s", googleProvider.RedirectURI)
+		}
+	}
+
+	// Microsoft OAuth
+	var microsoftProvider models.OAuthProvider
+	err = db.Where("provider_name = ?", "microsoft").First(&microsoftProvider).Error
+	if err != nil {
+		// Créer si n'existe pas
+		microsoftProvider = models.OAuthProvider{
+			ProviderName: "microsoft",
+			DisplayName:  "Microsoft",
+			Icon:         "mdi:microsoft",
+			IsEnabled:    false,
+			AuthURL:      "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+			TokenURL:     "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+			UserInfoURL:  "https://graph.microsoft.com/v1.0/me",
+			Scopes:       "openid email profile User.Read",
+			RedirectURI:  publicURL + "/auth/oauth/microsoft/callback",
+		}
+		db.Create(&microsoftProvider)
+		log.Printf("✅ Microsoft OAuth provider créé (désactivé par défaut) - Redirect: %s", microsoftProvider.RedirectURI)
+	} else {
+		// Mettre à jour le redirect URI si différent
+		newRedirectURI := publicURL + "/auth/oauth/microsoft/callback"
+		if microsoftProvider.RedirectURI != newRedirectURI {
+			microsoftProvider.RedirectURI = newRedirectURI
+			db.Save(&microsoftProvider)
+			log.Printf("🔄 Microsoft OAuth redirect URI mis à jour: %s", microsoftProvider.RedirectURI)
+		}
 	}
 }

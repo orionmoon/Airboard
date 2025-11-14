@@ -13,6 +13,30 @@
         
       </div>
 
+      <!-- OAuth Buttons -->
+      <div v-if="oauthProviders.length > 0" class="space-y-3 mb-6">
+        <button
+          v-for="provider in oauthProviders"
+          :key="provider.id"
+          type="button"
+          @click="handleOAuthLogin(provider)"
+          class="btn btn-secondary w-full flex items-center justify-center gap-3"
+        >
+          <Icon :icon="provider.icon" class="h-5 w-5" />
+          <span>Continue with {{ provider.display_name }}</span>
+        </button>
+
+        <!-- Divider -->
+        <div class="relative my-6">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-600"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-gray-800 text-gray-400">Or continue with credentials</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Form -->
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <div class="form-group">
@@ -91,19 +115,22 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive, nextTick, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
+import { oauthService } from '@/services/api'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const appStore = useAppStore()
 
 const loading = ref(false)
 const showPassword = ref(false)
 const errors = ref({})
+const oauthProviders = ref([])
 
 const form = reactive({
   username: '',
@@ -127,29 +154,29 @@ const validateForm = () => {
 
 const handleSubmit = async () => {
   if (!validateForm()) return
-  
+
   loading.value = true
-  
+
   try {
     const response = await authStore.login(form)
     console.log('✅ Login successful, redirecting...')
-    
+
     appStore.showSuccess('Welcome back!')
-    
+
     // Force navigation with nextTick to ensure state is updated
     await nextTick()
-    
+
     // Check for redirect parameter
     const redirectPath = router.currentRoute.value.query.redirect || '/dashboard'
-    
+
     // Force replace instead of push to avoid back button issues
     await router.replace(redirectPath)
-    
+
     console.log('🎯 Navigation completed to:', redirectPath)
-    
+
   } catch (error) {
     console.error('Login error:', error)
-    
+
     if (error.response?.status === 401) {
       appStore.showError('Invalid username or password')
     } else if (error.response?.status === 422) {
@@ -162,6 +189,80 @@ const handleSubmit = async () => {
     } else {
       appStore.showError('Login failed. Please try again.')
     }
+  } finally {
+    loading.value = false
+  }
+}
+
+const loadOAuthProviders = async () => {
+  try {
+    const data = await oauthService.getEnabledProviders()
+    oauthProviders.value = data.providers || []
+  } catch (error) {
+    console.error('Error loading OAuth providers:', error)
+  }
+}
+
+const handleOAuthLogin = async (provider) => {
+  try {
+    loading.value = true
+    const { auth_url, state } = await oauthService.initiateOAuth(provider.provider_name)
+
+    // Sauvegarder le state dans sessionStorage pour vérification ultérieure
+    sessionStorage.setItem('oauth_state', state)
+    sessionStorage.setItem('oauth_provider', provider.provider_name)
+
+    // Rediriger vers la page OAuth du provider
+    window.location.href = auth_url
+  } catch (error) {
+    console.error('OAuth initiation error:', error)
+    appStore.showError('Failed to initiate OAuth login')
+    loading.value = false
+  }
+}
+
+// Lifecycle
+onMounted(() => {
+  loadOAuthProviders()
+
+  // Vérifier si on revient d'un callback OAuth
+  const code = route.query.code
+  const state = route.query.state
+
+  if (code && state) {
+    handleOAuthCallback(code, state)
+  }
+})
+
+const handleOAuthCallback = async (code, state) => {
+  const savedState = sessionStorage.getItem('oauth_state')
+  const provider = sessionStorage.getItem('oauth_provider')
+
+  if (!savedState || savedState !== state) {
+    appStore.showError('Invalid OAuth state. Please try again.')
+    router.replace('/auth/login')
+    return
+  }
+
+  try {
+    loading.value = true
+    const response = await oauthService.handleCallback(provider, code, state)
+
+    // Sauvegarder les tokens
+    authStore.setToken(response.token)
+    authStore.setRefreshToken(response.refresh_token)
+    authStore.setUser(response.user)
+
+    // Nettoyer le sessionStorage
+    sessionStorage.removeItem('oauth_state')
+    sessionStorage.removeItem('oauth_provider')
+
+    appStore.showSuccess('Welcome back!')
+    await router.replace('/dashboard')
+  } catch (error) {
+    console.error('OAuth callback error:', error)
+    appStore.showError('OAuth authentication failed')
+    router.replace('/auth/login')
   } finally {
     loading.value = false
   }

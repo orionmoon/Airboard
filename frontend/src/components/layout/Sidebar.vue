@@ -82,6 +82,14 @@
           <Icon icon="mdi:cog" class="h-4 w-4" />
           <span>{{ $t('common.settings') }}</span>
         </router-link>
+
+        <router-link
+          to="/admin/oauth"
+          :class="getLinkClasses('/admin/oauth')"
+        >
+          <Icon icon="mdi:shield-key" class="h-4 w-4" />
+          <span>{{ $t('common.oauth') }}</span>
+        </router-link>
       </div>
     </nav>
 

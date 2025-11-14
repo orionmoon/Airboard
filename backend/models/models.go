@@ -169,3 +169,46 @@ type ChangePasswordRequest struct {
 	OldPassword string `json:"old_password" binding:"required"`
 	NewPassword string `json:"new_password" binding:"required,min=6"`
 }
+
+// OAuthProvider représente un fournisseur OAuth (Google, Microsoft, etc.)
+type OAuthProvider struct {
+	ID           uint      `json:"id" gorm:"primaryKey"`
+	ProviderName string    `json:"provider_name" gorm:"unique;not null"` // google, microsoft
+	DisplayName  string    `json:"display_name" gorm:"not null"`         // "Google", "Microsoft"
+	Icon         string    `json:"icon" gorm:"default:'mdi:login'"`      // Icône Iconify
+	IsEnabled    bool      `json:"is_enabled" gorm:"default:false"`
+	ClientID     string    `json:"client_id"`
+	ClientSecret string    `json:"-"` // Ne jamais exposer dans le JSON
+	RedirectURI  string    `json:"redirect_uri"`
+	AuthURL      string    `json:"auth_url"`      // URL d'autorisation OAuth
+	TokenURL     string    `json:"token_url"`     // URL d'échange de token
+	UserInfoURL  string    `json:"user_info_url"` // URL pour récupérer les infos utilisateur
+	Scopes       string    `json:"scopes"`        // Scopes OAuth séparés par des espaces
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+// OAuthProviderRequest pour les requêtes de mise à jour
+type OAuthProviderRequest struct {
+	ProviderName string `json:"provider_name" binding:"required"`
+	DisplayName  string `json:"display_name" binding:"required"`
+	Icon         string `json:"icon"`
+	IsEnabled    bool   `json:"is_enabled"`
+	ClientID     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+	RedirectURI  string `json:"redirect_uri"`
+	AuthURL      string `json:"auth_url"`
+	TokenURL     string `json:"token_url"`
+	UserInfoURL  string `json:"user_info_url"`
+	Scopes       string `json:"scopes"`
+}
+
+// OAuthProviderPublic pour l'affichage public (sans secrets)
+type OAuthProviderPublic struct {
+	ID           uint   `json:"id"`
+	ProviderName string `json:"provider_name"`
+	DisplayName  string `json:"display_name"`
+	Icon         string `json:"icon"`
+	IsEnabled    bool   `json:"is_enabled"`
+	RedirectURI  string `json:"redirect_uri"`
+}

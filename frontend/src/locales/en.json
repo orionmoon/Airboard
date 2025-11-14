@@ -25,7 +25,12 @@
     "language_en": "English",
     "language_es": "Spanish",
     "language_ar": "Arabic",
-    "edit": "Edit"
+    "edit": "Edit",
+    "save": "Save",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "oauth": "OAuth",
+    "notConfigured": "Not configured"
   },
   "groups": {
     "title": "User groups",
@@ -125,8 +130,39 @@
     "manageAppGroups": "Manage application categories",
     "manageApplications": "Add and edit applications",
     "manageUsers": "Manage user accounts"
+  },
+  "oauth": {
+    "title": "OAuth Authentication",
+    "subtitle": "Configure external authentication providers (Google, Microsoft)",
+    "configure": "Configure",
+    "configureSubtitle": "Set up OAuth credentials for this provider",
+    "enableProvider": "Enable this OAuth provider",
+    "enableProviderHelp": "Users will see a login button for this provider on the login page",
+    "clientId": "Client ID",
+    "clientIdHelp": "Obtain from your provider's developer console",
+    "clientSecret": "Client Secret",
+    "clientSecretPlaceholder": "Leave empty to keep existing secret",
+    "clientSecretHelp": "Keep this secret secure. Never share it publicly",
+    "redirectUri": "Redirect URI",
+    "redirectUriHelp": "Copy this URL and add it to your provider's allowed redirect URIs",
+    "advancedSettings": "Advanced Settings",
+    "authUrl": "Authorization URL",
+    "tokenUrl": "Token URL",
+    "userInfoUrl": "User Info URL",
+    "scopes": "OAuth Scopes",
+    "setupInstructions": "Setup Instructions",
+    "googleSetup1": "To configure Google OAuth:",
+    "googleSetup2": "Go to Google Cloud Console > APIs & Services > Credentials",
+    "googleSetup3": "Create OAuth 2.0 Client ID (Web application)",
+    "googleSetup4": "Add the redirect URI to authorized redirect URIs",
+    "googleSetup5": "Copy the Client ID and Client Secret here",
+    "microsoftSetup1": "To configure Microsoft OAuth:",
+    "microsoftSetup2": "Go to Azure Portal > App registrations > New registration",
+    "microsoftSetup3": "Set redirect URI in Authentication settings",
+    "microsoftSetup4": "Create a new client secret in Certificates & secrets",
+    "microsoftSetup5": "Copy the Application (client) ID and client secret here"
   }
-  
+
 }
 
 

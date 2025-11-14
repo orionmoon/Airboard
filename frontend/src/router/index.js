@@ -103,10 +103,20 @@ const routes = [
     path: '/admin/settings',
     name: 'AdminSettings',
     component: () => import('@/views/admin/SettingsManagement.vue'),
-    meta: { 
+    meta: {
       requiresAuth: true,
       requiresAdmin: true,
       title: 'Paramètres'
+    }
+  },
+  {
+    path: '/admin/oauth',
+    name: 'AdminOAuth',
+    component: () => import('@/views/admin/OAuthSettings.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'OAuth Configuration'
     }
   },
   {

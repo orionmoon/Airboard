@@ -249,6 +249,37 @@ export const adminService = {
   async resetDatabase() {
     const response = await api.post('/admin/database/reset')
     return response.data
+  },
+
+  // OAuth Providers
+  async getOAuthProviders() {
+    const response = await api.get('/admin/oauth/providers')
+    return response.data
+  },
+
+  async updateOAuthProvider(id, data) {
+    const response = await api.put(`/admin/oauth/providers/${id}`, data)
+    return response.data
+  }
+}
+
+// OAuth Service (public)
+export const oauthService = {
+  async getEnabledProviders() {
+    const response = await api.get('/auth/oauth/providers')
+    return response.data
+  },
+
+  async initiateOAuth(providerName) {
+    const response = await api.get(`/auth/oauth/${providerName}/initiate`)
+    return response.data
+  },
+
+  async handleCallback(providerName, code, state) {
+    const response = await api.get(`/auth/oauth/${providerName}/callback`, {
+      params: { code, state }
+    })
+    return response.data
   }
 }
 
