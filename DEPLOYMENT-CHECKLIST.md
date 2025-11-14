@@ -47,6 +47,25 @@ GIN_MODE=release
 - [ ] Vérifier que `JWT_SECRET` est unique et sécurisé
 - [ ] Configurer les variables de base de données
 
+### 1.1 Problème PostgreSQL "unhealthy"
+
+Si vous rencontrez l'erreur `dependency failed to start: container postgres is unhealthy` :
+
+**Solution 1 : Supprimer le volume PostgreSQL corrompu**
+```bash
+# Dans Coolify, aller dans l'onglet Storages/Volumes
+# Supprimer le volume postgres_data
+# Redéployer l'application
+```
+
+**Solution 2 : Augmenter le timeout du healthcheck**
+Le docker-compose.yaml a été mis à jour avec un healthcheck plus robuste :
+- `start_period: 30s` - Donne 30 secondes à PostgreSQL pour démarrer
+- `retries: 10` - Augmente le nombre de tentatives
+- `timeout: 10s` - Augmente le timeout de chaque check
+
+Si le problème persiste, vérifiez les logs PostgreSQL dans Coolify pour identifier la cause exacte.
+
 ### 2. Déployer l'application
 
 - [ ] Push le code sur Git

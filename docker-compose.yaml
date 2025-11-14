@@ -20,10 +20,11 @@ services:
     expose:
       - "5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-airboard}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-airboard} -d ${DB_NAME:-airboard}"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
   # Backend Go API
   backend:
@@ -40,6 +41,7 @@ services:
       - DB_NAME=${DB_NAME:-airboard}
       - JWT_SECRET=${JWT_SECRET:-airboard-super-secret-key-2024}
       - GIN_MODE=release
+      - PUBLIC_URL=${PUBLIC_URL:-http://localhost:5173}
       - SSO_ENABLED=${SSO_ENABLED:-true}
       - SSO_AUTO_PROVISION=${SSO_AUTO_PROVISION:-true}
       - SSO_DEFAULT_ROLE=${SSO_DEFAULT_ROLE:-user}
