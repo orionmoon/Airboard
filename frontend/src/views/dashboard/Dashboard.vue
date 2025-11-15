@@ -111,58 +111,71 @@
     </div>
 
     <!-- Groupes d'applications -->
-    <div v-else class="space-y-8">
+    <div v-else class="space-y-6">
       <div
         v-for="appGroup in dashboard.app_groups"
         :key="appGroup.id"
-        class="fade-in"
+        class="app-group-container fade-in"
       >
-        <!-- En-tête du groupe -->
-        <div class="flex items-center space-x-3 mb-6">
-          <div 
-            class="h-10 w-10 rounded-lg flex items-center justify-center shadow-sm"
-            :style="{ backgroundColor: appGroup.color || '#10b981' }"
-          >
-            <Icon :icon="appGroup.icon || 'mdi:folder'" class="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-              {{ appGroup.name }}
-            </h2>
-            <p v-if="appGroup.description" class="text-sm text-gray-600 dark:text-gray-400">
-              {{ appGroup.description }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Applications du groupe - version simple et sobre -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          <div
-            v-for="app in appGroup.applications"
-            :key="app.id"
-            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 cursor-pointer transition-all duration-150 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md hover:-translate-y-0.5"
-            @click="openApplication(app)"
-          >
-            <!-- Entête: icône + titre alignés -->
-            <div class="flex items-center gap-2">
-              <div 
-                class="h-10 w-10 rounded-lg flex items-center justify-center"
-                :style="{ backgroundColor: app.color || '#6366f1' }"
-              >
-                <Icon :icon="app.icon || 'mdi:application'" class="h-5 w-5 text-white" />
-              </div>
-              <h3 class="font-semibold text-gray-900 dark:text-white text-sm leading-tight flex-1 truncate">
-                {{ app.name }}
-              </h3>
-              <Icon v-if="app.open_in_new_tab" icon="mdi:open-in-new" class="h-4 w-4 text-gray-500 dark:text-gray-400" />
+        <!-- En-tête du groupe (cliquable pour collapse) -->
+        <div
+          class="app-group-header"
+          @click="toggleGroup(appGroup.id)"
+        >
+          <div class="flex items-center space-x-3 flex-1">
+            <div
+              class="h-10 w-10 rounded-lg flex items-center justify-center shadow-sm"
+              :style="{ backgroundColor: appGroup.color || '#10b981' }"
+            >
+              <Icon :icon="appGroup.icon || 'mdi:folder'" class="h-5 w-5 text-white" />
             </div>
-
-            <!-- Description sous le titre -->
-            <p v-if="app.description" class="text-xs text-gray-600 dark:text-gray-400 mt-2">
-              {{ app.description }}
-            </p>
+            <div class="flex-1">
+              <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                {{ appGroup.name }}
+              </h2>
+              <p v-if="appGroup.description" class="text-sm text-gray-600 dark:text-gray-400">
+                {{ appGroup.description }}
+              </p>
+            </div>
           </div>
+          <Icon
+            :icon="isGroupCollapsed(appGroup.id) ? 'mdi:chevron-down' : 'mdi:chevron-up'"
+            class="h-6 w-6 text-gray-500 dark:text-gray-400 transition-transform duration-300"
+          />
         </div>
+
+        <!-- Applications du groupe (collapsible) -->
+        <transition name="collapse">
+          <div v-show="!isGroupCollapsed(appGroup.id)" class="app-group-content">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              <div
+                v-for="app in appGroup.applications"
+                :key="app.id"
+                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 cursor-pointer transition-all duration-150 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md hover:-translate-y-0.5"
+                @click="openApplication(app)"
+              >
+                <!-- Entête: icône + titre alignés -->
+                <div class="flex items-center gap-2">
+                  <div
+                    class="h-10 w-10 rounded-lg flex items-center justify-center"
+                    :style="{ backgroundColor: app.color || '#6366f1' }"
+                  >
+                    <Icon :icon="app.icon || 'mdi:application'" class="h-5 w-5 text-white" />
+                  </div>
+                  <h3 class="font-semibold text-gray-900 dark:text-white text-sm leading-tight flex-1 truncate">
+                    {{ app.name }}
+                  </h3>
+                  <Icon v-if="app.open_in_new_tab" icon="mdi:open-in-new" class="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                </div>
+
+                <!-- Description sous le titre -->
+                <p v-if="app.description" class="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                  {{ app.description }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </transition>
       </div>
     </div>
   </div>
@@ -182,6 +195,43 @@ const appStore = useAppStore()
 const dashboard = ref(null)
 const appSettings = ref({})
 const isLoading = ref(false)
+const collapsedGroups = ref(new Set())
+
+// Charger les groupes effondrés depuis le localStorage
+const loadCollapsedGroups = () => {
+  try {
+    const saved = localStorage.getItem('airboard_collapsed_groups')
+    if (saved) {
+      collapsedGroups.value = new Set(JSON.parse(saved))
+    }
+  } catch (error) {
+    console.error('Error loading collapsed groups:', error)
+  }
+}
+
+// Sauvegarder les groupes effondrés dans le localStorage
+const saveCollapsedGroups = () => {
+  try {
+    localStorage.setItem('airboard_collapsed_groups', JSON.stringify([...collapsedGroups.value]))
+  } catch (error) {
+    console.error('Error saving collapsed groups:', error)
+  }
+}
+
+// Toggle un groupe
+const toggleGroup = (groupId) => {
+  if (collapsedGroups.value.has(groupId)) {
+    collapsedGroups.value.delete(groupId)
+  } else {
+    collapsedGroups.value.add(groupId)
+  }
+  saveCollapsedGroups()
+}
+
+// Vérifier si un groupe est effondré
+const isGroupCollapsed = (groupId) => {
+  return collapsedGroups.value.has(groupId)
+}
 
 // Fonctions
 const uniqueById = (items) => {
@@ -265,6 +315,7 @@ watch(() => appStore.settingsLastUpdated, async () => {
 
 // Lifecycle
 onMounted(async () => {
+  loadCollapsedGroups()
   await Promise.all([
     loadDashboard(),
     loadAppSettings()
@@ -273,6 +324,35 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* Conteneur de groupe d'applications */
+.app-group-container {
+  @apply bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden;
+}
+
+/* En-tête de groupe (cliquable) */
+.app-group-header {
+  @apply flex items-center justify-between p-5 cursor-pointer transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700;
+}
+
+/* Contenu du groupe */
+.app-group-content {
+  @apply p-5;
+}
+
+/* Transitions pour le collapse */
+.collapse-enter-active,
+.collapse-leave-active {
+  transition: all 0.3s ease;
+  max-height: 2000px;
+  overflow: hidden;
+}
+
+.collapse-enter-from,
+.collapse-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
 /* Cartes d'applications améliorées */
 .app-card {
   @apply relative bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 transition-all duration-200 hover:border-green-500 dark:hover:border-green-500 hover:shadow-xl hover:-translate-y-1 flex flex-col;

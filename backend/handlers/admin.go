@@ -638,6 +638,131 @@ func (h *AdminHandler) DeleteUser(c *gin.Context) {
 	})
 }
 
+// GetDeletedUsers récupère tous les utilisateurs supprimés (soft deleted)
+func (h *AdminHandler) GetDeletedUsers(c *gin.Context) {
+	var users []models.User
+
+	// Utiliser Unscoped() pour voir les enregistrements soft deleted
+	if err := h.db.Unscoped().Where("deleted_at IS NOT NULL").Preload("Groups").Find(&users).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Error:   "Internal Server Error",
+			Message: "Erreur lors de la récupération des utilisateurs supprimés",
+			Code:    http.StatusInternalServerError,
+		})
+		return
+	}
+
+	// Masquer les mots de passe
+	for i := range users {
+		users[i].Password = ""
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"users": users,
+	})
+}
+
+// RestoreUser restaure un utilisateur supprimé
+func (h *AdminHandler) RestoreUser(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Error:   "Bad Request",
+			Message: "ID invalide",
+			Code:    http.StatusBadRequest,
+		})
+		return
+	}
+
+	// Trouver l'utilisateur supprimé
+	var user models.User
+	if err := h.db.Unscoped().First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, models.ErrorResponse{
+			Error:   "Not Found",
+			Message: "Utilisateur non trouvé",
+			Code:    http.StatusNotFound,
+		})
+		return
+	}
+
+	// Vérifier qu'il est bien supprimé
+	if user.DeletedAt.Time.IsZero() {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Error:   "Bad Request",
+			Message: "Cet utilisateur n'est pas supprimé",
+			Code:    http.StatusBadRequest,
+		})
+		return
+	}
+
+	// Restaurer l'utilisateur
+	user.DeletedAt = gorm.DeletedAt{}
+	if err := h.db.Unscoped().Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Error:   "Internal Server Error",
+			Message: "Erreur lors de la restauration",
+			Code:    http.StatusInternalServerError,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, models.SuccessResponse{
+		Message: "Utilisateur restauré avec succès",
+		Data:    user,
+	})
+}
+
+// PermanentlyDeleteUser supprime définitivement un utilisateur
+func (h *AdminHandler) PermanentlyDeleteUser(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Error:   "Bad Request",
+			Message: "ID invalide",
+			Code:    http.StatusBadRequest,
+		})
+		return
+	}
+
+	// Trouver l'utilisateur supprimé
+	var user models.User
+	if err := h.db.Unscoped().First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, models.ErrorResponse{
+			Error:   "Not Found",
+			Message: "Utilisateur non trouvé",
+			Code:    http.StatusNotFound,
+		})
+		return
+	}
+
+	// Vérifier qu'il est bien supprimé
+	if user.DeletedAt.Time.IsZero() {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Error:   "Bad Request",
+			Message: "Cet utilisateur doit d'abord être supprimé",
+			Code:    http.StatusBadRequest,
+		})
+		return
+	}
+
+	// Supprimer définitivement les associations
+	h.db.Unscoped().Model(&user).Association("Groups").Clear()
+
+	// Supprimer définitivement
+	if err := h.db.Unscoped().Delete(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Error:   "Internal Server Error",
+			Message: "Erreur lors de la suppression définitive",
+			Code:    http.StatusInternalServerError,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, models.SuccessResponse{
+		Message: "Utilisateur supprimé définitivement",
+	})
+}
+
 // @Summary Assigner un utilisateur à des groupes
 // @Description Assigne un utilisateur à des groupes d'utilisateurs (admin uniquement)
 // @Tags Admin

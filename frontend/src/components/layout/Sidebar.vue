@@ -1,5 +1,5 @@
 <template>
-  <aside class="sidebar">
+  <aside :class="['sidebar', { 'sidebar-open': appStore.sidebarOpen }]">
     <!-- Header -->
     <div class="sidebar-header">
       <div class="flex items-center gap-3">
@@ -117,10 +117,10 @@
           :value="appStore.locale"
           @change="onChangeLocale($event.target.value)"
         >
-          <option value="fr">{{ $t('common.language_fr') }}</option>
+          <option value="ar">{{ $t('common.language_ar') }}</option>
           <option value="en">{{ $t('common.language_en') }}</option>
           <option value="es">{{ $t('common.language_es') }}</option>
-          <option value="ar">{{ $t('common.language_ar') }}</option>
+          <option value="fr">{{ $t('common.language_fr') }}</option>
         </select>
       </div>
 

@@ -119,6 +119,9 @@ func main() {
 			admin.POST("/users", adminHandler.CreateUser)
 			admin.PUT("/users/:id", adminHandler.UpdateUser)
 			admin.DELETE("/users/:id", adminHandler.DeleteUser)
+			admin.GET("/users/deleted", adminHandler.GetDeletedUsers)
+			admin.POST("/users/:id/restore", adminHandler.RestoreUser)
+			admin.DELETE("/users/:id/permanent", adminHandler.PermanentlyDeleteUser)
 
 			// Gestion des groupes d'utilisateurs
 			admin.GET("/groups", adminHandler.GetGroups)

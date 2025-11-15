@@ -260,6 +260,22 @@ export const adminService = {
   async updateOAuthProvider(id, data) {
     const response = await api.put(`/admin/oauth/providers/${id}`, data)
     return response.data
+  },
+
+  // Deleted Users Management
+  async getDeletedUsers() {
+    const response = await api.get('/admin/users/deleted')
+    return response.data
+  },
+
+  async restoreUser(id) {
+    const response = await api.post(`/admin/users/${id}/restore`)
+    return response.data
+  },
+
+  async permanentlyDeleteUser(id) {
+    const response = await api.delete(`/admin/users/${id}/permanent`)
+    return response.data
   }
 }
 

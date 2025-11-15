@@ -77,13 +77,14 @@
           <p v-if="app.description" class="text-sm mb-3">{{ app.description }}</p>
           
           <div class="mb-3">
-            <a 
-              :href="app.url" 
+            <a
+              :href="app.url"
               :target="app.open_in_new_tab ? '_blank' : '_self'"
-              class="text-sm text-green-400 hover:text-green-300 break-all flex items-center space-x-1"
+              class="text-sm text-green-400 hover:text-green-300 flex items-center space-x-1 group"
+              :title="app.url"
             >
-              <span>{{ app.url }}</span>
-              <Icon v-if="app.open_in_new_tab" icon="mdi:open-in-new" class="h-3 w-3" />
+              <span class="truncate">{{ app.url }}</span>
+              <Icon v-if="app.open_in_new_tab" icon="mdi:open-in-new" class="h-3 w-3 flex-shrink-0" />
             </a>
           </div>
           
