@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 const Dashboard = () => import('@/views/dashboard/Dashboard.vue')
 const Login = () => import('@/views/auth/Login.vue')
 const Register = () => import('@/views/auth/Register.vue')
+const OAuthCallback = () => import('@/views/auth/OAuthCallback.vue')
 
 // Admin views
 const AdminDashboard = () => import('@/views/admin/AdminDashboard.vue')
@@ -44,9 +45,17 @@ const routes = [
     path: '/auth/register',
     name: 'Register',
     component: Register,
-    meta: { 
+    meta: {
       requiresGuest: true,
       title: 'Inscription'
+    }
+  },
+  {
+    path: '/auth/oauth/:provider/callback',
+    name: 'OAuthCallback',
+    component: OAuthCallback,
+    meta: {
+      title: 'Authentification OAuth'
     }
   },
   {
