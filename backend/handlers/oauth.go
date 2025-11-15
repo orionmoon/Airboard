@@ -360,9 +360,14 @@ func (h *OAuthHandler) findOrCreateOAuthUser(providerName string, userInfo map[s
 		return models.User{}, fmt.Errorf("missing required user information")
 	}
 
-	// Chercher l'utilisateur existant
+	// Chercher l'utilisateur existant par email d'abord, puis par SSO
 	var user models.User
-	err := h.db.Where("email = ? OR (sso_provider = ? AND sso_id = ?)", email, providerName, ssoID).First(&user).Error
+	err := h.db.Where("email = ?", email).First(&user).Error
+
+	if err == gorm.ErrRecordNotFound {
+		// Chercher par SSO ID si pas trouvé par email
+		err = h.db.Where("sso_provider = ? AND sso_id = ?", providerName, ssoID).First(&user).Error
+	}
 
 	if err == gorm.ErrRecordNotFound {
 		// Créer un nouvel utilisateur
@@ -405,8 +410,17 @@ func (h *OAuthHandler) findOrCreateOAuthUser(providerName string, userInfo map[s
 	} else if err != nil {
 		return models.User{}, err
 	} else {
-		// Mettre à jour les informations si nécessaire
+		// Utilisateur existant trouvé - mettre à jour les informations
 		updated := false
+
+		// Mettre à jour les infos SSO si l'utilisateur était créé manuellement
+		if user.SSOProvider == "" || user.SSOID == "" {
+			user.SSOProvider = providerName
+			user.SSOID = ssoID
+			updated = true
+			log.Printf("[OAuth] Linking existing user %s to %s SSO", user.Email, providerName)
+		}
+
 		if user.FirstName != firstName && firstName != "" {
 			user.FirstName = firstName
 			updated = true
@@ -415,6 +429,7 @@ func (h *OAuthHandler) findOrCreateOAuthUser(providerName string, userInfo map[s
 			user.LastName = lastName
 			updated = true
 		}
+
 		if updated {
 			h.db.Save(&user)
 		}
