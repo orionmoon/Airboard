@@ -258,7 +258,7 @@ import { Icon } from '@iconify/vue'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
 import { useFavoritesStore } from '@/stores/favorites'
-import { dashboardService, adminService } from '@/services/api'
+import { dashboardService, adminService, analyticsService } from '@/services/api'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
@@ -369,7 +369,11 @@ const loadAppSettings = async () => {
   }
 }
 
-const openApplication = (app) => {
+const openApplication = async (app) => {
+  // Track click for analytics (non-bloquant)
+  analyticsService.trackClick(app.id)
+
+  // Ouvrir l'application
   if (app.open_in_new_tab) {
     window.open(app.url, '_blank', 'noopener,noreferrer')
   } else {

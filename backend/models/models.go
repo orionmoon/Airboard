@@ -213,3 +213,51 @@ type OAuthProviderPublic struct {
 	IsEnabled    bool   `json:"is_enabled"`
 	RedirectURI  string `json:"redirect_uri"`
 }
+
+// ApplicationClick représente un clic sur une application pour les analytics
+type ApplicationClick struct {
+	ID            uint      `json:"id" gorm:"primaryKey"`
+	UserID        uint      `json:"user_id"`
+	ApplicationID uint      `json:"application_id"`
+	ClickedAt     time.Time `json:"clicked_at"`
+
+	// Relations
+	User        User        `json:"user,omitempty"`
+	Application Application `json:"application,omitempty"`
+}
+
+// Analytics response structures
+type ApplicationStats struct {
+	ApplicationID   uint   `json:"application_id"`
+	ApplicationName string `json:"application_name"`
+	Icon            string `json:"icon"`
+	Color           string `json:"color"`
+	ClickCount      int64  `json:"click_count"`
+	UniqueUsers     int64  `json:"unique_users"`
+}
+
+type UserStats struct {
+	UserID       uint   `json:"user_id"`
+	Username     string `json:"username"`
+	FirstName    string `json:"first_name"`
+	LastName     string `json:"last_name"`
+	ClickCount   int64  `json:"click_count"`
+	UniqueApps   int64  `json:"unique_apps"`
+	LastActivity string `json:"last_activity"`
+}
+
+type DailyStats struct {
+	Date       string `json:"date"`
+	ClickCount int64  `json:"click_count"`
+	UniqueUsers int64 `json:"unique_users"`
+}
+
+type AnalyticsDashboard struct {
+	TotalClicks         int64              `json:"total_clicks"`
+	TotalUniqueUsers    int64              `json:"total_unique_users"`
+	TopApplications     []ApplicationStats `json:"top_applications"`
+	TopUsers            []UserStats        `json:"top_users"`
+	DailyActivity       []DailyStats       `json:"daily_activity"`
+	ClicksLast7Days     int64              `json:"clicks_last_7_days"`
+	ClicksLast30Days    int64              `json:"clicks_last_30_days"`
+}

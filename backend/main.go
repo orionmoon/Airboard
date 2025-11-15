@@ -35,6 +35,7 @@ func main() {
 		&models.Application{},
 		&models.AppSettings{},
 		&models.OAuthProvider{},
+		&models.ApplicationClick{},
 	); err != nil {
 		log.Fatal("Erreur lors des migrations:", err)
 	}
@@ -53,6 +54,7 @@ func main() {
 	settingsHandler := handlers.NewSettingsHandler(db)
 	oauthHandler := handlers.NewOAuthHandler(db, authMiddleware)
 	favoritesHandler := handlers.NewFavoritesHandler(db)
+	analyticsHandler := handlers.NewAnalyticsHandler(db)
 
 	// Configuration du routeur
 	router := gin.Default()
@@ -108,6 +110,12 @@ func main() {
 			user.GET("/favorites/:id/check", favoritesHandler.IsFavorite)
 		}
 
+		// Routes analytics (tracking accessible à tous les utilisateurs connectés)
+		analytics := protected.Group("/analytics")
+		{
+			analytics.POST("/track", analyticsHandler.TrackClick)
+		}
+
 		// Routes admin
 		admin := protected.Group("/admin")
 		admin.Use(authMiddleware.RequireAdmin())
@@ -147,6 +155,11 @@ func main() {
 			// Gestion des fournisseurs OAuth
 			admin.GET("/oauth/providers", oauthHandler.GetAllProviders)
 			admin.PUT("/oauth/providers/:id", oauthHandler.UpdateProvider)
+
+			// Analytics (réservé aux admins)
+			admin.GET("/analytics/dashboard", analyticsHandler.GetDashboard)
+			admin.GET("/analytics/applications/:id", analyticsHandler.GetApplicationStats)
+			admin.GET("/analytics/users/:id", analyticsHandler.GetUserStats)
 
 			// Gestion de la base de données
 			admin.POST("/database/reset", adminHandler.ResetDatabase)

@@ -322,4 +322,33 @@ export const favoritesService = {
   }
 }
 
+// Analytics Service
+export const analyticsService = {
+  async trackClick(applicationId) {
+    try {
+      const response = await api.post('/analytics/track', { application_id: applicationId })
+      return response.data
+    } catch (error) {
+      // Ne pas bloquer l'application si le tracking échoue
+      console.error('Error tracking click:', error)
+      return null
+    }
+  },
+
+  async getDashboard() {
+    const response = await api.get('/admin/analytics/dashboard')
+    return response.data
+  },
+
+  async getApplicationStats(applicationId) {
+    const response = await api.get(`/admin/analytics/applications/${applicationId}`)
+    return response.data
+  },
+
+  async getUserStats(userId) {
+    const response = await api.get(`/admin/analytics/users/${userId}`)
+    return response.data
+  }
+}
+
 export default api
