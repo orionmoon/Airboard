@@ -261,3 +261,29 @@ type AnalyticsDashboard struct {
 	ClicksLast7Days     int64              `json:"clicks_last_7_days"`
 	ClicksLast30Days    int64              `json:"clicks_last_30_days"`
 }
+
+// Announcement représente une annonce/actualité affichée sur le dashboard
+type Announcement struct {
+	ID          uint           `json:"id" gorm:"primaryKey"`
+	Title       string         `json:"title" gorm:"not null"`
+	Content     string         `json:"content" gorm:"type:text"`
+	Type        string         `json:"type" gorm:"default:'info'"` // info, warning, success, error
+	Priority    int            `json:"priority" gorm:"default:0"`  // Plus élevé = plus important
+	IsActive    bool           `json:"is_active" gorm:"default:true"`
+	StartDate   *time.Time     `json:"start_date"`  // Date de début d'affichage (optionnel)
+	EndDate     *time.Time     `json:"end_date"`    // Date de fin d'affichage (optionnel)
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`
+}
+
+// AnnouncementRequest pour les requêtes de création/mise à jour
+type AnnouncementRequest struct {
+	Title    string     `json:"title" binding:"required,min=1"`
+	Content  string     `json:"content"`
+	Type     string     `json:"type" binding:"required,oneof=info warning success error"`
+	Priority int        `json:"priority"`
+	IsActive bool       `json:"is_active"`
+	StartDate *time.Time `json:"start_date"`
+	EndDate   *time.Time `json:"end_date"`
+}

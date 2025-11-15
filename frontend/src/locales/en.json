@@ -36,7 +36,8 @@
     "addToFavorites": "Add to favorites",
     "removeFromFavorites": "Remove from favorites",
     "noFavorites": "No favorites yet",
-    "analytics": "Analytics"
+    "analytics": "Analytics",
+    "announcements": "Announcements"
   },
   "groups": {
     "title": "User groups",
@@ -202,6 +203,34 @@
     "noData": "No data available",
     "noAnalytics": "No Analytics Data",
     "noAnalyticsText": "Start using applications to see analytics data here."
+  },
+  "announcements": {
+    "title": "Announcements",
+    "subtitle": "Manage announcements displayed on the dashboard",
+    "new": "New Announcement",
+    "create": "Create Announcement",
+    "edit": "Edit Announcement",
+    "titleField": "Title",
+    "contentField": "Content",
+    "typeField": "Type",
+    "priorityField": "Priority",
+    "startDateField": "Start Date",
+    "endDateField": "End Date",
+    "isActive": "Active Announcement",
+    "type_info": "Information",
+    "type_warning": "Warning",
+    "type_success": "Success",
+    "type_error": "Error",
+    "priority": "Priority",
+    "startDate": "Start",
+    "endDate": "End",
+    "created": "Created",
+    "emptyTitle": "No Announcements",
+    "emptyText": "Create your first announcement to inform your users.",
+    "confirmDeleteTitle": "Delete Announcement",
+    "confirmDeleteText": "Are you sure you want to delete the announcement \"{title}\"?",
+    "saving": "Saving...",
+    "deleting": "Deleting..."
   }
 
 }

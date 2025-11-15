@@ -31,7 +31,9 @@
     "addToFavorites": "Añadir a favoritos",
     "removeFromFavorites": "Quitar de favoritos",
     "noFavorites": "Aún no hay favoritos",
-    "analytics": "Analíticas"
+    "analytics": "Analíticas",
+    "announcements": "Anuncios",
+    "save": "Guardar"
   },
   "groups": {
     "title": "Grupos de usuarios",
@@ -166,6 +168,34 @@
     "noData": "No hay datos disponibles",
     "noAnalytics": "Sin datos de analíticas",
     "noAnalyticsText": "Comienza a usar las aplicaciones para ver las estadísticas aquí."
+  },
+  "announcements": {
+    "title": "Anuncios",
+    "subtitle": "Gestione los anuncios mostrados en el panel",
+    "new": "Nuevo Anuncio",
+    "create": "Crear Anuncio",
+    "edit": "Editar Anuncio",
+    "titleField": "Título",
+    "contentField": "Contenido",
+    "typeField": "Tipo",
+    "priorityField": "Prioridad",
+    "startDateField": "Fecha de inicio",
+    "endDateField": "Fecha de fin",
+    "isActive": "Anuncio activo",
+    "type_info": "Información",
+    "type_warning": "Advertencia",
+    "type_success": "Éxito",
+    "type_error": "Error",
+    "priority": "Prioridad",
+    "startDate": "Inicio",
+    "endDate": "Fin",
+    "created": "Creado",
+    "emptyTitle": "Sin anuncios",
+    "emptyText": "Cree su primer anuncio para informar a sus usuarios.",
+    "confirmDeleteTitle": "Eliminar Anuncio",
+    "confirmDeleteText": "¿Está seguro de que desea eliminar el anuncio \"{title}\"?",
+    "saving": "Guardando...",
+    "deleting": "Eliminando..."
   }
 }
 

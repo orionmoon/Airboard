@@ -14,6 +14,7 @@ const ApplicationsManagement = () => import('@/views/admin/ApplicationsManagemen
 const UsersManagement = () => import('@/views/admin/UsersManagement.vue')
 const GroupsManagement = () => import('@/views/admin/GroupsManagement.vue')
 const Analytics = () => import('@/views/admin/Analytics.vue')
+const AnnouncementsManagement = () => import('@/views/admin/AnnouncementsManagement.vue')
 
 // Error views
 const NotFound = () => import('@/views/errors/NotFound.vue')
@@ -137,6 +138,16 @@ const routes = [
       requiresAuth: true,
       requiresAdmin: true,
       title: 'Analytics'
+    }
+  },
+  {
+    path: '/admin/announcements',
+    name: 'AdminAnnouncements',
+    component: AnnouncementsManagement,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Announcements'
     }
   },
   {

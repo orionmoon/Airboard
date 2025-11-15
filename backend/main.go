@@ -36,6 +36,7 @@ func main() {
 		&models.AppSettings{},
 		&models.OAuthProvider{},
 		&models.ApplicationClick{},
+		&models.Announcement{},
 	); err != nil {
 		log.Fatal("Erreur lors des migrations:", err)
 	}
@@ -55,6 +56,7 @@ func main() {
 	oauthHandler := handlers.NewOAuthHandler(db, authMiddleware)
 	favoritesHandler := handlers.NewFavoritesHandler(db)
 	analyticsHandler := handlers.NewAnalyticsHandler(db)
+	announcementHandler := handlers.NewAnnouncementHandler(db)
 
 	// Configuration du routeur
 	router := gin.Default()
@@ -116,6 +118,9 @@ func main() {
 			analytics.POST("/track", analyticsHandler.TrackClick)
 		}
 
+		// Routes announcements (accessible à tous les utilisateurs connectés)
+		protected.GET("/announcements", announcementHandler.GetActiveAnnouncements)
+
 		// Routes admin
 		admin := protected.Group("/admin")
 		admin.Use(authMiddleware.RequireAdmin())
@@ -160,6 +165,13 @@ func main() {
 			admin.GET("/analytics/dashboard", analyticsHandler.GetDashboard)
 			admin.GET("/analytics/applications/:id", analyticsHandler.GetApplicationStats)
 			admin.GET("/analytics/users/:id", analyticsHandler.GetUserStats)
+
+			// Gestion des annonces (réservé aux admins)
+			admin.GET("/announcements", announcementHandler.GetAllAnnouncements)
+			admin.GET("/announcements/:id", announcementHandler.GetAnnouncement)
+			admin.POST("/announcements", announcementHandler.CreateAnnouncement)
+			admin.PUT("/announcements/:id", announcementHandler.UpdateAnnouncement)
+			admin.DELETE("/announcements/:id", announcementHandler.DeleteAnnouncement)
 
 			// Gestion de la base de données
 			admin.POST("/database/reset", adminHandler.ResetDatabase)

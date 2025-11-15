@@ -31,7 +31,9 @@
     "addToFavorites": "Ajouter aux favoris",
     "removeFromFavorites": "Retirer des favoris",
     "noFavorites": "Aucun favori pour le moment",
-    "analytics": "Analytiques"
+    "analytics": "Analytiques",
+    "announcements": "Annonces",
+    "save": "Enregistrer"
   },
   "groups": {
     "title": "Groupes d'utilisateurs",
@@ -166,6 +168,34 @@
     "noData": "Aucune donnée disponible",
     "noAnalytics": "Aucune donnée d'analyse",
     "noAnalyticsText": "Commencez à utiliser les applications pour voir les statistiques ici."
+  },
+  "announcements": {
+    "title": "Annonces",
+    "subtitle": "Gérez les annonces affichées sur le tableau de bord",
+    "new": "Nouvelle annonce",
+    "create": "Créer une annonce",
+    "edit": "Modifier l'annonce",
+    "titleField": "Titre",
+    "contentField": "Contenu",
+    "typeField": "Type",
+    "priorityField": "Priorité",
+    "startDateField": "Date de début",
+    "endDateField": "Date de fin",
+    "isActive": "Annonce active",
+    "type_info": "Information",
+    "type_warning": "Avertissement",
+    "type_success": "Succès",
+    "type_error": "Erreur",
+    "priority": "Priorité",
+    "startDate": "Début",
+    "endDate": "Fin",
+    "created": "Créé",
+    "emptyTitle": "Aucune annonce",
+    "emptyText": "Créez votre première annonce pour informer vos utilisateurs.",
+    "confirmDeleteTitle": "Supprimer l'annonce",
+    "confirmDeleteText": "Êtes-vous sûr de vouloir supprimer l'annonce \"{title}\" ?",
+    "saving": "Enregistrement...",
+    "deleting": "Suppression..."
   }
 
 }

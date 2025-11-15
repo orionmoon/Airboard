@@ -31,7 +31,9 @@
     "addToFavorites": "إضافة إلى المفضلة",
     "removeFromFavorites": "إزالة من المفضلة",
     "noFavorites": "لا توجد مفضلات بعد",
-    "analytics": "التحليلات"
+    "analytics": "التحليلات",
+    "announcements": "الإعلانات",
+    "save": "حفظ"
   },
   "groups": {
     "title": "مجموعات المستخدمين",
@@ -166,6 +168,34 @@
     "noData": "لا توجد بيانات متاحة",
     "noAnalytics": "لا توجد بيانات تحليلية",
     "noAnalyticsText": "ابدأ استخدام التطبيقات لرؤية الإحصائيات هنا."
+  },
+  "announcements": {
+    "title": "الإعلانات",
+    "subtitle": "إدارة الإعلانات المعروضة على لوحة التحكم",
+    "new": "إعلان جديد",
+    "create": "إنشاء إعلان",
+    "edit": "تعديل الإعلان",
+    "titleField": "العنوان",
+    "contentField": "المحتوى",
+    "typeField": "النوع",
+    "priorityField": "الأولوية",
+    "startDateField": "تاريخ البدء",
+    "endDateField": "تاريخ الانتهاء",
+    "isActive": "إعلان نشط",
+    "type_info": "معلومات",
+    "type_warning": "تحذير",
+    "type_success": "نجاح",
+    "type_error": "خطأ",
+    "priority": "الأولوية",
+    "startDate": "البدء",
+    "endDate": "الانتهاء",
+    "created": "أُنشئ",
+    "emptyTitle": "لا توجد إعلانات",
+    "emptyText": "أنشئ أول إعلان لإعلام المستخدمين.",
+    "confirmDeleteTitle": "حذف الإعلان",
+    "confirmDeleteText": "هل أنت متأكد من حذف الإعلان \"{title}\"؟",
+    "saving": "جارٍ الحفظ...",
+    "deleting": "جارٍ الحذف..."
   }
 }
 

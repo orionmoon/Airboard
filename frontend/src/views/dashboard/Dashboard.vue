@@ -112,6 +112,24 @@
 
     <!-- Groupes d'applications -->
     <div v-else class="space-y-6">
+      <!-- Announcements Section -->
+      <div v-if="activeAnnouncements.length > 0" class="space-y-3 mb-6">
+        <div
+          v-for="announcement in activeAnnouncements"
+          :key="announcement.id"
+          :class="getAnnouncementClass(announcement.type)"
+          class="rounded-lg p-4 border-l-4"
+        >
+          <div class="flex items-start gap-3">
+            <Icon :icon="getAnnouncementIcon(announcement.type)" class="h-5 w-5 flex-shrink-0 mt-0.5" />
+            <div class="flex-1">
+              <h3 class="font-semibold text-sm mb-1">{{ announcement.title }}</h3>
+              <p v-if="announcement.content" class="text-sm whitespace-pre-wrap">{{ announcement.content }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Mes Favoris Section -->
       <div v-if="favoriteApps.length > 0" class="app-group-container fade-in">
         <div class="app-group-header bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20">
@@ -258,7 +276,7 @@ import { Icon } from '@iconify/vue'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
 import { useFavoritesStore } from '@/stores/favorites'
-import { dashboardService, adminService, analyticsService } from '@/services/api'
+import { dashboardService, adminService, analyticsService, announcementsService } from '@/services/api'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
@@ -269,6 +287,7 @@ const dashboard = ref(null)
 const appSettings = ref({})
 const isLoading = ref(false)
 const collapsedGroups = ref(new Set())
+const activeAnnouncements = ref([])
 
 // Charger les groupes effondrés depuis le localStorage
 const loadCollapsedGroups = () => {
@@ -406,6 +425,37 @@ const favoriteApps = computed(() => {
   return allApps
 })
 
+// Load active announcements
+const loadAnnouncements = async () => {
+  try {
+    activeAnnouncements.value = await announcementsService.getActiveAnnouncements()
+  } catch (error) {
+    console.error('Error loading announcements:', error)
+  }
+}
+
+// Get announcement styling
+const getAnnouncementClass = (type) => {
+  const classes = {
+    info: 'bg-blue-50 dark:bg-blue-900/20 border-blue-500 text-blue-900 dark:text-blue-100',
+    warning: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-500 text-yellow-900 dark:text-yellow-100',
+    success: 'bg-green-50 dark:bg-green-900/20 border-green-500 text-green-900 dark:text-green-100',
+    error: 'bg-red-50 dark:bg-red-900/20 border-red-500 text-red-900 dark:text-red-100'
+  }
+  return classes[type] || classes.info
+}
+
+// Get announcement icon
+const getAnnouncementIcon = (type) => {
+  const icons = {
+    info: 'mdi:information',
+    warning: 'mdi:alert',
+    success: 'mdi:check-circle',
+    error: 'mdi:alert-circle'
+  }
+  return icons[type] || icons.info
+}
+
 // 🔧 FIX: Watcher pour les changements de settings
 watch(() => appStore.settingsLastUpdated, async () => {
   console.log('Settings updated, reloading dashboard settings...')
@@ -418,7 +468,8 @@ onMounted(async () => {
   await Promise.all([
     loadDashboard(),
     loadAppSettings(),
-    favoritesStore.loadFavorites()
+    favoritesStore.loadFavorites(),
+    loadAnnouncements()
   ])
 })
 </script>

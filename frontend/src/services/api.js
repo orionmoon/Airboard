@@ -351,4 +351,43 @@ export const analyticsService = {
   }
 }
 
+// Announcements Service
+export const announcementsService = {
+  // Public - Get active announcements for users
+  async getActiveAnnouncements() {
+    const response = await api.get('/announcements')
+    return response.data
+  },
+
+  // Admin - Get all announcements
+  async getAllAnnouncements() {
+    const response = await api.get('/admin/announcements')
+    return response.data
+  },
+
+  // Admin - Get single announcement
+  async getAnnouncement(id) {
+    const response = await api.get(`/admin/announcements/${id}`)
+    return response.data
+  },
+
+  // Admin - Create announcement
+  async createAnnouncement(data) {
+    const response = await api.post('/admin/announcements', data)
+    return response.data
+  },
+
+  // Admin - Update announcement
+  async updateAnnouncement(id, data) {
+    const response = await api.put(`/admin/announcements/${id}`, data)
+    return response.data
+  },
+
+  // Admin - Delete announcement
+  async deleteAnnouncement(id) {
+    const response = await api.delete(`/admin/announcements/${id}`)
+    return response.data
+  }
+}
+
 export default api

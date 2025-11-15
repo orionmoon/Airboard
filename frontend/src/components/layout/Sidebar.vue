@@ -98,6 +98,14 @@
           <Icon icon="mdi:chart-line" class="h-4 w-4" />
           <span>{{ $t('common.analytics') }}</span>
         </router-link>
+
+        <router-link
+          to="/admin/announcements"
+          :class="getLinkClasses('/admin/announcements')"
+        >
+          <Icon icon="mdi:bullhorn" class="h-4 w-4" />
+          <span>{{ $t('common.announcements') }}</span>
+        </router-link>
       </div>
     </nav>
 
