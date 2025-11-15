@@ -138,10 +138,10 @@
               class="app-card-favorite"
               @click="openApplication(app)"
             >
-              <!-- Star icon (top-right, absolute) -->
+              <!-- Star icon (bottom-right, absolute) -->
               <button
                 @click="toggleFavorite($event, app)"
-                class="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow-md"
+                class="absolute bottom-2 right-2 z-10 p-1.5 rounded-full bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow-md"
                 :title="$t('common.removeFromFavorites')"
               >
                 <Icon icon="mdi:star" class="h-4 w-4 text-yellow-500" />
@@ -212,10 +212,10 @@
                 class="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 cursor-pointer transition-all duration-150 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md hover:-translate-y-0.5"
                 @click="openApplication(app)"
               >
-                <!-- Star icon (top-right, absolute) -->
+                <!-- Star icon (bottom-right, absolute) -->
                 <button
                   @click="toggleFavorite($event, app)"
-                  class="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow-md"
+                  class="absolute bottom-2 right-2 z-10 p-1.5 rounded-full bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow-md"
                   :title="favoritesStore.isFavorite(app.id) ? $t('common.removeFromFavorites') : $t('common.addToFavorites')"
                 >
                   <Icon
