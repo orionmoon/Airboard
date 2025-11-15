@@ -100,7 +100,7 @@
               </tr>
             </thead>
             <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-              <tr v-for="user in filteredUsers" :key="user.id" class="hover:bg-gray-50 dark:hover:bg-gray-800">
+              <tr v-for="user in displayedUsers" :key="user.id" class="hover:bg-gray-50 dark:hover:bg-gray-800">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="h-10 w-10 rounded-full bg-primary-500 flex items-center justify-center">
@@ -122,8 +122,8 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex flex-wrap gap-1">
-                    <span 
-                      v-for="group in user.groups" 
+                    <span
+                      v-for="group in user.groups"
                       :key="group.id"
                       class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
                       :style="{ backgroundColor: group.color + '20', color: group.color }"
@@ -141,24 +141,42 @@
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div class="flex gap-2">
+                  <!-- Actions pour utilisateurs actifs -->
+                  <div v-if="!showDeleted" class="flex gap-2">
                     <button @click="editUser(user)" class="btn-ghost btn-sm" :title="$t('common.edit')">
                       <Icon icon="mdi:pencil" class="h-4 w-4" />
                     </button>
-                    <button 
-                      @click="toggleUserStatus(user)" 
+                    <button
+                      @click="toggleUserStatus(user)"
                       class="btn-ghost btn-sm"
                       :class="user.is_active ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700'"
                       :title="user.is_active ? $t('users.deactivate') : $t('users.activate')"
                     >
                       <Icon :icon="user.is_active ? 'mdi:account-off' : 'mdi:account-check'" class="h-4 w-4" />
                     </button>
-                    <button 
-                      @click="confirmDelete(user)" 
+                    <button
+                      @click="confirmDelete(user)"
                       class="btn-ghost btn-sm text-red-600 hover:text-red-700"
                       :title="$t('common.delete')"
                     >
                       <Icon icon="mdi:delete" class="h-4 w-4" />
+                    </button>
+                  </div>
+                  <!-- Actions pour utilisateurs supprimés -->
+                  <div v-else class="flex gap-2">
+                    <button
+                      @click="restoreUser(user)"
+                      class="btn-ghost btn-sm text-green-600 hover:text-green-700"
+                      title="Restaurer l'utilisateur"
+                    >
+                      <Icon icon="mdi:restore" class="h-4 w-4" />
+                    </button>
+                    <button
+                      @click="confirmPermanentDelete(user)"
+                      class="btn-ghost btn-sm text-red-600 hover:text-red-700"
+                      title="Supprimer définitivement (irréversible)"
+                    >
+                      <Icon icon="mdi:delete-forever" class="h-4 w-4" />
                     </button>
                   </div>
                 </td>
@@ -250,6 +268,8 @@ const appStore = useAppStore()
 
 // State
 const users = ref([])
+const deletedUsers = ref([])
+const showDeleted = ref(false)
 const showModal = ref(false)
 const selectedUser = ref(null)
 const showDeleteModal = ref(false)
@@ -289,6 +309,11 @@ const filteredUsers = computed(() => {
   return Array.isArray(filtered) ? filtered.sort((a, b) => a.username.localeCompare(b.username)) : []
 })
 
+// Computed pour afficher soit les utilisateurs actifs, soit les supprimés
+const displayedUsers = computed(() => {
+  return showDeleted.value ? deletedUsers.value : filteredUsers.value
+})
+
 // Methods
 const getUserInitials = (user) => {
   if (user.first_name && user.last_name) {
@@ -315,6 +340,16 @@ const loadUsers = async () => {
     appStore.showError('Erreur lors du chargement des utilisateurs')
   } finally {
     appStore.setLoading(false)
+  }
+}
+
+const loadDeletedUsers = async () => {
+  try {
+    const data = await adminService.getDeletedUsers()
+    deletedUsers.value = Array.isArray(data.users) ? data.users : []
+  } catch (error) {
+    console.error('Erreur lors du chargement des utilisateurs supprimés:', error)
+    deletedUsers.value = []
   }
 }
 
@@ -390,7 +425,7 @@ const deleteUser = async () => {
     console.error('Aucun utilisateur sélectionné pour suppression')
     return
   }
-  
+
   try {
     deleteLoading.value = true
     console.log('Suppression de l\'utilisateur:', userToDelete.value.id)
@@ -398,6 +433,7 @@ const deleteUser = async () => {
     appStore.showSuccess('Utilisateur supprimé avec succès')
     closeDeleteModal()
     await loadUsers()
+    await loadDeletedUsers()
   } catch (error) {
     console.error('Erreur lors de la suppression:', error)
     appStore.showError('Erreur lors de la suppression de l\'utilisateur')
@@ -406,8 +442,34 @@ const deleteUser = async () => {
   }
 }
 
+const restoreUser = async (user) => {
+  try {
+    await adminService.restoreUser(user.id)
+    appStore.showSuccess(`Utilisateur ${user.username} restauré avec succès`)
+    await loadUsers()
+    await loadDeletedUsers()
+  } catch (error) {
+    console.error('Erreur lors de la restauration:', error)
+    appStore.showError('Erreur lors de la restauration de l\'utilisateur')
+  }
+}
+
+const confirmPermanentDelete = async (user) => {
+  if (confirm(`⚠️ ATTENTION: Supprimer DÉFINITIVEMENT l'utilisateur "${user.username}" ?\n\nCette action est IRRÉVERSIBLE et supprimera toutes les données associées.`)) {
+    try {
+      await adminService.permanentlyDeleteUser(user.id)
+      appStore.showSuccess('Utilisateur supprimé définitivement')
+      await loadDeletedUsers()
+    } catch (error) {
+      console.error('Erreur lors de la suppression définitive:', error)
+      appStore.showError('Erreur lors de la suppression définitive')
+    }
+  }
+}
+
 // Lifecycle
 onMounted(() => {
   loadUsers()
+  loadDeletedUsers()
 })
 </script>
