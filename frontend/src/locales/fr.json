@@ -30,7 +30,8 @@
     "myFavorites": "Mes Favoris",
     "addToFavorites": "Ajouter aux favoris",
     "removeFromFavorites": "Retirer des favoris",
-    "noFavorites": "Aucun favori pour le moment"
+    "noFavorites": "Aucun favori pour le moment",
+    "analytics": "Analytiques"
   },
   "groups": {
     "title": "Groupes d'utilisateurs",
@@ -148,8 +149,25 @@
   "appGroups": {
     "subtitle": "Organisez vos applications en groupes",
     "new": "Nouveau groupe"
+  },
+  "analytics": {
+    "title": "Analytiques",
+    "subtitle": "Statistiques d'utilisation des applications",
+    "totalClicks": "Clics totaux",
+    "uniqueUsers": "Utilisateurs uniques",
+    "last7Days": "7 derniers jours",
+    "last30Days": "30 derniers jours",
+    "topApplications": "Applications les plus utilisées",
+    "topUsers": "Utilisateurs les plus actifs",
+    "dailyActivity": "Activité quotidienne (30 derniers jours)",
+    "clicks": "clics",
+    "users": "utilisateurs",
+    "apps": "apps",
+    "noData": "Aucune donnée disponible",
+    "noAnalytics": "Aucune donnée d'analyse",
+    "noAnalyticsText": "Commencez à utiliser les applications pour voir les statistiques ici."
   }
-  
+
 }
 
 

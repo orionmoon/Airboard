@@ -13,6 +13,7 @@ const AppGroupsManagement = () => import('@/views/admin/AppGroupsManagement.vue'
 const ApplicationsManagement = () => import('@/views/admin/ApplicationsManagement.vue')
 const UsersManagement = () => import('@/views/admin/UsersManagement.vue')
 const GroupsManagement = () => import('@/views/admin/GroupsManagement.vue')
+const Analytics = () => import('@/views/admin/Analytics.vue')
 
 // Error views
 const NotFound = () => import('@/views/errors/NotFound.vue')
@@ -126,6 +127,16 @@ const routes = [
       requiresAuth: true,
       requiresAdmin: true,
       title: 'OAuth Configuration'
+    }
+  },
+  {
+    path: '/admin/analytics',
+    name: 'AdminAnalytics',
+    component: Analytics,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Analytics'
     }
   },
   {

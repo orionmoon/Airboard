@@ -90,6 +90,14 @@
           <Icon icon="mdi:shield-key" class="h-4 w-4" />
           <span>{{ $t('common.oauth') }}</span>
         </router-link>
+
+        <router-link
+          to="/admin/analytics"
+          :class="getLinkClasses('/admin/analytics')"
+        >
+          <Icon icon="mdi:chart-line" class="h-4 w-4" />
+          <span>{{ $t('common.analytics') }}</span>
+        </router-link>
       </div>
     </nav>
 
