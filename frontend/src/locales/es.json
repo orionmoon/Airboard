@@ -122,9 +122,27 @@
     "resetButton": "Restablecer"
   },
   "admin": {
+    "overviewTitle": "Administración",
+    "overviewSubtitle": "Gestiona tu portal de aplicaciones y usuarios",
     "manageAppGroups": "Gestionar categorías de aplicaciones",
     "manageApplications": "Añadir y editar aplicaciones",
-    "manageUsers": "Gestionar cuentas de usuarios"
+    "manageUsers": "Gestionar cuentas de usuarios",
+    "manageGroups": "Gestionar permisos por grupos",
+    "dangerZone": "Zona de peligro",
+    "resetDatabaseTitle": "Restablece la base de datos para comenzar de nuevo con datos de demostración.",
+    "resetDatabaseWarning": "Advertencia: Esta acción eliminará permanentemente todos tus datos actuales.",
+    "resetDatabaseButton": "Restablecer base de datos",
+    "resetDatabaseInProgress": "Restableciendo en progreso...",
+    "confirmResetTitle": "Confirmar restablecimiento",
+    "confirmResetMessage": "¿Estás absolutamente seguro de que deseas restablecer la base de datos?",
+    "confirmResetWarning": "Todos los datos actuales se eliminarán permanentemente.",
+    "confirmResetButton": "Sí, restablecer",
+    "confirmResetCancel": "Cancelar",
+    "resetInProgress": "Restableciendo..."
+  },
+  "appGroups": {
+    "subtitle": "Organiza tus aplicaciones en grupos",
+    "new": "Nuevo grupo"
   }
 }
 

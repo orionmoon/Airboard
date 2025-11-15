@@ -4,10 +4,10 @@
       <!-- Header -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-          Administration
+          {{ $t('admin.overviewTitle') }}
         </h1>
         <p class="mt-1 text-gray-600 dark:text-gray-400">
-          Gérez votre portail applicatif et vos utilisateurs
+          {{ $t('admin.overviewSubtitle') }}
         </p>
       </div>
 
@@ -139,11 +139,11 @@
           </div>
           <div class="flex-1">
             <h3 class="text-lg font-semibold text-red-900 dark:text-red-100 mb-2">
-              Zone de danger
+              {{ $t('admin.dangerZone') }}
             </h3>
             <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">
-              Réinitialisez la base de données pour repartir sur une installation propre avec les données de démonstration.
-              <strong class="text-red-600 dark:text-red-400">Attention : Cette action supprimera toutes vos données actuelles de façon irréversible.</strong>
+              {{ $t('admin.resetDatabaseTitle') }}
+              <strong class="text-red-600 dark:text-red-400">{{ $t('admin.resetDatabaseWarning') }}</strong>
             </p>
             <button
               @click="showResetConfirmation = true"
@@ -151,8 +151,8 @@
               class="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
             >
               <Icon icon="mdi:database-refresh" class="h-5 w-5" />
-              <span v-if="!isResetting">Réinitialiser la base de données</span>
-              <span v-else>Réinitialisation en cours...</span>
+              <span v-if="!isResetting">{{ $t('admin.resetDatabaseButton') }}</span>
+              <span v-else>{{ $t('admin.resetDatabaseInProgress') }}</span>
             </button>
           </div>
         </div>
@@ -170,14 +170,14 @@
               <Icon icon="mdi:alert" class="h-6 w-6 text-red-600 dark:text-red-400" />
             </div>
             <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-              Confirmer la réinitialisation
+              {{ $t('admin.confirmResetTitle') }}
             </h3>
           </div>
 
           <p class="text-gray-700 dark:text-gray-300 mb-6">
-            Êtes-vous absolument sûr de vouloir réinitialiser la base de données ?
+            {{ $t('admin.confirmResetMessage') }}
             <strong class="text-red-600 dark:text-red-400 block mt-2">
-              Toutes les données actuelles seront définitivement supprimées.
+              {{ $t('admin.confirmResetWarning') }}
             </strong>
           </p>
 
@@ -186,14 +186,14 @@
               @click="showResetConfirmation = false"
               class="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
-              Annuler
+              {{ $t('admin.confirmResetCancel') }}
             </button>
             <button
               @click="handleResetDatabase"
               :disabled="isResetting"
               class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded-lg font-medium transition-colors"
             >
-              {{ isResetting ? 'Réinitialisation...' : 'Oui, réinitialiser' }}
+              {{ isResetting ? $t('admin.resetInProgress') : $t('admin.confirmResetButton') }}
             </button>
           </div>
         </div>

@@ -99,7 +99,7 @@
 
               <IconInput
                 v-model="form.app_icon"
-                label="{{ $t('settings.appIcon') }}"
+                :label="$t('settings.appIcon')"
                 placeholder="mdi:view-dashboard, lucide:layout-dashboard"
                 category="general"
                 :show-suggestions="true"

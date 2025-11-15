@@ -4,12 +4,12 @@
     <div class="page-header">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="page-title">App Groups</h1>
-          <p class="page-subtitle">Organize your applications into groups</p>
+          <h1 class="page-title">{{ $t('common.appGroups') }}</h1>
+          <p class="page-subtitle">{{ $t('appGroups.subtitle') }}</p>
         </div>
         <button @click="openCreateModal" class="btn btn-primary">
           <Icon icon="mdi:plus" class="h-4 w-4 mr-2" />
-          New Group
+          {{ $t('appGroups.new') }}
         </button>
       </div>
     </div>

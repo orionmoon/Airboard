@@ -194,11 +194,11 @@
               </div>
 
               <!-- Setup Instructions -->
-              <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+              <div class="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-500/30 rounded-lg p-4">
                 <div class="flex items-start gap-3">
-                  <Icon icon="mdi:information" class="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                  <div class="text-sm text-gray-300">
-                    <p class="font-medium text-white mb-2">{{ $t('oauth.setupInstructions') }}</p>
+                  <Icon icon="mdi:information" class="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                  <div class="text-sm text-gray-700 dark:text-gray-300">
+                    <p class="font-medium text-gray-900 dark:text-white mb-2">{{ $t('oauth.setupInstructions') }}</p>
                     <div v-if="selectedProvider.provider_name === 'google'">
                       <p class="mb-2">{{ $t('oauth.googleSetup1') }}</p>
                       <ol class="list-decimal list-inside space-y-1 text-xs">

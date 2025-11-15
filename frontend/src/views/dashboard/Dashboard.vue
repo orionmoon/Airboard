@@ -331,7 +331,7 @@ onMounted(async () => {
 
 /* En-tête de groupe (cliquable) */
 .app-group-header {
-  @apply flex items-center justify-between p-5 cursor-pointer transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700;
+  @apply flex items-center justify-between px-4 py-3 cursor-pointer transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700;
 }
 
 /* Contenu du groupe */

@@ -122,9 +122,27 @@
     "resetButton": "Réinitialiser"
   },
   "admin": {
+    "overviewTitle": "Administration",
+    "overviewSubtitle": "Gérez votre portail applicatif et vos utilisateurs",
     "manageAppGroups": "Gérer les catégories d'applications",
     "manageApplications": "Ajouter et modifier les applications",
-    "manageUsers": "Gérer les comptes utilisateurs"
+    "manageUsers": "Gérer les comptes utilisateurs",
+    "manageGroups": "Gérer les permissions par groupes",
+    "dangerZone": "Zone de danger",
+    "resetDatabaseTitle": "Réinitialisez la base de données pour repartir sur une installation propre avec les données de démonstration.",
+    "resetDatabaseWarning": "Attention : Cette action supprimera toutes vos données actuelles de façon irréversible.",
+    "resetDatabaseButton": "Réinitialiser la base de données",
+    "resetDatabaseInProgress": "Réinitialisation en cours...",
+    "confirmResetTitle": "Confirmer la réinitialisation",
+    "confirmResetMessage": "Êtes-vous absolument sûr de vouloir réinitialiser la base de données ?",
+    "confirmResetWarning": "Toutes les données actuelles seront définitivement supprimées.",
+    "confirmResetButton": "Oui, réinitialiser",
+    "confirmResetCancel": "Annuler",
+    "resetInProgress": "Réinitialisation..."
+  },
+  "appGroups": {
+    "subtitle": "Organisez vos applications en groupes",
+    "new": "Nouveau groupe"
   }
   
 }

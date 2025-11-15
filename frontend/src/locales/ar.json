@@ -122,9 +122,27 @@
     "resetButton": "إعادة الضبط"
   },
   "admin": {
+    "overviewTitle": "الإدارة",
+    "overviewSubtitle": "إدارة بوابة التطبيقات والمستخدمين",
     "manageAppGroups": "إدارة فئات التطبيقات",
     "manageApplications": "إضافة التطبيقات وتعديلها",
-    "manageUsers": "إدارة حسابات المستخدمين"
+    "manageUsers": "إدارة حسابات المستخدمين",
+    "manageGroups": "إدارة الصلاحيات حسب المجموعات",
+    "dangerZone": "منطقة الخطر",
+    "resetDatabaseTitle": "إعادة تعيين قاعدة البيانات للبدء من جديد مع بيانات تجريبية.",
+    "resetDatabaseWarning": "تحذير: سيؤدي هذا الإجراء إلى حذف جميع بياناتك الحالية بشكل دائم.",
+    "resetDatabaseButton": "إعادة تعيين قاعدة البيانات",
+    "resetDatabaseInProgress": "جارٍ إعادة التعيين...",
+    "confirmResetTitle": "تأكيد إعادة التعيين",
+    "confirmResetMessage": "هل أنت متأكد تمامًا من أنك تريد إعادة تعيين قاعدة البيانات؟",
+    "confirmResetWarning": "سيتم حذف جميع البيانات الحالية بشكل دائم.",
+    "confirmResetButton": "نعم، إعادة التعيين",
+    "confirmResetCancel": "إلغاء",
+    "resetInProgress": "جارٍ إعادة التعيين..."
+  },
+  "appGroups": {
+    "subtitle": "نظم تطبيقاتك في مجموعات",
+    "new": "مجموعة جديدة"
   }
 }
 

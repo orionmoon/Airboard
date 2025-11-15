@@ -127,9 +127,27 @@
     "resetButton": "Reset Settings"
   },
   "admin": {
+    "overviewTitle": "Administration",
+    "overviewSubtitle": "Manage your application portal and users",
     "manageAppGroups": "Manage application categories",
     "manageApplications": "Add and edit applications",
-    "manageUsers": "Manage user accounts"
+    "manageUsers": "Manage user accounts",
+    "manageGroups": "Manage permissions by groups",
+    "dangerZone": "Danger Zone",
+    "resetDatabaseTitle": "Reset the database to start fresh with demo data.",
+    "resetDatabaseWarning": "Warning: This action will permanently delete all your current data.",
+    "resetDatabaseButton": "Reset Database",
+    "resetDatabaseInProgress": "Resetting in progress...",
+    "confirmResetTitle": "Confirm Reset",
+    "confirmResetMessage": "Are you absolutely sure you want to reset the database?",
+    "confirmResetWarning": "All current data will be permanently deleted.",
+    "confirmResetButton": "Yes, reset",
+    "confirmResetCancel": "Cancel",
+    "resetInProgress": "Resetting..."
+  },
+  "appGroups": {
+    "subtitle": "Organize your applications into groups",
+    "new": "New Group"
   },
   "oauth": {
     "title": "OAuth Authentication",
