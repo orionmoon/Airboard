@@ -112,6 +112,64 @@
 
     <!-- Groupes d'applications -->
     <div v-else class="space-y-6">
+      <!-- Mes Favoris Section -->
+      <div v-if="favoriteApps.length > 0" class="app-group-container fade-in">
+        <div class="app-group-header bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20">
+          <div class="flex items-center space-x-3 flex-1">
+            <div class="h-10 w-10 rounded-lg flex items-center justify-center shadow-sm bg-gradient-to-br from-yellow-400 to-orange-500">
+              <Icon icon="mdi:star" class="h-5 w-5 text-white" />
+            </div>
+            <div class="flex-1">
+              <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                {{ $t('common.myFavorites') }}
+              </h2>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ favoriteApps.length }} {{ favoriteApps.length > 1 ? $t('common.applications').toLowerCase() : $t('common.applications').toLowerCase().slice(0, -1) }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-group-content">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div
+              v-for="app in favoriteApps"
+              :key="app.id"
+              class="app-card-favorite"
+              @click="openApplication(app)"
+            >
+              <!-- Star icon (top-right, absolute) -->
+              <button
+                @click="toggleFavorite($event, app)"
+                class="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow-md"
+                :title="$t('common.removeFromFavorites')"
+              >
+                <Icon icon="mdi:star" class="h-4 w-4 text-yellow-500" />
+              </button>
+
+              <!-- App content -->
+              <div class="flex items-center gap-2">
+                <div
+                  class="h-10 w-10 rounded-lg flex items-center justify-center"
+                  :style="{ backgroundColor: app.color || '#6366f1' }"
+                >
+                  <Icon :icon="app.icon || 'mdi:application'" class="h-5 w-5 text-white" />
+                </div>
+                <h3 class="font-semibold text-gray-900 dark:text-white text-sm leading-tight flex-1 truncate">
+                  {{ app.name }}
+                </h3>
+                <Icon v-if="app.open_in_new_tab" icon="mdi:open-in-new" class="h-4 w-4 text-gray-500 dark:text-gray-400" />
+              </div>
+
+              <p v-if="app.description" class="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                {{ app.description }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regular App Groups -->
       <div
         v-for="appGroup in dashboard.app_groups"
         :key="appGroup.id"
@@ -151,9 +209,22 @@
               <div
                 v-for="app in appGroup.applications"
                 :key="app.id"
-                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 cursor-pointer transition-all duration-150 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md hover:-translate-y-0.5"
+                class="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 cursor-pointer transition-all duration-150 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md hover:-translate-y-0.5"
                 @click="openApplication(app)"
               >
+                <!-- Star icon (top-right, absolute) -->
+                <button
+                  @click="toggleFavorite($event, app)"
+                  class="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow-md"
+                  :title="favoritesStore.isFavorite(app.id) ? $t('common.removeFromFavorites') : $t('common.addToFavorites')"
+                >
+                  <Icon
+                    :icon="favoritesStore.isFavorite(app.id) ? 'mdi:star' : 'mdi:star-outline'"
+                    class="h-4 w-4"
+                    :class="favoritesStore.isFavorite(app.id) ? 'text-yellow-500' : 'text-gray-400'"
+                  />
+                </button>
+
                 <!-- Entête: icône + titre alignés -->
                 <div class="flex items-center gap-2">
                   <div
@@ -162,7 +233,7 @@
                   >
                     <Icon :icon="app.icon || 'mdi:application'" class="h-5 w-5 text-white" />
                   </div>
-                  <h3 class="font-semibold text-gray-900 dark:text-white text-sm leading-tight flex-1 truncate">
+                  <h3 class="font-semibold text-gray-900 dark:text-white text-sm leading-tight flex-1 truncate pr-6">
                     {{ app.name }}
                   </h3>
                   <Icon v-if="app.open_in_new_tab" icon="mdi:open-in-new" class="h-4 w-4 text-gray-500 dark:text-gray-400" />
@@ -182,14 +253,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
+import { useFavoritesStore } from '@/stores/favorites'
 import { dashboardService, adminService } from '@/services/api'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
+const favoritesStore = useFavoritesStore()
 
 // État local
 const dashboard = ref(null)
@@ -302,10 +375,32 @@ const openApplication = (app) => {
   } else {
     window.location.href = app.url
   }
-  
+
   // Analytics ou logging (optionnel)
   console.log(`Application opened: ${app.name} - ${app.url}`)
 }
+
+// Toggle favorite
+const toggleFavorite = async (event, app) => {
+  event.stopPropagation() // Empêcher l'ouverture de l'application
+  await favoritesStore.toggleFavorite(app.id)
+}
+
+// Get favorite applications
+const favoriteApps = computed(() => {
+  if (!dashboard.value?.app_groups) return []
+
+  const allApps = []
+  dashboard.value.app_groups.forEach(group => {
+    group.applications?.forEach(app => {
+      if (favoritesStore.isFavorite(app.id)) {
+        allApps.push(app)
+      }
+    })
+  })
+
+  return allApps
+})
 
 // 🔧 FIX: Watcher pour les changements de settings
 watch(() => appStore.settingsLastUpdated, async () => {
@@ -318,7 +413,8 @@ onMounted(async () => {
   loadCollapsedGroups()
   await Promise.all([
     loadDashboard(),
-    loadAppSettings()
+    loadAppSettings(),
+    favoritesStore.loadFavorites()
   ])
 })
 </script>
@@ -412,5 +508,10 @@ onMounted(async () => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Favorites card styling */
+.app-card-favorite {
+  @apply relative bg-white dark:bg-gray-800 border-2 border-yellow-200 dark:border-yellow-800/50 rounded-lg p-3 cursor-pointer transition-all duration-150 hover:bg-yellow-50 dark:hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 hover:border-yellow-400 dark:hover:border-yellow-600;
 }
 </style>

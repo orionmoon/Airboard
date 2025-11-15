@@ -25,7 +25,12 @@
     "language_en": "Inglés",
     "language_es": "Español",
     "language_ar": "Árabe",
-    "edit": "Editar"
+    "edit": "Editar",
+    "favorites": "Favoritos",
+    "myFavorites": "Mis Favoritos",
+    "addToFavorites": "Añadir a favoritos",
+    "removeFromFavorites": "Quitar de favoritos",
+    "noFavorites": "Aún no hay favoritos"
   },
   "groups": {
     "title": "Grupos de usuarios",

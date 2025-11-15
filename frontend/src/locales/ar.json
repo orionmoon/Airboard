@@ -25,7 +25,12 @@
     "language_en": "الإنجليزية",
     "language_es": "الإسبانية",
     "language_ar": "العربية",
-    "edit": "تعديل"
+    "edit": "تعديل",
+    "favorites": "المفضلة",
+    "myFavorites": "مفضلاتي",
+    "addToFavorites": "إضافة إلى المفضلة",
+    "removeFromFavorites": "إزالة من المفضلة",
+    "noFavorites": "لا توجد مفضلات بعد"
   },
   "groups": {
     "title": "مجموعات المستخدمين",

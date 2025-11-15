@@ -23,7 +23,8 @@ type User struct {
 	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`
 
 	// Relations
-	Groups []Group `json:"groups,omitempty" gorm:"many2many:user_groups;"`
+	Groups    []Group       `json:"groups,omitempty" gorm:"many2many:user_groups;"`
+	Favorites []Application `json:"favorites,omitempty" gorm:"many2many:user_favorites;"`
 }
 
 // Group représente un groupe d'utilisateurs

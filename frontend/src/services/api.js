@@ -299,4 +299,27 @@ export const oauthService = {
   }
 }
 
+// Favorites Service
+export const favoritesService = {
+  async getFavorites() {
+    const response = await api.get('/user/favorites')
+    return response.data
+  },
+
+  async addFavorite(applicationId) {
+    const response = await api.post('/user/favorites', { application_id: applicationId })
+    return response.data
+  },
+
+  async removeFavorite(applicationId) {
+    const response = await api.delete(`/user/favorites/${applicationId}`)
+    return response.data
+  },
+
+  async isFavorite(applicationId) {
+    const response = await api.get(`/user/favorites/${applicationId}/check`)
+    return response.data
+  }
+}
+
 export default api

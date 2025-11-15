@@ -52,6 +52,7 @@ func main() {
 	adminHandler := handlers.NewAdminHandler(db)
 	settingsHandler := handlers.NewSettingsHandler(db)
 	oauthHandler := handlers.NewOAuthHandler(db, authMiddleware)
+	favoritesHandler := handlers.NewFavoritesHandler(db)
 
 	// Configuration du routeur
 	router := gin.Default()
@@ -97,6 +98,15 @@ func main() {
 
 		// Dashboard
 		protected.GET("/dashboard", dashboardHandler.GetDashboard)
+
+		// Routes favorites
+		user := protected.Group("/user")
+		{
+			user.GET("/favorites", favoritesHandler.GetUserFavorites)
+			user.POST("/favorites", favoritesHandler.AddFavorite)
+			user.DELETE("/favorites/:id", favoritesHandler.RemoveFavorite)
+			user.GET("/favorites/:id/check", favoritesHandler.IsFavorite)
+		}
 
 		// Routes admin
 		admin := protected.Group("/admin")
