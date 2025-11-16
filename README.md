@@ -47,8 +47,30 @@ Airboard simplifies access to your organization's digital resources while mainta
 - 🔐 **Dual Authentication** - Classic login/password + SSO (Authentik/Microsoft 365)
 - 👥 **User Management** - Complete CRUD operations for users and groups
 - 🎯 **Application Portal** - Organize apps by groups with custom icons
+- ⭐ **User Favorites** - Pin favorite applications for quick access
+- 📊 **Analytics Dashboard** - Track application usage and user activity
+- 📢 **Announcements System** - Display important messages on dashboard
+- 📰 **News Hub** - Internal news and documentation management
 - 🌐 **Multi-language** - Support for French, English, Spanish, Arabic
 - 🎨 **Modern UI** - Clean, responsive design with dark mode
+
+### News Hub Features
+- 📝 **Rich Text Editor** - Tiptap-powered editor with full formatting support
+- 🏷️ **Categories & Tags** - Organize articles with dynamic categories and tags
+- 👁️ **View Tracking** - Monitor article popularity with view counts
+- ❤️ **Reactions System** - Emoji reactions (👍, ❤️, 🎉) for user engagement
+- 🔖 **Article Types** - Support for articles, tutorials, announcements, FAQ
+- 📌 **Pinning** - Pin important articles to the top
+- 🎨 **Multiple View Modes** - Grid, List, and Compact display options
+- 🔍 **Advanced Filtering** - Search, category, type, and tag-based filtering
+- 📈 **News Analytics** - View counts, reactions, and top articles tracking
+- 🔗 **SEO-Friendly URLs** - Slug-based article URLs
+
+### User Roles & Permissions
+- 👑 **Admin Role** - Full system access and management
+- ✍️ **Editor Role** - Create and manage news articles
+- 👤 **User Role** - Access to assigned applications and content
+- 🎭 **Role-Based Access Control** - Fine-grained permissions for different features
 
 ### Security & Authentication
 - 🔒 **JWT Authentication** - Secure token-based auth with refresh tokens
@@ -57,12 +79,64 @@ Airboard simplifies access to your organization's digital resources while mainta
 - 🎭 **Role Mapping** - Automatic admin role assignment via Authentik groups
 - 🛡️ **Security Headers** - CSP, CORS protection, password hashing
 
+### Analytics & Insights
+- 📊 **Application Analytics** - Track clicks, unique users, daily activity
+- 📈 **User Activity** - Monitor most active users and applications
+- 📰 **News Analytics** - Article views, reactions, and engagement metrics
+- 📅 **Daily Activity Charts** - 30-day activity visualization
+- 🏆 **Top Content** - Most popular applications and articles
+
 ### Deployment & DevOps
 - 🐳 **Docker Ready** - Production-ready docker-compose deployment
 - ☁️ **Coolify Compatible** - Deploy from GitHub repository
 - 🔧 **Environment Variables** - Full externalization for Coolify/Docker
 - ⚡ **Fast** - Optimized Vue.js frontend with Go backend
 - 📦 **PostgreSQL Integrated** - Embedded database in docker-compose
+
+---
+
+## 📸 Screenshots
+
+> **Note**: Screenshots will be added here to showcase the application's interface and features.
+
+### Dashboard & Applications
+<!-- Add screenshots showing:
+- Main dashboard with application groups
+- Application cards with favorites
+- Search and filter functionality
+- Dark mode vs Light mode
+-->
+
+### User Management
+<!-- Add screenshots showing:
+- User list with role badges
+- User creation/edit modal
+- Group management interface
+-->
+
+### News Hub
+<!-- Add screenshots showing:
+- News Hub main view (Grid, List, Compact modes)
+- Rich text editor with Tiptap
+- Article detail page with reactions
+- News management interface
+- Categories and tags filtering
+-->
+
+### Analytics Dashboard
+<!-- Add screenshots showing:
+- Application usage analytics
+- Daily activity charts
+- Top applications and users
+- News Hub statistics
+-->
+
+### Announcements
+<!-- Add screenshots showing:
+- Announcements carousel on dashboard
+- Announcement creation/editing
+- Different announcement types (info, warning, success, error)
+-->
 
 ---
 
@@ -480,10 +554,13 @@ SSO_ADMIN_GROUPS=airboard-admins,it-admins,sysadmins
 | **ORM** | GORM | Database abstraction |
 | **Auth** | JWT | Token-based authentication |
 | **SSO** | Authentik | Identity provider integration |
+| **Rich Text Editor** | Tiptap | WYSIWYG editor for News Hub |
 | **Containerization** | Docker + Docker Compose | Container orchestration |
 | **Reverse Proxy** | Nginx | Production web server |
 | **Icons** | Iconify | Icon library |
 | **State Management** | Pinia | Vue state management |
+| **Routing** | Vue Router | Client-side routing |
+| **I18n** | vue-i18n | Internationalization |
 
 ---
 
@@ -498,15 +575,21 @@ airboard/
 │   │   ├── auth.go            # Auth endpoints (login, SSO)
 │   │   ├── users.go           # User CRUD
 │   │   ├── groups.go          # Group CRUD
-│   │   └── applications.go    # App CRUD
+│   │   ├── applications.go    # App CRUD
+│   │   ├── analytics.go       # Analytics endpoints
+│   │   ├── announcements.go   # Announcements CRUD
+│   │   ├── news.go            # News Hub CRUD & reactions
+│   │   └── news_categories.go # Categories & tags CRUD
 │   ├── middleware/            # HTTP middleware
 │   │   ├── auth.go            # JWT validation
 │   │   ├── cors.go            # CORS headers
-│   │   └── sso.go             # SSO header detection (NEW)
+│   │   ├── sso.go             # SSO header detection
+│   │   └── editor.go          # Editor role middleware
 │   ├── models/                # Database models
-│   │   └── models.go          # User, Group, App models
+│   │   ├── models.go          # User, Group, App, Analytics
+│   │   └── news.go            # News, Category, Tag, Reaction
 │   ├── services/              # Business logic
-│   │   └── sso_mapper.go      # SSO user sync (NEW)
+│   │   └── sso_mapper.go      # SSO user sync
 │   ├── Dockerfile             # Backend container
 │   ├── go.mod                 # Go dependencies
 │   └── main.go                # Entry point
@@ -514,16 +597,40 @@ airboard/
 ├── frontend/                   # Vue.js application
 │   ├── src/
 │   │   ├── components/        # Reusable components
+│   │   │   ├── admin/         # Admin components (modals, etc.)
+│   │   │   ├── dashboard/     # Dashboard components
+│   │   │   ├── layout/        # Layout components (Sidebar, etc.)
+│   │   │   └── news/          # News Hub components
+│   │   │       ├── NewsCard.vue         # Article card (grid view)
+│   │   │       ├── NewsCardCompact.vue  # Compact article card
+│   │   │       ├── RichTextEditor.vue   # Tiptap editor
+│   │   │       ├── TiptapRenderer.vue   # Read-only renderer
+│   │   │       ├── ViewModeSelector.vue # Grid/List/Compact toggle
+│   │   │       └── SortSelector.vue     # Sort options
 │   │   ├── views/             # Page components
-│   │   │   ├── Dashboard.vue  # Main dashboard
+│   │   │   ├── dashboard/
+│   │   │   │   ├── Dashboard.vue        # Main dashboard
+│   │   │   │   └── Analytics.vue        # Analytics page
+│   │   │   ├── admin/
+│   │   │   │   ├── UsersManagement.vue  # User management
+│   │   │   │   ├── GroupsManagement.vue # Group management
+│   │   │   │   ├── NewsManagement.vue   # News management
+│   │   │   │   └── NewsEditor.vue       # News editor
 │   │   │   ├── Login.vue      # Login page
-│   │   │   ├── Users.vue      # User management
-│   │   │   └── Groups.vue     # Group management
+│   │   │   ├── NewsCenter.vue # News Hub main view
+│   │   │   └── NewsDetail.vue # Article detail page
 │   │   ├── stores/            # Pinia stores
-│   │   │   └── auth.js        # Auth state + SSO auto-login (NEW)
+│   │   │   ├── auth.js        # Auth state + SSO
+│   │   │   ├── app.js         # App state
+│   │   │   └── favorites.js   # Favorites state
 │   │   ├── services/          # API services
-│   │   │   └── api.js         # Axios instance + SSO endpoint (NEW)
-│   │   ├── App.vue            # Root component + SSO check (NEW)
+│   │   │   └── api.js         # Axios instance + all endpoints
+│   │   ├── locales/           # i18n translations
+│   │   │   ├── fr.json        # French
+│   │   │   ├── en.json        # English
+│   │   │   ├── es.json        # Spanish
+│   │   │   └── ar.json        # Arabic
+│   │   ├── App.vue            # Root component
 │   │   └── main.js            # Entry point
 │   ├── nginx.conf             # Production Nginx config
 │   ├── Dockerfile             # Frontend container (multi-stage)
@@ -534,7 +641,8 @@ airboard/
 ├── .env.example               # Environment template
 ├── .gitignore                 # Git ignore rules
 ├── LICENSE                    # MIT license
-└── README.md                  # This file
+├── README.md                  # This file
+└── HOW-TO-USE.md              # User guide
 ```
 
 ### Key Files (Modified for SSO)
@@ -561,37 +669,91 @@ airboard/
 |--------|----------|-------------|---------------|
 | POST | `/api/v1/auth/login` | Classic login | No |
 | POST | `/api/v1/auth/refresh` | Refresh JWT token | No |
-| GET | `/api/v1/auth/sso/auto-login` | SSO auto-login (NEW) | No (uses headers) |
+| GET | `/api/v1/auth/sso/auto-login` | SSO auto-login | No (uses headers) |
 
 ### Users
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/users` | List all users | Yes |
-| GET | `/api/v1/users/:id` | Get user by ID | Yes |
-| POST | `/api/v1/users` | Create user | Yes (admin) |
-| PUT | `/api/v1/users/:id` | Update user | Yes (admin) |
-| DELETE | `/api/v1/users/:id` | Delete user | Yes (admin) |
+| GET | `/api/v1/users` | List all users | Yes (admin) |
+| GET | `/api/v1/users/:id` | Get user by ID | Yes (admin) |
+| POST | `/api/v1/admin/users` | Create user | Yes (admin) |
+| PUT | `/api/v1/admin/users/:id` | Update user | Yes (admin) |
+| DELETE | `/api/v1/admin/users/:id` | Delete user | Yes (admin) |
 
 ### Groups
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/groups` | List all groups | Yes |
-| GET | `/api/v1/groups/:id` | Get group by ID | Yes |
-| POST | `/api/v1/groups` | Create group | Yes (admin) |
-| PUT | `/api/v1/groups/:id` | Update group | Yes (admin) |
-| DELETE | `/api/v1/groups/:id` | Delete group | Yes (admin) |
+| GET | `/api/v1/admin/groups` | List all groups | Yes (admin) |
+| GET | `/api/v1/admin/groups/:id` | Get group by ID | Yes (admin) |
+| POST | `/api/v1/admin/groups` | Create group | Yes (admin) |
+| PUT | `/api/v1/admin/groups/:id` | Update group | Yes (admin) |
+| DELETE | `/api/v1/admin/groups/:id` | Delete group | Yes (admin) |
 
 ### Applications
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/applications` | List all apps | Yes |
-| GET | `/api/v1/applications/:id` | Get app by ID | Yes |
-| POST | `/api/v1/applications` | Create app | Yes (admin) |
-| PUT | `/api/v1/applications/:id` | Update app | Yes (admin) |
-| DELETE | `/api/v1/applications/:id` | Delete app | Yes (admin) |
+| GET | `/api/v1/dashboard` | Get user dashboard with apps | Yes |
+| GET | `/api/v1/admin/applications` | List all apps | Yes (admin) |
+| POST | `/api/v1/admin/applications` | Create app | Yes (admin) |
+| PUT | `/api/v1/admin/applications/:id` | Update app | Yes (admin) |
+| DELETE | `/api/v1/admin/applications/:id` | Delete app | Yes (admin) |
+
+### Favorites
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/favorites` | Get user favorites | Yes |
+| POST | `/api/v1/favorites/:id` | Add favorite | Yes |
+| DELETE | `/api/v1/favorites/:id` | Remove favorite | Yes |
+
+### Analytics
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/analytics/dashboard` | Get analytics dashboard | Yes (admin) |
+| POST | `/api/v1/analytics/click` | Track app click | Yes |
+
+### Announcements
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/announcements/active` | Get active announcements | Yes |
+| GET | `/api/v1/admin/announcements` | List all announcements | Yes (admin) |
+| POST | `/api/v1/admin/announcements` | Create announcement | Yes (admin) |
+| PUT | `/api/v1/admin/announcements/:id` | Update announcement | Yes (admin) |
+| DELETE | `/api/v1/admin/announcements/:id` | Delete announcement | Yes (admin) |
+
+### News Hub
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/news` | List news with filters | Yes |
+| GET | `/api/v1/news/article/:slug` | Get article by slug | Yes |
+| POST | `/api/v1/news/:id/view` | Increment view count | Yes |
+| GET | `/api/v1/news/:id/reactions` | Get article reactions | Yes |
+| POST | `/api/v1/news/:id/react` | Add/update reaction | Yes |
+| DELETE | `/api/v1/news/:id/react` | Remove reaction | Yes |
+| POST | `/api/v1/editor/news` | Create article | Yes (editor/admin) |
+| PUT | `/api/v1/editor/news/:id` | Update article | Yes (editor/admin) |
+| DELETE | `/api/v1/editor/news/:id` | Delete article | Yes (editor/admin) |
+| GET | `/api/v1/admin/news/analytics` | Get news analytics | Yes (admin) |
+| POST | `/api/v1/admin/news/:id/pin` | Toggle pin status | Yes (admin) |
+
+### Categories & Tags
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/news/categories` | List categories | Yes |
+| GET | `/api/v1/news/tags` | List tags | Yes |
+| POST | `/api/v1/admin/news/categories` | Create category | Yes (admin) |
+| PUT | `/api/v1/admin/news/categories/:id` | Update category | Yes (admin) |
+| DELETE | `/api/v1/admin/news/categories/:id` | Delete category | Yes (admin) |
+| POST | `/api/v1/editor/news/tags` | Create tag | Yes (editor/admin) |
+| PUT | `/api/v1/editor/news/tags/:id` | Update tag | Yes (editor/admin) |
+| DELETE | `/api/v1/editor/news/tags/:id` | Delete tag | Yes (editor/admin) |
 
 ---
 
@@ -698,17 +860,26 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 | User Management | ✅ Complete |
 | Group Management | ✅ Complete |
 | Application Portal | ✅ Complete |
-| Multi-language | ✅ Complete |
+| User Favorites | ✅ Complete |
+| Analytics Dashboard | ✅ Complete |
+| Announcements System | ✅ Complete |
+| News Hub | ✅ Complete |
+| Rich Text Editor (Tiptap) | ✅ Complete |
+| Reactions System | ✅ Complete |
+| Multi-view Modes | ✅ Complete |
+| Editor Role | ✅ Complete |
+| Multi-language (fr, en, es, ar) | ✅ Complete |
 | Docker Support | ✅ Complete |
 | Coolify Deployment | ✅ Complete |
 | Environment Variables | ✅ Complete |
 | Security (CSP, CORS) | ✅ Complete |
 | Dark Mode | ✅ Complete |
-| API Documentation | 🔄 In Progress |
+| API Documentation | ✅ Complete |
 | Automated Tests | 🔄 In Progress |
 | Advanced Permissions | 📋 Planned |
 | LDAP Integration | 📋 Planned |
 | Kubernetes Support | 📋 Planned |
+| Mobile App | 📋 Planned |
 
 ---
 
