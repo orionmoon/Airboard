@@ -112,19 +112,80 @@
 
     <!-- Groupes d'applications -->
     <div v-else class="space-y-6">
-      <!-- Announcements Section -->
-      <div v-if="activeAnnouncements.length > 0" class="space-y-3 mb-6">
-        <div
-          v-for="announcement in activeAnnouncements"
-          :key="announcement.id"
-          :class="getAnnouncementClass(announcement.type)"
-          class="rounded-lg p-4 border-l-4"
-        >
-          <div class="flex items-start gap-3">
-            <Icon :icon="getAnnouncementIcon(announcement.type)" class="h-5 w-5 flex-shrink-0 mt-0.5" />
-            <div class="flex-1">
-              <h3 class="font-semibold text-sm mb-1">{{ announcement.title }}</h3>
-              <p v-if="announcement.content" class="text-sm whitespace-pre-wrap">{{ announcement.content }}</p>
+      <!-- Announcements Carousel -->
+      <div v-if="activeAnnouncements.length > 0" class="relative mb-6">
+        <div class="announcement-carousel">
+          <!-- Carousel Container -->
+          <div class="relative overflow-hidden" @mouseenter="pauseAutoRotation" @mouseleave="resumeAutoRotation">
+            <!-- Announcement Slide -->
+            <transition :name="slideDirection" mode="out-in">
+              <div
+                :key="currentAnnouncementIndex"
+                :class="getAnnouncementClass(currentAnnouncement.type)"
+                class="rounded-lg p-4 border-l-4"
+              >
+                <div class="flex items-start gap-3">
+                  <Icon :icon="getAnnouncementIcon(currentAnnouncement.type)" class="h-5 w-5 flex-shrink-0 mt-0.5" />
+                  <div class="flex-1">
+                    <h3 class="font-semibold text-sm mb-1">{{ currentAnnouncement.title }}</h3>
+                    <p v-if="currentAnnouncement.content" class="text-sm whitespace-pre-wrap line-clamp-3">
+                      {{ currentAnnouncement.content }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </transition>
+
+            <!-- Navigation Buttons -->
+            <button
+              v-if="activeAnnouncements.length > 1"
+              @click="previousAnnouncement"
+              class="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 shadow-md transition-all z-10"
+              :title="'Previous'"
+            >
+              <Icon icon="mdi:chevron-left" class="h-5 w-5 text-gray-700 dark:text-gray-300" />
+            </button>
+            <button
+              v-if="activeAnnouncements.length > 1"
+              @click="nextAnnouncement"
+              class="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 shadow-md transition-all z-10"
+              :title="'Next'"
+            >
+              <Icon icon="mdi:chevron-right" class="h-5 w-5 text-gray-700 dark:text-gray-300" />
+            </button>
+          </div>
+
+          <!-- Controls Bar -->
+          <div v-if="activeAnnouncements.length > 1" class="flex items-center justify-between mt-3 px-2">
+            <!-- Pagination Dots -->
+            <div class="flex items-center gap-2">
+              <button
+                v-for="(announcement, index) in activeAnnouncements"
+                :key="index"
+                @click="goToAnnouncement(index)"
+                class="transition-all duration-200"
+                :class="index === currentAnnouncementIndex
+                  ? 'w-6 h-2 rounded-full bg-blue-600 dark:bg-blue-400'
+                  : 'w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'"
+                :title="`Announcement ${index + 1}`"
+              ></button>
+            </div>
+
+            <!-- Counter and Auto-play Control -->
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-gray-600 dark:text-gray-400 font-medium">
+                {{ currentAnnouncementIndex + 1 }}/{{ activeAnnouncements.length }}
+              </span>
+              <button
+                @click="toggleAutoRotation"
+                class="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                :title="isAutoRotating ? 'Pause' : 'Play'"
+              >
+                <Icon
+                  :icon="isAutoRotating ? 'mdi:pause' : 'mdi:play'"
+                  class="h-4 w-4 text-gray-600 dark:text-gray-400"
+                />
+              </button>
             </div>
           </div>
         </div>
@@ -271,7 +332,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
@@ -288,6 +349,99 @@ const appSettings = ref({})
 const isLoading = ref(false)
 const collapsedGroups = ref(new Set())
 const activeAnnouncements = ref([])
+
+// Carousel state
+const currentAnnouncementIndex = ref(0)
+const isAutoRotating = ref(true)
+const slideDirection = ref('slide-left')
+const autoRotationInterval = ref(null)
+
+// Computed property for current announcement
+const currentAnnouncement = computed(() => {
+  return activeAnnouncements.value[currentAnnouncementIndex.value] || {}
+})
+
+// Carousel navigation methods
+const previousAnnouncement = () => {
+  slideDirection.value = 'slide-right'
+  if (currentAnnouncementIndex.value === 0) {
+    currentAnnouncementIndex.value = activeAnnouncements.value.length - 1
+  } else {
+    currentAnnouncementIndex.value--
+  }
+}
+
+const nextAnnouncement = () => {
+  slideDirection.value = 'slide-left'
+  if (currentAnnouncementIndex.value === activeAnnouncements.value.length - 1) {
+    currentAnnouncementIndex.value = 0
+  } else {
+    currentAnnouncementIndex.value++
+  }
+}
+
+const goToAnnouncement = (index) => {
+  if (index === currentAnnouncementIndex.value) return
+  slideDirection.value = index > currentAnnouncementIndex.value ? 'slide-left' : 'slide-right'
+  currentAnnouncementIndex.value = index
+}
+
+// Auto-rotation methods
+const startAutoRotation = () => {
+  if (autoRotationInterval.value) {
+    clearInterval(autoRotationInterval.value)
+  }
+  if (activeAnnouncements.value.length > 1) {
+    autoRotationInterval.value = setInterval(() => {
+      nextAnnouncement()
+    }, 5000) // 5 seconds
+  }
+}
+
+const stopAutoRotation = () => {
+  if (autoRotationInterval.value) {
+    clearInterval(autoRotationInterval.value)
+    autoRotationInterval.value = null
+  }
+}
+
+const toggleAutoRotation = () => {
+  isAutoRotating.value = !isAutoRotating.value
+  if (isAutoRotating.value) {
+    startAutoRotation()
+  } else {
+    stopAutoRotation()
+  }
+}
+
+const pauseAutoRotation = () => {
+  if (isAutoRotating.value) {
+    stopAutoRotation()
+  }
+}
+
+const resumeAutoRotation = () => {
+  if (isAutoRotating.value) {
+    startAutoRotation()
+  }
+}
+
+// Watch for announcements changes to reset carousel
+watch(activeAnnouncements, (newVal) => {
+  if (newVal.length > 0) {
+    currentAnnouncementIndex.value = 0
+    if (isAutoRotating.value) {
+      startAutoRotation()
+    }
+  } else {
+    stopAutoRotation()
+  }
+}, { immediate: true })
+
+// Cleanup on unmount
+onUnmounted(() => {
+  stopAutoRotation()
+})
 
 // Charger les groupes effondrés depuis le localStorage
 const loadCollapsedGroups = () => {
@@ -568,5 +722,33 @@ onMounted(async () => {
 /* Favorites card styling */
 .app-card-favorite {
   @apply relative bg-white dark:bg-gray-800 border-2 border-yellow-200 dark:border-yellow-800/50 rounded-lg p-3 cursor-pointer transition-all duration-150 hover:bg-yellow-50 dark:hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 hover:border-yellow-400 dark:hover:border-yellow-600;
+}
+
+/* Carousel slide transitions */
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.4s ease-in-out;
+}
+
+.slide-left-enter-from {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+.slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
 }
 </style>

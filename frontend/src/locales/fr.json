@@ -33,6 +33,7 @@
     "noFavorites": "Aucun favori pour le moment",
     "analytics": "Analytiques",
     "announcements": "Annonces",
+    "newsHub": "News Hub",
     "save": "Enregistrer"
   },
   "groups": {
@@ -87,9 +88,11 @@
     "searchPlaceholder": "Rechercher un utilisateur...",
     "filter_all_roles": "Tous les rôles",
     "filter_admins": "Administrateurs",
+    "filter_editors": "Éditeurs",
     "filter_users": "Utilisateurs",
     "no_group": "Aucun groupe",
     "role_admin": "Administrateur",
+    "role_editor": "Éditeur",
     "role_user": "Utilisateur",
     "noResultsTitle": "Aucun résultat",
     "noResultsText": "Aucun utilisateur ne correspond à vos critères de recherche.",
@@ -196,6 +199,49 @@
     "confirmDeleteText": "Êtes-vous sûr de vouloir supprimer l'annonce \"{title}\" ?",
     "saving": "Enregistrement...",
     "deleting": "Suppression..."
+  },
+  "news": {
+    "widget": {
+      "title": "À la Une",
+      "viewAll": "Voir tout",
+      "noNews": "Aucune actualité pour le moment"
+    },
+    "center": {
+      "title": "News Hub",
+      "subtitle": "Toutes les actualités et articles",
+      "searchPlaceholder": "Rechercher des articles...",
+      "allCategories": "Toutes les catégories",
+      "allTypes": "Tous les types",
+      "noNews": "Aucun article disponible"
+    },
+    "detail": {
+      "back": "Retour",
+      "pinned": "Épinglé",
+      "views": "vues",
+      "reactions": "Réactions",
+      "edit": "Modifier l'article",
+      "notFound": "Article introuvable",
+      "backToList": "Retour aux articles"
+    },
+    "types": {
+      "article": "Article",
+      "tutorial": "Tutoriel",
+      "announcement": "Annonce",
+      "faq": "FAQ"
+    },
+    "priority": {
+      "urgent": "Urgent",
+      "important": "Important",
+      "normal": "Normal"
+    },
+    "sort": {
+      "dateNewest": "Plus récents",
+      "dateOldest": "Plus anciens",
+      "mostViewed": "Plus vus",
+      "mostReacted": "Plus de réactions",
+      "titleAZ": "Titre (A-Z)",
+      "titleZA": "Titre (Z-A)"
+    }
   }
 
 }

@@ -37,6 +37,11 @@ func main() {
 		&models.OAuthProvider{},
 		&models.ApplicationClick{},
 		&models.Announcement{},
+		&models.News{},
+		&models.NewsCategory{},
+		&models.Tag{},
+		&models.NewsReaction{},
+		&models.NewsRead{},
 	); err != nil {
 		log.Fatal("Erreur lors des migrations:", err)
 	}
@@ -57,6 +62,7 @@ func main() {
 	favoritesHandler := handlers.NewFavoritesHandler(db)
 	analyticsHandler := handlers.NewAnalyticsHandler(db)
 	announcementHandler := handlers.NewAnnouncementHandler(db)
+	newsHandler := handlers.NewNewsHandler(db)
 
 	// Configuration du routeur
 	router := gin.Default()
@@ -121,6 +127,26 @@ func main() {
 		// Routes announcements (accessible à tous les utilisateurs connectés)
 		protected.GET("/announcements", announcementHandler.GetActiveAnnouncements)
 
+		// Routes News Hub (accessible à tous les utilisateurs connectés)
+		news := protected.Group("/news")
+		{
+			news.GET("", newsHandler.GetNews)                             // Liste des news avec filtres
+
+			// Routes spécifiques d'abord (avant les routes avec paramètres)
+			news.GET("/unread/count", newsHandler.GetUnreadCount)         // Nombre de news non lues
+			news.GET("/categories", newsHandler.GetCategories)            // Catégories (lecture seule)
+			news.GET("/tags", newsHandler.GetTags)                        // Tags (lecture seule)
+
+			// Routes avec ID numérique
+			news.POST("/:id/view", newsHandler.IncrementView)             // Incrémenter les vues
+			news.GET("/:id/reactions", newsHandler.GetReactions)          // Récupérer les réactions
+			news.POST("/:id/react", newsHandler.AddReaction)              // Ajouter une réaction
+			news.DELETE("/:id/react", newsHandler.RemoveReaction)         // Retirer une réaction
+
+			// Route slug en dernier (greedy wildcard)
+			news.GET("/article/:slug", newsHandler.GetNewsBySlug)         // Récupérer une news par slug
+		}
+
 		// Routes admin
 		admin := protected.Group("/admin")
 		admin.Use(authMiddleware.RequireAdmin())
@@ -175,6 +201,32 @@ func main() {
 
 			// Gestion de la base de données
 			admin.POST("/database/reset", adminHandler.ResetDatabase)
+
+			// Gestion des catégories de news (admin uniquement)
+			admin.POST("/news/categories", newsHandler.CreateCategory)
+			admin.PUT("/news/categories/:id", newsHandler.UpdateCategory)
+			admin.DELETE("/news/categories/:id", newsHandler.DeleteCategory)
+
+			// Épingler des news (admin uniquement)
+			admin.POST("/news/:id/pin", newsHandler.TogglePin)
+
+			// Analytics News (admin uniquement)
+			admin.GET("/news/analytics", newsHandler.GetAnalytics)
+		}
+
+		// Routes editor (admin et editor peuvent créer/modifier des news)
+		editor := protected.Group("/editor")
+		editor.Use(authMiddleware.RequireEditor())
+		{
+			// Gestion des news
+			editor.POST("/news", newsHandler.CreateNews)
+			editor.PUT("/news/:id", newsHandler.UpdateNews)
+			editor.DELETE("/news/:id", newsHandler.DeleteNews)
+
+			// Gestion des tags (editors peuvent créer des tags)
+			editor.POST("/news/tags", newsHandler.CreateTag)
+			editor.PUT("/news/tags/:id", newsHandler.UpdateTag)
+			editor.DELETE("/news/tags/:id", newsHandler.DeleteTag)
 		}
 	}
 

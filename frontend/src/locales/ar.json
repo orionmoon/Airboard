@@ -33,6 +33,7 @@
     "noFavorites": "لا توجد مفضلات بعد",
     "analytics": "التحليلات",
     "announcements": "الإعلانات",
+    "newsHub": "مركز الأخبار",
     "save": "حفظ"
   },
   "groups": {
@@ -87,9 +88,11 @@
     "searchPlaceholder": "ابحث عن مستخدم...",
     "filter_all_roles": "كل الأدوار",
     "filter_admins": "المديرون",
+    "filter_editors": "المحررون",
     "filter_users": "المستخدمون",
     "no_group": "لا مجموعة",
     "role_admin": "مدير",
+    "role_editor": "محرر",
     "role_user": "مستخدم",
     "noResultsTitle": "لا توجد نتائج",
     "noResultsText": "لا يوجد مستخدم يطابق معايير البحث.",
@@ -196,6 +199,49 @@
     "confirmDeleteText": "هل أنت متأكد من حذف الإعلان \"{title}\"؟",
     "saving": "جارٍ الحفظ...",
     "deleting": "جارٍ الحذف..."
+  },
+  "news": {
+    "widget": {
+      "title": "أبرز الأخبار",
+      "viewAll": "عرض الكل",
+      "noNews": "لا توجد أخبار في الوقت الحالي"
+    },
+    "center": {
+      "title": "مركز الأخبار",
+      "subtitle": "جميع الأخبار والمقالات",
+      "searchPlaceholder": "البحث عن المقالات...",
+      "allCategories": "جميع الفئات",
+      "allTypes": "جميع الأنواع",
+      "noNews": "لا توجد مقالات متاحة"
+    },
+    "detail": {
+      "back": "رجوع",
+      "pinned": "مثبت",
+      "views": "مشاهدة",
+      "reactions": "التفاعلات",
+      "edit": "تعديل المقال",
+      "notFound": "المقال غير موجود",
+      "backToList": "العودة إلى المقالات"
+    },
+    "types": {
+      "article": "مقال",
+      "tutorial": "درس تعليمي",
+      "announcement": "إعلان",
+      "faq": "الأسئلة الشائعة"
+    },
+    "priority": {
+      "urgent": "عاجل",
+      "important": "مهم",
+      "normal": "عادي"
+    },
+    "sort": {
+      "dateNewest": "الأحدث أولاً",
+      "dateOldest": "الأقدم أولاً",
+      "mostViewed": "الأكثر مشاهدة",
+      "mostReacted": "الأكثر تفاعلاً",
+      "titleAZ": "العنوان (أ-ي)",
+      "titleZA": "العنوان (ي-أ)"
+    }
   }
 }
 

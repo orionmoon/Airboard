@@ -119,12 +119,12 @@ func (h *AnalyticsHandler) GetDashboard(c *gin.Context) {
 	dailyStats := []models.DailyStats{}
 	h.db.Table("application_clicks").
 		Select(`
-			DATE(clicked_at) as date,
+			clicked_at::date as date,
 			COUNT(*) as click_count,
 			COUNT(DISTINCT user_id) as unique_users
 		`).
 		Where("clicked_at >= ?", time.Now().AddDate(0, 0, -30)).
-		Group("DATE(clicked_at)").
+		Group("clicked_at::date").
 		Order("date ASC").
 		Scan(&dailyStats)
 	dashboard.DailyActivity = dailyStats
@@ -168,12 +168,12 @@ func (h *AnalyticsHandler) GetApplicationStats(c *gin.Context) {
 	dailyStats := []models.DailyStats{}
 	h.db.Table("application_clicks").
 		Select(`
-			DATE(clicked_at) as date,
+			clicked_at::date as date,
 			COUNT(*) as click_count,
 			COUNT(DISTINCT user_id) as unique_users
 		`).
 		Where("application_id = ? AND clicked_at >= ?", appID, time.Now().AddDate(0, 0, -30)).
-		Group("DATE(clicked_at)").
+		Group("clicked_at::date").
 		Order("date ASC").
 		Scan(&dailyStats)
 	stats.DailyActivity = dailyStats
@@ -226,11 +226,11 @@ func (h *AnalyticsHandler) GetUserStats(c *gin.Context) {
 	dailyStats := []models.DailyStats{}
 	h.db.Table("application_clicks").
 		Select(`
-			DATE(clicked_at) as date,
+			clicked_at::date as date,
 			COUNT(*) as click_count
 		`).
 		Where("user_id = ? AND clicked_at >= ?", userID, time.Now().AddDate(0, 0, -30)).
-		Group("DATE(clicked_at)").
+		Group("clicked_at::date").
 		Order("date ASC").
 		Scan(&dailyStats)
 	stats.DailyActivity = dailyStats

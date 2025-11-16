@@ -29,6 +29,14 @@
         <span>{{ $t('common.dashboard') }}</span>
       </router-link>
 
+      <router-link
+        to="/news"
+        :class="getLinkClasses('/news')"
+      >
+        <Icon icon="mdi:newspaper" class="h-4 w-4" />
+        <span>{{ $t('common.newsHub') }}</span>
+      </router-link>
+
       <!-- Admin section -->
       <div v-if="authStore.isAdmin" class="sidebar-section">
         <div class="sidebar-section-title">
@@ -105,6 +113,21 @@
         >
           <Icon icon="mdi:bullhorn" class="h-4 w-4" />
           <span>{{ $t('common.announcements') }}</span>
+        </router-link>
+      </div>
+
+      <!-- Editor section (for admin and editor roles) -->
+      <div v-if="authStore.user?.role === 'admin' || authStore.user?.role === 'editor'" class="sidebar-section">
+        <div class="sidebar-section-title">
+          News Hub
+        </div>
+
+        <router-link
+          to="/admin/news"
+          :class="getLinkClasses('/admin/news')"
+        >
+          <Icon icon="mdi:newspaper" class="h-4 w-4" />
+          <span>News Articles</span>
         </router-link>
       </div>
     </nav>

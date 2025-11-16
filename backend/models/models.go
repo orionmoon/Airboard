@@ -14,7 +14,7 @@ type User struct {
 	Password    string         `json:"-"` // Nullable pour les users SSO
 	FirstName   string         `json:"first_name"`
 	LastName    string         `json:"last_name"`
-	Role        string         `json:"role" gorm:"default:'user'"` // admin, user
+	Role        string         `json:"role" gorm:"default:'user'"` // admin, editor, user
 	IsActive    bool           `json:"is_active" gorm:"default:true"`
 	SSOProvider string         `json:"sso_provider,omitempty"` // authentik, azure, etc.
 	SSOID       string         `json:"sso_id,omitempty"`       // ID utilisateur externe

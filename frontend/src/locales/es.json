@@ -33,6 +33,7 @@
     "noFavorites": "Aún no hay favoritos",
     "analytics": "Analíticas",
     "announcements": "Anuncios",
+    "newsHub": "Centro de Noticias",
     "save": "Guardar"
   },
   "groups": {
@@ -87,9 +88,11 @@
     "searchPlaceholder": "Buscar un usuario...",
     "filter_all_roles": "Todos los roles",
     "filter_admins": "Administradores",
+    "filter_editors": "Editores",
     "filter_users": "Usuarios",
     "no_group": "Sin grupo",
     "role_admin": "Administrador",
+    "role_editor": "Editor",
     "role_user": "Usuario",
     "noResultsTitle": "Sin resultados",
     "noResultsText": "Ningún usuario coincide con tus criterios de búsqueda.",
@@ -196,6 +199,49 @@
     "confirmDeleteText": "¿Está seguro de que desea eliminar el anuncio \"{title}\"?",
     "saving": "Guardando...",
     "deleting": "Eliminando..."
+  },
+  "news": {
+    "widget": {
+      "title": "Destacados",
+      "viewAll": "Ver todo",
+      "noNews": "No hay noticias en este momento"
+    },
+    "center": {
+      "title": "Centro de Noticias",
+      "subtitle": "Todas las noticias y artículos",
+      "searchPlaceholder": "Buscar artículos...",
+      "allCategories": "Todas las categorías",
+      "allTypes": "Todos los tipos",
+      "noNews": "No hay artículos disponibles"
+    },
+    "detail": {
+      "back": "Volver",
+      "pinned": "Fijado",
+      "views": "vistas",
+      "reactions": "Reacciones",
+      "edit": "Editar artículo",
+      "notFound": "Artículo no encontrado",
+      "backToList": "Volver a los artículos"
+    },
+    "types": {
+      "article": "Artículo",
+      "tutorial": "Tutorial",
+      "announcement": "Anuncio",
+      "faq": "FAQ"
+    },
+    "priority": {
+      "urgent": "Urgente",
+      "important": "Importante",
+      "normal": "Normal"
+    },
+    "sort": {
+      "dateNewest": "Más recientes",
+      "dateOldest": "Más antiguos",
+      "mostViewed": "Más vistos",
+      "mostReacted": "Más reacciones",
+      "titleAZ": "Título (A-Z)",
+      "titleZA": "Título (Z-A)"
+    }
   }
 }
 

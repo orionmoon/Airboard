@@ -15,6 +15,12 @@ const UsersManagement = () => import('@/views/admin/UsersManagement.vue')
 const GroupsManagement = () => import('@/views/admin/GroupsManagement.vue')
 const Analytics = () => import('@/views/admin/Analytics.vue')
 const AnnouncementsManagement = () => import('@/views/admin/AnnouncementsManagement.vue')
+const NewsManagement = () => import('@/views/admin/NewsManagement.vue')
+const NewsEditor = () => import('@/views/admin/NewsEditor.vue')
+
+// News views (public)
+const NewsCenter = () => import('@/views/NewsCenter.vue')
+const NewsDetail = () => import('@/views/NewsDetail.vue')
 
 // Error views
 const NotFound = () => import('@/views/errors/NotFound.vue')
@@ -29,9 +35,27 @@ const routes = [
     path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard,
-    meta: { 
+    meta: {
       requiresAuth: true,
       title: 'Tableau de bord'
+    }
+  },
+  {
+    path: '/news',
+    name: 'NewsCenter',
+    component: NewsCenter,
+    meta: {
+      requiresAuth: true,
+      title: 'News Hub'
+    }
+  },
+  {
+    path: '/news/:slug',
+    name: 'NewsDetail',
+    component: NewsDetail,
+    meta: {
+      requiresAuth: true,
+      title: 'Article'
     }
   },
   {
@@ -151,6 +175,36 @@ const routes = [
     }
   },
   {
+    path: '/admin/news',
+    name: 'AdminNews',
+    component: NewsManagement,
+    meta: {
+      requiresAuth: true,
+      requiresEditor: true,
+      title: 'News Hub'
+    }
+  },
+  {
+    path: '/admin/news/:id/edit',
+    name: 'AdminNewsEdit',
+    component: NewsEditor,
+    meta: {
+      requiresAuth: true,
+      requiresEditor: true,
+      title: 'Edit Article'
+    }
+  },
+  {
+    path: '/admin/news/new',
+    name: 'AdminNewsNew',
+    component: NewsEditor,
+    meta: {
+      requiresAuth: true,
+      requiresEditor: true,
+      title: 'New Article'
+    }
+  },
+  {
     path: '/unauthorized',
     name: 'Unauthorized',
     component: Unauthorized,
@@ -217,6 +271,15 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAdmin && !authStore.isAdmin) {
     next({ name: 'Unauthorized' })
     return
+  }
+
+  // Vérifier les droits editor (admin ou editor)
+  if (to.meta.requiresEditor) {
+    const userRole = authStore.user?.role
+    if (userRole !== 'admin' && userRole !== 'editor') {
+      next({ name: 'Unauthorized' })
+      return
+    }
   }
 
   // Rediriger les utilisateurs connectés loin des pages d'auth

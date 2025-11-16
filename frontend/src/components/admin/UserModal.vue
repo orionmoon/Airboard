@@ -159,10 +159,15 @@
                     class="form-select"
                   >
                     <option value="user">Utilisateur standard</option>
+                    <option value="editor">Éditeur (gestion des actualités)</option>
                     <option value="admin">Administrateur</option>
                   </select>
                   <p v-if="errors.role" class="form-error">{{ errors.role }}</p>
-                  <p class="form-help">Les administrateurs ont accès à toutes les fonctionnalités</p>
+                  <p class="form-help">
+                    <span v-if="form.role === 'admin'">Les administrateurs ont accès à toutes les fonctionnalités</span>
+                    <span v-else-if="form.role === 'editor'">Les éditeurs peuvent créer et gérer les actualités du News Hub</span>
+                    <span v-else>Les utilisateurs ont accès aux applications assignées via les groupes</span>
+                  </p>
                 </div>
 
                 <!-- Groups -->

@@ -37,7 +37,8 @@
     "removeFromFavorites": "Remove from favorites",
     "noFavorites": "No favorites yet",
     "analytics": "Analytics",
-    "announcements": "Announcements"
+    "announcements": "Announcements",
+    "newsHub": "News Hub"
   },
   "groups": {
     "title": "User groups",
@@ -91,9 +92,11 @@
     "searchPlaceholder": "Search a user...",
     "filter_all_roles": "All roles",
     "filter_admins": "Administrators",
+    "filter_editors": "Editors",
     "filter_users": "Users",
     "no_group": "No group",
     "role_admin": "Administrator",
+    "role_editor": "Editor",
     "role_user": "User",
     "noResultsTitle": "No Results",
     "noResultsText": "No user matches your search criteria.",
@@ -231,6 +234,49 @@
     "confirmDeleteText": "Are you sure you want to delete the announcement \"{title}\"?",
     "saving": "Saving...",
     "deleting": "Deleting..."
+  },
+  "news": {
+    "widget": {
+      "title": "Featured",
+      "viewAll": "View all",
+      "noNews": "No news at the moment"
+    },
+    "center": {
+      "title": "News Hub",
+      "subtitle": "All news and articles",
+      "searchPlaceholder": "Search articles...",
+      "allCategories": "All categories",
+      "allTypes": "All types",
+      "noNews": "No articles available"
+    },
+    "detail": {
+      "back": "Back",
+      "pinned": "Pinned",
+      "views": "views",
+      "reactions": "Reactions",
+      "edit": "Edit article",
+      "notFound": "Article not found",
+      "backToList": "Back to articles"
+    },
+    "types": {
+      "article": "Article",
+      "tutorial": "Tutorial",
+      "announcement": "Announcement",
+      "faq": "FAQ"
+    },
+    "priority": {
+      "urgent": "Urgent",
+      "important": "Important",
+      "normal": "Normal"
+    },
+    "sort": {
+      "dateNewest": "Newest first",
+      "dateOldest": "Oldest first",
+      "mostViewed": "Most viewed",
+      "mostReacted": "Most reactions",
+      "titleAZ": "Title (A-Z)",
+      "titleZA": "Title (Z-A)"
+    }
   }
 
 }

@@ -173,6 +173,59 @@
           </div>
         </div>
 
+        <!-- News Hub Statistics -->
+        <div v-if="newsStats" class="card p-6 mb-8">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+            📰 Statistiques News Hub
+          </h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center">
+              <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ newsStats.total_news }}</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Articles totaux</p>
+            </div>
+            <div class="text-center">
+              <p class="text-3xl font-bold text-green-600 dark:text-green-400">{{ newsStats.published_news }}</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Publiés</p>
+            </div>
+            <div class="text-center">
+              <p class="text-3xl font-bold text-purple-600 dark:text-purple-400">{{ newsStats.total_views }}</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Vues totales</p>
+            </div>
+            <div class="text-center">
+              <p class="text-3xl font-bold text-red-600 dark:text-red-400">{{ newsStats.total_reactions }}</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Réactions totales</p>
+            </div>
+          </div>
+
+          <!-- Top News -->
+          <div v-if="newsStats.top_news && newsStats.top_news.length > 0" class="mt-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Articles les plus populaires</h3>
+            <div class="space-y-3">
+              <div
+                v-for="(article, index) in newsStats.top_news"
+                :key="article.id"
+                class="flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors cursor-pointer"
+                @click="viewArticle(article.slug)"
+              >
+                <div class="flex-shrink-0 w-8 text-center">
+                  <span class="text-lg font-bold text-gray-400">#{{ index + 1 }}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ article.title }}</p>
+                  <div class="flex gap-3 mt-1">
+                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                      <Icon icon="mdi:eye" class="inline h-3 w-3" /> {{ article.view_count }}
+                    </span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                      <Icon icon="mdi:heart" class="inline h-3 w-3" /> {{ article.reaction_count }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Daily Activity Chart -->
         <div class="card p-6">
           <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">
@@ -221,10 +274,13 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
-import { analyticsService } from '@/services/api'
+import { analyticsService, newsService } from '@/services/api'
 
+const router = useRouter()
 const analytics = ref(null)
+const newsStats = ref(null)
 const isLoading = ref(false)
 
 const loadAnalytics = async () => {
@@ -235,6 +291,14 @@ const loadAnalytics = async () => {
     console.error('Error loading analytics:', error)
   } finally {
     isLoading.value = false
+  }
+}
+
+const loadNewsStats = async () => {
+  try {
+    newsStats.value = await newsService.getAnalytics()
+  } catch (error) {
+    console.error('Error loading news stats:', error)
   }
 }
 
@@ -256,8 +320,13 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
 }
 
+const viewArticle = (slug) => {
+  router.push({ name: 'NewsDetail', params: { slug } })
+}
+
 onMounted(() => {
   loadAnalytics()
+  loadNewsStats()
 })
 </script>
 

@@ -390,4 +390,133 @@ export const announcementsService = {
   }
 }
 
+// News Hub Service
+export const newsService = {
+  // User - Get news with filters and pagination
+  async getNews(params = {}) {
+    const response = await api.get('/news', { params })
+    return response.data
+  },
+
+  // User - Get news by slug
+  async getNewsBySlug(slug) {
+    const response = await api.get(`/news/article/${slug}`)
+    return response.data
+  },
+
+  // User - Increment view count
+  async incrementView(id) {
+    const response = await api.post(`/news/${id}/view`)
+    return response.data
+  },
+
+  // User - Get reactions for a news
+  async getReactions(id) {
+    const response = await api.get(`/news/${id}/reactions`)
+    return response.data
+  },
+
+  // User - Add reaction
+  async addReaction(id, reactionType) {
+    const response = await api.post(`/news/${id}/react`, { reaction_type: reactionType })
+    return response.data
+  },
+
+  // User - Remove reaction
+  async removeReaction(id) {
+    const response = await api.delete(`/news/${id}/react`)
+    return response.data
+  },
+
+  // User - Get unread count
+  async getUnreadCount() {
+    const response = await api.get('/news/unread/count')
+    return response.data
+  },
+
+  // User - Get categories
+  async getCategories() {
+    const response = await api.get('/news/categories')
+    return response.data
+  },
+
+  // User - Get tags
+  async getTags() {
+    const response = await api.get('/news/tags')
+    return response.data
+  },
+
+  // User - Get unread count
+  async getUnreadCount() {
+    const response = await api.get('/news/unread/count')
+    return response.data
+  },
+
+  // Editor - Create news
+  async createNews(data) {
+    const response = await api.post('/editor/news', data)
+    return response.data
+  },
+
+  // Editor - Update news
+  async updateNews(id, data) {
+    const response = await api.put(`/editor/news/${id}`, data)
+    return response.data
+  },
+
+  // Editor - Delete news
+  async deleteNews(id) {
+    const response = await api.delete(`/editor/news/${id}`)
+    return response.data
+  },
+
+  // Editor - Create tag
+  async createTag(data) {
+    const response = await api.post('/editor/news/tags', data)
+    return response.data
+  },
+
+  // Editor - Update tag
+  async updateTag(id, data) {
+    const response = await api.put(`/editor/news/tags/${id}`, data)
+    return response.data
+  },
+
+  // Editor - Delete tag
+  async deleteTag(id) {
+    const response = await api.delete(`/editor/news/tags/${id}`)
+    return response.data
+  },
+
+  // Admin - Create category
+  async createCategory(data) {
+    const response = await api.post('/admin/news/categories', data)
+    return response.data
+  },
+
+  // Admin - Update category
+  async updateCategory(id, data) {
+    const response = await api.put(`/admin/news/categories/${id}`, data)
+    return response.data
+  },
+
+  // Admin - Delete category
+  async deleteCategory(id) {
+    const response = await api.delete(`/admin/news/categories/${id}`)
+    return response.data
+  },
+
+  // Admin - Toggle pin
+  async togglePin(id) {
+    const response = await api.post(`/admin/news/${id}/pin`)
+    return response.data
+  },
+
+  // Admin - Get analytics
+  async getAnalytics() {
+    const response = await api.get('/admin/news/analytics')
+    return response.data
+  }
+}
+
 export default api
