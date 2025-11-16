@@ -18,26 +18,32 @@
 
 ## 📖 About
 
-**Airboard** is an application portal platform designed to enable organizations to centralize and share links to their main applications and tools with their staff.
+**Airboard** is a comprehensive internal portal platform designed to empower organizations with centralized access to applications, real-time communications, and actionable insights—all in one place.
 
 ### Main Objective
 
-In a modern professional environment, employees use many applications daily: management tools, communication platforms, business systems, etc. **Airboard** addresses this need by offering:
+In a modern professional environment, organizations need more than just a link directory. **Airboard** addresses this by providing a complete digital workplace solution:
 
-- **🎯 Single Access Point** - A centralized dashboard where all important links are accessible
-- **👥 Group Management** - Organize applications by department, function, or project
-- **🔐 Role-Based Access Control** - Each user sees only the applications relevant to their group
-- **🔄 SSO Synchronization** - Seamless integration with your authentication system (Microsoft 365, LDAP, etc.)
-- **⚡ Simple Deployment** - Docker-ready, deployable in minutes on your infrastructure
+- **🎯 Unified Application Portal** - Centralized dashboard with customizable access to all your tools and applications
+- **📰 News Hub** - Rich internal communication system with articles, tutorials, announcements, and FAQs
+- **📊 Analytics Dashboard** - Track application usage, user engagement, and content performance
+- **📢 Announcements System** - Broadcast important messages to teams instantly
+- **⭐ User Favorites** - Personalized experience with favorite apps and content
+- **👥 Role-Based Management** - Granular permissions for Admins, Editors, and Users
+- **🌍 Multi-Language Support** - Available in French, English, Spanish, and Arabic
+- **🔐 SSO Integration** - Seamless authentication with Authentik, Microsoft 365, LDAP, and more
+- **⚡ Docker-Ready** - Deploy in minutes on your infrastructure with full containerization
 
 ### Use Cases
 
-- **SMB/SME**: Centralize access to management tools (ERP, CRM, HR, accounting)
-- **IT Services**: Technical tools portal for teams (monitoring, CI/CD, documentation)
-- **Departments**: Customized dashboards per service (HR, Finance, Sales, Production)
-- **Projects**: Collaborative spaces with access to project tools (Jira, Confluence, GitLab, etc.)
+- **Enterprise Communication**: Publish company news, policy updates, and knowledge base articles with rich text formatting
+- **IT Services**: Application portal + technical documentation + usage analytics for internal tools
+- **HR & Internal Comms**: Share announcements, employee handbooks, tutorials, and FAQs across the organization
+- **Department Dashboards**: Customized views per team (HR, Finance, Sales) with relevant apps and news
+- **Project Collaboration**: Team-specific portals with apps, announcements, and project documentation
+- **Analytics & Insights**: Track which applications are most used, monitor content engagement, and understand user behavior
 
-Airboard simplifies access to your organization's digital resources while maintaining granular control over permissions.
+Airboard transforms how organizations manage digital resources, internal communications, and user engagement—providing a single source of truth for your entire workforce.
 
 ---
 
