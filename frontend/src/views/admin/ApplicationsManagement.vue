@@ -218,7 +218,8 @@ const filteredApplications = computed(() => {
 const loadApplications = async () => {
   try {
     appStore.setLoading(true)
-    const data = await adminService.getApplications()
+    // Request all applications by setting a high limit
+    const data = await adminService.getApplications({ limit: 1000 })
     console.log('Raw applications API response:', data)
     applications.value = Array.isArray(data) ? data : []
     console.log('Applications loaded:', applications.value)
