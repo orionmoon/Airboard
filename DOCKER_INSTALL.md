@@ -45,6 +45,12 @@ nano .env
 - `SSO_ENABLED` : true/false pour activer/désactiver le SSO
 - `PUBLIC_URL` : URL publique de votre application
 
+**Note importante sur la configuration API :**
+- Le frontend a deux fichiers de configuration :
+  - `frontend/.env` : Pour le développement local (pointe vers http://localhost:8080)
+  - `frontend/.env.production` : Pour Docker/production (utilise le proxy nginx à /api/v1)
+- Ces fichiers sont déjà configurés correctement, pas besoin de les modifier
+
 ### 4. Construire et démarrer les services
 
 ```bash
