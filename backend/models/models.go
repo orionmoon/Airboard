@@ -153,6 +153,7 @@ type AppSettings struct {
 	AppIcon        string    `json:"app_icon" gorm:"default:'mdi:view-dashboard'"`
 	DashboardTitle string    `json:"dashboard_title" gorm:"default:'Dashboard'"`
 	WelcomeMessage string    `json:"welcome_message" gorm:"default:'Welcome to your application portal'"`
+	DefaultGroupID *uint     `json:"default_group_id" gorm:"default:null"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -163,6 +164,7 @@ type AppSettingsRequest struct {
 	AppIcon        string `json:"app_icon" binding:"required"`
 	DashboardTitle string `json:"dashboard_title" binding:"required,min=1"`
 	WelcomeMessage string `json:"welcome_message" binding:"required,min=1"`
+	DefaultGroupID *uint  `json:"default_group_id"`
 }
 
 // ChangePasswordRequest pour les changements de mot de passe

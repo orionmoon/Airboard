@@ -80,6 +80,7 @@ func (h *SettingsHandler) UpdateAppSettings(c *gin.Context) {
 				AppIcon:        request.AppIcon,
 				DashboardTitle: request.DashboardTitle,
 				WelcomeMessage: request.WelcomeMessage,
+				DefaultGroupID: request.DefaultGroupID,
 			}
 			
 			if err := h.DB.Create(&settings).Error; err != nil {
@@ -104,7 +105,8 @@ func (h *SettingsHandler) UpdateAppSettings(c *gin.Context) {
 		settings.AppIcon = request.AppIcon
 		settings.DashboardTitle = request.DashboardTitle
 		settings.WelcomeMessage = request.WelcomeMessage
-		
+		settings.DefaultGroupID = request.DefaultGroupID
+
 		if err := h.DB.Save(&settings).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 				Error:   "database_error",
@@ -168,4 +170,24 @@ func (h *SettingsHandler) ResetAppSettings(c *gin.Context) {
 		Message: "App settings reset to defaults successfully",
 		Data:    settings,
 	})
+}
+
+// GetDefaultGroupFromDB récupère le groupe par défaut depuis les settings
+// Retourne nil si aucun groupe par défaut n'est configuré
+func GetDefaultGroupFromDB(db *gorm.DB) *models.Group {
+	var settings models.AppSettings
+	if err := db.First(&settings).Error; err != nil {
+		return nil
+	}
+
+	if settings.DefaultGroupID == nil {
+		return nil
+	}
+
+	var group models.Group
+	if err := db.First(&group, *settings.DefaultGroupID).Error; err != nil {
+		return nil
+	}
+
+	return &group
 }

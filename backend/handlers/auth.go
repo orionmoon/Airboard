@@ -170,29 +170,36 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	// Ajouter l'utilisateur au groupe "common" par défaut
-	var commonGroup models.Group
-	if err := h.db.Where("name = ?", "common").First(&commonGroup).Error; err == nil {
-		// Le groupe "common" existe, l'ajouter à l'utilisateur
-		if err := h.db.Model(&user).Association("Groups").Append(&commonGroup); err != nil {
-			// Log l'erreur mais ne pas faire échouer l'inscription
-			log.Printf("Erreur lors de l'ajout de l'utilisateur au groupe common: %v", err)
+	// Ajouter l'utilisateur au groupe par défaut configuré
+	defaultGroup := GetDefaultGroupFromDB(h.db)
+	if defaultGroup != nil {
+		// Un groupe par défaut est configuré, l'ajouter à l'utilisateur
+		if err := h.db.Model(&user).Association("Groups").Append(defaultGroup); err != nil {
+			log.Printf("Erreur lors de l'ajout de l'utilisateur au groupe par défaut: %v", err)
 		}
 	} else {
-		// Le groupe "common" n'existe pas, le créer puis ajouter l'utilisateur
-		commonGroup = models.Group{
-			Name:        "common",
-			Description: "Groupe par défaut pour tous les nouveaux utilisateurs",
-			Color:       "#3B82F6",
-			IsActive:    true,
-		}
-		if err := h.db.Create(&commonGroup).Error; err == nil {
-			// Groupe créé avec succès, ajouter l'utilisateur
+		// Aucun groupe par défaut configuré, utiliser "common" comme fallback
+		var commonGroup models.Group
+		if err := h.db.Where("name = ?", "common").First(&commonGroup).Error; err == nil {
+			// Le groupe "common" existe, l'ajouter à l'utilisateur
 			if err := h.db.Model(&user).Association("Groups").Append(&commonGroup); err != nil {
 				log.Printf("Erreur lors de l'ajout de l'utilisateur au groupe common: %v", err)
 			}
 		} else {
-			log.Printf("Erreur lors de la création du groupe common: %v", err)
+			// Le groupe "common" n'existe pas, le créer puis ajouter l'utilisateur
+			commonGroup = models.Group{
+				Name:        "common",
+				Description: "Groupe par défaut pour tous les nouveaux utilisateurs",
+				Color:       "#3B82F6",
+				IsActive:    true,
+			}
+			if err := h.db.Create(&commonGroup).Error; err == nil {
+				if err := h.db.Model(&user).Association("Groups").Append(&commonGroup); err != nil {
+					log.Printf("Erreur lors de l'ajout de l'utilisateur au groupe common: %v", err)
+				}
+			} else {
+				log.Printf("Erreur lors de la création du groupe common: %v", err)
+			}
 		}
 	}
 
