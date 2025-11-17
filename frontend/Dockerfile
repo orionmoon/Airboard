@@ -16,7 +16,11 @@ RUN npm ci --silent
 # Copie du code source
 COPY . .
 
-# Build de l'application
+# Copie du fichier .env.production pour la configuration de production
+COPY .env.production .env
+
+# Build de l'application avec NODE_ENV=production
+ENV NODE_ENV=production
 RUN npm run build
 
 # Production stage

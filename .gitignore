@@ -1,8 +1,8 @@
 # Environnement
 .env
 .env.local
-.env.production
 .env.development
+# Ne pas ignorer .env.production - nécessaire pour Docker build
 
 # Node.js
 node_modules/
