@@ -110,27 +110,6 @@ Airboard transforms how organizations manage digital resources, internal communi
 **Main Dashboard with Applications**
 ![Dashboard](img/Screenshot_20251117_090240.png)
 
-**Application Groups with Different View Modes**
-![View Modes](img/Screenshot_20251117_090338.png)
-
-**Compact View Mode**
-![Compact View](img/Screenshot_20251117_090346.png)
-
-**Grid View Mode**
-![Grid View](img/Screenshot_20251117_090356.png)
-
-</div>
-
-### User Management
-
-<div align="center">
-
-**User Management Interface**
-![Users Management](img/Screenshot_20251117_090403.png)
-
-**Application Management**
-![Applications Management](img/Screenshot_20251117_090409.png)
-
 </div>
 
 ### News Hub
@@ -138,39 +117,59 @@ Airboard transforms how organizations manage digital resources, internal communi
 <div align="center">
 
 **News Hub - Grid View**
-![News Hub Grid](img/Screenshot_20251117_090415.png)
+
 
 **News Article Detail**
-![Article Detail](img/Screenshot_20251117_090420.png)
+
 
 **News Hub - List View**
-![News Hub List](img/Screenshot_20251117_090429.png)
 
-**Rich Text Editor**
-![Rich Editor](img/Screenshot_20251117_090439.png)
-
-</div>
-
-### Analytics Dashboard
-
-<div align="center">
-
-**Analytics Dashboard**
+**News Hub Management**
 ![Analytics](img/Screenshot_20251117_090448.png)
 
-**Application Usage Statistics**
+**Rich Text Editor**
 ![Usage Stats](img/Screenshot_20251117_090503.png)
+
 
 </div>
 
-### Groups Management
+
+### Administration
 
 <div align="center">
 
-**Groups & Organization Management**
+**Administration -  OverView**
+![OverView pages](img/Screenshot_20251117_090338.png)
+
+**Administration - App Groups Management**
+![Compact View](img/Screenshot_20251117_090346.png)
+
+**Administration - Applications Management**
+![Grid View](img/Screenshot_20251117_090356.png)
+
+**User Management Interface**
+![Users Management](img/Screenshot_20251117_090403.png)
+
+**Groups Management**
+![Applications Management](img/Screenshot_20251117_090409.png)
+
+**Settings**
+![News Hub Grid](img/Screenshot_20251117_090415.png)
+
+**OAuth**
+![Article Detail](img/Screenshot_20251117_090420.png)
+
+**Analytics Dashboard**
+![News Hub List](img/Screenshot_20251117_090429.png)
+
+**Annoucments Management**
+![Rich Editor](img/Screenshot_20251117_090439.png)
+
+**Annoucments Editor**
 ![Groups Management](img/Screenshot_20251117_090514.png)
 
 </div>
+
 
 ---
 
