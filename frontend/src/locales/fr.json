@@ -242,6 +242,15 @@
       "titleAZ": "Titre (A-Z)",
       "titleZA": "Titre (Z-A)"
     }
+  },
+  "dashboard": {
+    "collapseAll": "Réduire tout",
+    "expandAll": "Développer tout",
+    "viewModes": {
+      "grid": "Grille",
+      "default": "Par Défaut",
+      "compact": "Compact"
+    }
   }
 
 }

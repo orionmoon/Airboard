@@ -242,6 +242,15 @@
       "titleAZ": "العنوان (أ-ي)",
       "titleZA": "العنوان (ي-أ)"
     }
+  },
+  "dashboard": {
+    "collapseAll": "طي الكل",
+    "expandAll": "توسيع الكل",
+    "viewModes": {
+      "grid": "شبكة",
+      "default": "افتراضي",
+      "compact": "مضغوط"
+    }
   }
 }
 

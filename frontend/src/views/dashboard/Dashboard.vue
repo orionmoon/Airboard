@@ -9,14 +9,43 @@
             {{ appSettings.welcome_message || 'Welcome to your application portal' }}
           </p>
         </div>
-        
-        <!-- Bouton menu mobile -->
-        <button
-          @click="appStore.toggleSidebar()"
-          class="lg:hidden btn btn-secondary"
-        >
-          <Icon icon="mdi:menu" class="h-5 w-5" />
-        </button>
+
+        <!-- Controls -->
+        <div class="flex items-center gap-3">
+          <!-- View Mode Selector (hidden on mobile) -->
+          <div class="hidden md:block">
+            <ViewModeSelector v-model="viewMode" />
+          </div>
+
+          <!-- Collapse/Expand All Button -->
+          <button
+            v-if="dashboard?.app_groups?.length > 0"
+            @click="toggleAllGroups"
+            class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300"
+            :title="allGroupsCollapsed ? $t('dashboard.expandAll') : $t('dashboard.collapseAll')"
+          >
+            <Icon
+              :icon="allGroupsCollapsed ? 'mdi:unfold-more-horizontal' : 'mdi:unfold-less-horizontal'"
+              class="h-5 w-5"
+            />
+            <span class="hidden lg:inline">
+              {{ allGroupsCollapsed ? $t('dashboard.expandAll') : $t('dashboard.collapseAll') }}
+            </span>
+          </button>
+
+          <!-- Bouton menu mobile -->
+          <button
+            @click="appStore.toggleSidebar()"
+            class="lg:hidden btn btn-secondary"
+          >
+            <Icon icon="mdi:menu" class="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+
+      <!-- View Mode Selector Mobile (below header) -->
+      <div class="md:hidden mt-4">
+        <ViewModeSelector v-model="viewMode" />
       </div>
     </div>
 
@@ -210,11 +239,11 @@
         </div>
 
         <div class="app-group-content">
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div :class="getGridClasses">
             <div
               v-for="app in favoriteApps"
               :key="app.id"
-              class="app-card-favorite"
+              :class="getAppCardClasses"
               @click="openApplication(app)"
             >
               <!-- Star icon (bottom-right, absolute) -->
@@ -259,36 +288,36 @@
           class="app-group-header"
           @click="toggleGroup(appGroup.id)"
         >
-          <div class="flex items-center space-x-3 flex-1">
+          <div class="flex items-center gap-2 flex-1">
             <div
-              class="h-10 w-10 rounded-lg flex items-center justify-center shadow-sm"
+              class="h-8 w-8 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0"
               :style="{ backgroundColor: appGroup.color || '#10b981' }"
             >
-              <Icon :icon="appGroup.icon || 'mdi:folder'" class="h-5 w-5 text-white" />
+              <Icon :icon="appGroup.icon || 'mdi:folder'" class="h-4 w-4 text-white" />
             </div>
-            <div class="flex-1">
-              <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+            <div class="flex items-baseline gap-2 flex-1 min-w-0">
+              <h2 class="text-base font-semibold text-gray-900 dark:text-white truncate">
                 {{ appGroup.name }}
               </h2>
-              <p v-if="appGroup.description" class="text-sm text-gray-600 dark:text-gray-400">
-                {{ appGroup.description }}
-              </p>
+              <span v-if="appGroup.description" class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                - {{ appGroup.description }}
+              </span>
             </div>
           </div>
           <Icon
             :icon="isGroupCollapsed(appGroup.id) ? 'mdi:chevron-down' : 'mdi:chevron-up'"
-            class="h-6 w-6 text-gray-500 dark:text-gray-400 transition-transform duration-300"
+            class="h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform duration-300 flex-shrink-0"
           />
         </div>
 
         <!-- Applications du groupe (collapsible) -->
         <transition name="collapse">
           <div v-show="!isGroupCollapsed(appGroup.id)" class="app-group-content">
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div :class="getGridClasses">
               <div
                 v-for="app in appGroup.applications"
                 :key="app.id"
-                class="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 cursor-pointer transition-all duration-150 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md hover:-translate-y-0.5"
+                :class="getAppCardClasses"
                 @click="openApplication(app)"
               >
                 <!-- Star icon (bottom-right, absolute) -->
@@ -338,6 +367,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
 import { useFavoritesStore } from '@/stores/favorites'
 import { dashboardService, adminService, analyticsService, announcementsService } from '@/services/api'
+import ViewModeSelector from '@/components/dashboard/ViewModeSelector.vue'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
@@ -350,6 +380,10 @@ const isLoading = ref(false)
 const collapsedGroups = ref(new Set())
 const activeAnnouncements = ref([])
 
+// View mode state
+const viewMode = ref(localStorage.getItem('dashboard-view-mode') || 'default')
+const allGroupsCollapsed = ref(false)
+
 // Carousel state
 const currentAnnouncementIndex = ref(0)
 const isAutoRotating = ref(true)
@@ -359,6 +393,50 @@ const autoRotationInterval = ref(null)
 // Computed property for current announcement
 const currentAnnouncement = computed(() => {
   return activeAnnouncements.value[currentAnnouncementIndex.value] || {}
+})
+
+// Computed properties for view modes
+const getGridClasses = computed(() => {
+  switch (viewMode.value) {
+    case 'grid':
+      return 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'
+    case 'compact':
+      return 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2'
+    case 'default':
+    default:
+      return 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4'
+  }
+})
+
+const getAppCardClasses = computed(() => {
+  const baseClasses = 'relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer transition-all duration-150 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md hover:-translate-y-0.5'
+
+  switch (viewMode.value) {
+    case 'grid':
+      return `${baseClasses} p-4`
+    case 'compact':
+      return `${baseClasses} p-2`
+    case 'default':
+    default:
+      return `${baseClasses} p-3`
+  }
+})
+
+const getIconSize = computed(() => {
+  switch (viewMode.value) {
+    case 'grid':
+      return 'h-12 w-12'
+    case 'compact':
+      return 'h-8 w-8'
+    case 'default':
+    default:
+      return 'h-10 w-10'
+  }
+})
+
+// Watch view mode changes and save to localStorage
+watch(viewMode, (newMode) => {
+  localStorage.setItem('dashboard-view-mode', newMode)
 })
 
 // Carousel navigation methods
@@ -477,6 +555,33 @@ const toggleGroup = (groupId) => {
 // Vérifier si un groupe est effondré
 const isGroupCollapsed = (groupId) => {
   return collapsedGroups.value.has(groupId)
+}
+
+// Collapse all groups
+const collapseAll = () => {
+  if (!dashboard.value?.app_groups) return
+
+  dashboard.value.app_groups.forEach(group => {
+    collapsedGroups.value.add(group.id)
+  })
+  allGroupsCollapsed.value = true
+  saveCollapsedGroups()
+}
+
+// Expand all groups
+const expandAll = () => {
+  collapsedGroups.value.clear()
+  allGroupsCollapsed.value = false
+  saveCollapsedGroups()
+}
+
+// Toggle all groups
+const toggleAllGroups = () => {
+  if (allGroupsCollapsed.value) {
+    expandAll()
+  } else {
+    collapseAll()
+  }
 }
 
 // Fonctions
