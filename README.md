@@ -110,8 +110,8 @@ Airboard transforms how organizations manage digital resources, internal communi
 **Main Dashboard with Applications**
 ![Dashboard](img/Screenshot_20251117_090240.png)
 
-**Application Groups with Different View Modes**
-![View Modes](img/Screenshot_20251117_090338.png)
+**Administration -  OverView**
+![OverView pages](img/Screenshot_20251117_090338.png)
 
 **Compact View Mode**
 ![Compact View](img/Screenshot_20251117_090346.png)
