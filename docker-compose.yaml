@@ -61,8 +61,8 @@ services:
       dockerfile: Dockerfile
       network: host
     container_name: airboard-frontend
-    expose:
-      - "80"
+    ports:
+      - "80:80"
     depends_on:
       - backend
     restart: unless-stopped
