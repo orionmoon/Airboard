@@ -113,23 +113,38 @@ Airboard transforms how organizations manage digital resources, internal communi
 **Administration -  OverView**
 ![OverView pages](img/Screenshot_20251117_090338.png)
 
-**Compact View Mode**
+**Administration - App Groups Management**
 ![Compact View](img/Screenshot_20251117_090346.png)
 
-**Grid View Mode**
+**Administration - Applications Management**
 ![Grid View](img/Screenshot_20251117_090356.png)
 
 </div>
 
-### User Management
+### Administration
 
 <div align="center">
 
 **User Management Interface**
 ![Users Management](img/Screenshot_20251117_090403.png)
 
-**Application Management**
+**Groups Management**
 ![Applications Management](img/Screenshot_20251117_090409.png)
+
+**Settings**
+![News Hub Grid](img/Screenshot_20251117_090415.png)
+
+**OAuth**
+![Article Detail](img/Screenshot_20251117_090420.png)
+
+**Analytics Dashboard**
+![News Hub List](img/Screenshot_20251117_090429.png)
+
+**Annoucments Management**
+![Rich Editor](img/Screenshot_20251117_090439.png)
+
+**Annoucments Editor**
+![Groups Management](img/Screenshot_20251117_090514.png)
 
 </div>
 
@@ -138,16 +153,19 @@ Airboard transforms how organizations manage digital resources, internal communi
 <div align="center">
 
 **News Hub - Grid View**
-![News Hub Grid](img/Screenshot_20251117_090415.png)
+
 
 **News Article Detail**
-![Article Detail](img/Screenshot_20251117_090420.png)
+
 
 **News Hub - List View**
-![News Hub List](img/Screenshot_20251117_090429.png)
+
+**News Hub Management**
+![Analytics](img/Screenshot_20251117_090448.png)
 
 **Rich Text Editor**
-![Rich Editor](img/Screenshot_20251117_090439.png)
+![Usage Stats](img/Screenshot_20251117_090503.png)
+
 
 </div>
 
@@ -156,10 +174,10 @@ Airboard transforms how organizations manage digital resources, internal communi
 <div align="center">
 
 **Analytics Dashboard**
-![Analytics](img/Screenshot_20251117_090448.png)
+
 
 **Application Usage Statistics**
-![Usage Stats](img/Screenshot_20251117_090503.png)
+
 
 </div>
 
