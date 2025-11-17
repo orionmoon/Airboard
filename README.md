@@ -107,7 +107,7 @@ Airboard transforms how organizations manage digital resources, internal communi
 
 ### Dashboard & Applications
 <!-- Add screenshots showing:
-- Main dashboard with application groups: img/Screenshot_20251117_090240.png
+- Main dashboard with application groups: [Main dashboard with application groups](img/Screenshot_20251117_090240.png)
 - Application cards with favorites
 - Search and filter functionality
 - Dark mode vs Light mode
