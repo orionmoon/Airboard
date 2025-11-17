@@ -215,13 +215,20 @@ For detailed instructions and troubleshooting, see [DOCKER_INSTALL.md](DOCKER_IN
 2. **Select "Deploy from Git"**
 3. **Repository**: `https://github.com/orionmoon/airboard.git`
 4. **Build Pack**: `docker-compose`
-5. **Configure Environment Variables** (see [Configuration](#-configuration))
-6. **Deploy**
+5. **Docker Compose File**: Select `docker-compose.prod.yaml` in Coolify settings
+6. **Configure Environment Variables** (see below)
+7. **Deploy**
+
+**Why use docker-compose.prod.yaml for Coolify?**
+- Uses `expose` instead of `ports` for frontend (avoids port 80 conflict)
+- Coolify manages routing via its reverse proxy (Traefik)
+- Local installation uses `docker-compose.yaml` with direct port 80 access
 
 **Environment Variables to set in Coolify (minimum):**
 ```env
 DB_PASSWORD=your_secure_password
 JWT_SECRET=your-very-long-secret-key-minimum-32-characters
+PUBLIC_URL=https://your-domain.com
 SSO_ENABLED=true  # If using Authentik
 ```
 
