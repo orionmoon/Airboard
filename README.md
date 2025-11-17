@@ -117,12 +117,13 @@ Airboard transforms how organizations manage digital resources, internal communi
 <div align="center">
 
 **News Hub - Grid View**
+![Dashboard](img/Screenshot_20251117_093545.png)
 
-
-**News Article Detail**
-
+**News compact View**
+![Dashboard](img/Screenshot_20251117_093555.png)
 
 **News Hub - List View**
+![Dashboard](img/Screenshot_20251117_093524.png)
 
 **News Hub Management**
 ![Analytics](img/Screenshot_20251117_090448.png)
