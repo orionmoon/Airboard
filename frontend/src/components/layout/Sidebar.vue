@@ -135,8 +135,8 @@
     <!-- Footer -->
     <div class="mt-auto border-t border-gray-700 p-4">
       <!-- Zoom Control -->
-      <div class="mb-4">
-        <label class="block text-xs text-gray-400 mb-2">{{ $t('common.zoom') }}</label>
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-sm text-gray-400">{{ $t('common.zoom') }}</span>
         <ZoomControl v-model="appStore.zoomLevel" @update:modelValue="appStore.setZoomLevel" />
       </div>
 
