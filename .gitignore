@@ -25,6 +25,7 @@ build/
 backend/backend
 backend/backend-test
 backend/main
+backend/airboard
 *.test
 *.out
 go.work
