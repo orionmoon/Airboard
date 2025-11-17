@@ -1,8 +1,6 @@
 <template>
-  <div class="app-layout" :style="{ transform: `scale(${appStore.zoomScale})`, transformOrigin: 'top left', width: `${100 / appStore.zoomScale}%`, height: `${100 / appStore.zoomScale}%` }">
-
-
-    <!-- Sidebar -->
+  <div class="app-layout">
+    <!-- Sidebar (non zoomée) -->
     <Sidebar v-if="isAuthenticated && !isAuthPage" />
 
     <!-- Overlay mobile -->
@@ -14,15 +12,31 @@
 
     <!-- Main content -->
     <div :class="mainContentClasses">
-      <!-- Loading global -->
-      <LoadingOverlay v-if="appStore.isLoading" />
-      
-      <!-- Router view -->
-      <router-view v-slot="{ Component, route }">
-        <transition name="page" mode="out-in">
-          <component :is="Component" :key="route.path" />
-        </transition>
-      </router-view>
+      <!-- Zoom wrapper (contenu zoomé) -->
+      <div v-if="isAuthenticated && !isAuthPage" class="zoom-wrapper" :style="zoomWrapperStyle">
+        <!-- Loading global -->
+        <LoadingOverlay v-if="appStore.isLoading" />
+
+        <!-- Router view -->
+        <router-view v-slot="{ Component, route }">
+          <transition name="page" mode="out-in">
+            <component :is="Component" :key="route.path" />
+          </transition>
+        </router-view>
+      </div>
+
+      <!-- Auth pages (non zoomées) -->
+      <template v-else>
+        <!-- Loading global -->
+        <LoadingOverlay v-if="appStore.isLoading" />
+
+        <!-- Router view -->
+        <router-view v-slot="{ Component, route }">
+          <transition name="page" mode="out-in">
+            <component :is="Component" :key="route.path" />
+          </transition>
+        </router-view>
+      </template>
     </div>
 
     <!-- Notifications -->
@@ -56,6 +70,14 @@ const mainContentClasses = computed(() => {
     return 'main-content'
   } else {
     return 'min-h-screen bg-gray-900'
+  }
+})
+
+const zoomWrapperStyle = computed(() => {
+  // Utiliser la propriété zoom CSS au lieu de transform scale
+  // Cela préserve les coordonnées pour Vue DevTools
+  return {
+    zoom: appStore.zoomScale
   }
 })
 
@@ -115,6 +137,13 @@ onMounted(async () => {
 </script>
 
 <style>
+/* Zoom wrapper */
+.zoom-wrapper {
+  /* Avec la propriété zoom CSS, pas besoin de compensation de taille */
+  width: 100%;
+  min-height: 100vh;
+}
+
 /* Transitions globales */
 .page-enter-active,
 .page-leave-active {
