@@ -103,46 +103,74 @@ Airboard transforms how organizations manage digital resources, internal communi
 
 ## 📸 Screenshots
 
-> **Note**: Screenshots will be added here to showcase the application's interface and features.
-
 ### Dashboard & Applications
-<!-- Add screenshots showing:
-- Main dashboard with application groups
-- Application cards with favorites
-- Search and filter functionality
-- Dark mode vs Light mode
--->
+
+<div align="center">
+
+**Main Dashboard with Applications**
+![Dashboard](img/Screenshot_20251117_090240.png)
+
+**Application Groups with Different View Modes**
+![View Modes](img/Screenshot_20251117_090338.png)
+
+**Compact View Mode**
+![Compact View](img/Screenshot_20251117_090346.png)
+
+**Grid View Mode**
+![Grid View](img/Screenshot_20251117_090356.png)
+
+</div>
 
 ### User Management
-<!-- Add screenshots showing:
-- User list with role badges
-- User creation/edit modal
-- Group management interface
--->
+
+<div align="center">
+
+**User Management Interface**
+![Users Management](img/Screenshot_20251117_090403.png)
+
+**Application Management**
+![Applications Management](img/Screenshot_20251117_090409.png)
+
+</div>
 
 ### News Hub
-<!-- Add screenshots showing:
-- News Hub main view (Grid, List, Compact modes)
-- Rich text editor with Tiptap
-- Article detail page with reactions
-- News management interface
-- Categories and tags filtering
--->
+
+<div align="center">
+
+**News Hub - Grid View**
+![News Hub Grid](img/Screenshot_20251117_090415.png)
+
+**News Article Detail**
+![Article Detail](img/Screenshot_20251117_090420.png)
+
+**News Hub - List View**
+![News Hub List](img/Screenshot_20251117_090429.png)
+
+**Rich Text Editor**
+![Rich Editor](img/Screenshot_20251117_090439.png)
+
+</div>
 
 ### Analytics Dashboard
-<!-- Add screenshots showing:
-- Application usage analytics
-- Daily activity charts
-- Top applications and users
-- News Hub statistics
--->
 
-### Announcements
-<!-- Add screenshots showing:
-- Announcements carousel on dashboard
-- Announcement creation/editing
-- Different announcement types (info, warning, success, error)
--->
+<div align="center">
+
+**Analytics Dashboard**
+![Analytics](img/Screenshot_20251117_090448.png)
+
+**Application Usage Statistics**
+![Usage Stats](img/Screenshot_20251117_090503.png)
+
+</div>
+
+### Groups Management
+
+<div align="center">
+
+**Groups & Organization Management**
+![Groups Management](img/Screenshot_20251117_090514.png)
+
+</div>
 
 ---
 
