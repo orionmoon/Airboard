@@ -134,6 +134,12 @@
 
     <!-- Footer -->
     <div class="mt-auto border-t border-gray-700 p-4">
+      <!-- Zoom Control -->
+      <div class="mb-4">
+        <label class="block text-xs text-gray-400 mb-2">{{ $t('common.zoom') }}</label>
+        <ZoomControl v-model="appStore.zoomLevel" @update:modelValue="appStore.setZoomLevel" />
+      </div>
+
       <!-- Theme toggle -->
       <div class="flex items-center justify-between mb-4">
         <span class="text-sm text-gray-400">{{ $t('common.darkMode') }}</span>
@@ -141,8 +147,8 @@
           @click="appStore.toggleDarkMode()"
           class="theme-toggle"
         >
-          <Icon 
-            :icon="appStore.isDarkMode ? 'mdi:weather-night' : 'mdi:weather-sunny'" 
+          <Icon
+            :icon="appStore.isDarkMode ? 'mdi:weather-night' : 'mdi:weather-sunny'"
             class="h-4 w-4"
           />
         </button>
@@ -198,6 +204,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
+import ZoomControl from '@/components/dashboard/ZoomControl.vue'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()

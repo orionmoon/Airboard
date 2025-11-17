@@ -1,10 +1,10 @@
 <template>
-  <div class="app-layout">
-    
+  <div class="app-layout" :style="{ transform: `scale(${appStore.zoomScale})`, transformOrigin: 'top left', width: `${100 / appStore.zoomScale}%`, height: `${100 / appStore.zoomScale}%` }">
+
 
     <!-- Sidebar -->
     <Sidebar v-if="isAuthenticated && !isAuthPage" />
-    
+
     <!-- Overlay mobile -->
     <div
       v-if="isAuthenticated && !isAuthPage && appStore.sidebarOpen"

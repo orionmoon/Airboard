@@ -130,9 +130,7 @@ Airboard transforms how organizations manage digital resources, internal communi
 **Rich Text Editor**
 ![Usage Stats](img/Screenshot_20251117_090503.png)
 
-
 </div>
-
 
 ### Administration
 

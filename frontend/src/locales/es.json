@@ -9,6 +9,7 @@
     "groups": "Grupos",
     "settings": "Ajustes",
     "darkMode": "Modo oscuro",
+    "zoom": "Zoom",
     "logout": "Cerrar sesión",
     "search": "Buscar",
     "status_all": "Todos los estados",
@@ -250,6 +251,12 @@
       "grid": "Cuadrícula",
       "default": "Predeterminado",
       "compact": "Compacto"
+    },
+    "zoom": {
+      "extraSmall": "Muy pequeño",
+      "small": "Pequeño",
+      "normal": "Normal",
+      "large": "Grande"
     }
   }
 }

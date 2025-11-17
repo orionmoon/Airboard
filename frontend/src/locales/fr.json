@@ -9,6 +9,7 @@
     "groups": "Groupes",
     "settings": "Paramètres",
     "darkMode": "Mode sombre",
+    "zoom": "Zoom",
     "logout": "Se déconnecter",
     "search": "Rechercher",
     "status_all": "Tous les statuts",
@@ -250,6 +251,12 @@
       "grid": "Grille",
       "default": "Par Défaut",
       "compact": "Compact"
+    },
+    "zoom": {
+      "extraSmall": "Très petit",
+      "small": "Petit",
+      "normal": "Normal",
+      "large": "Grand"
     }
   }
 

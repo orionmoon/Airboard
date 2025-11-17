@@ -9,6 +9,7 @@
     "groups": "المجموعات",
     "settings": "الإعدادات",
     "darkMode": "الوضع الداكن",
+    "zoom": "تكبير",
     "logout": "تسجيل الخروج",
     "search": "بحث",
     "status_all": "كل الحالات",
@@ -250,6 +251,12 @@
       "grid": "شبكة",
       "default": "افتراضي",
       "compact": "مضغوط"
+    },
+    "zoom": {
+      "extraSmall": "صغير جدا",
+      "small": "صغير",
+      "normal": "عادي",
+      "large": "كبير"
     }
   }
 }

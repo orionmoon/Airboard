@@ -11,13 +11,15 @@ export const useAppStore = defineStore('app', () => {
   const appSettings = ref(null)
   const settingsLastUpdated = ref(Date.now())
   const locale = ref(resolveInitialLocale())
+  const zoomLevel = ref('100')
 
   // Getters
   const hasNotifications = computed(() => notifications.value.length > 0)
-  const unreadNotifications = computed(() => 
+  const unreadNotifications = computed(() =>
     notifications.value.filter(n => !n.read)
   )
   const unreadCount = computed(() => unreadNotifications.value.length)
+  const zoomScale = computed(() => parseInt(zoomLevel.value) / 100)
 
   // Actions
   const toggleDarkMode = () => {
@@ -49,6 +51,11 @@ export const useAppStore = defineStore('app', () => {
   const setSidebarOpen = (value) => {
     sidebarOpen.value = value
     localStorage.setItem('airboard_sidebar_open', value.toString())
+  }
+
+  const setZoomLevel = (value) => {
+    zoomLevel.value = value
+    localStorage.setItem('airboard_zoom_level', value)
   }
 
   const setLoading = (value) => {
@@ -112,6 +119,12 @@ export const useAppStore = defineStore('app', () => {
       const storedSidebarOpen = localStorage.getItem('airboard_sidebar_open')
       if (storedSidebarOpen !== null) {
         sidebarOpen.value = storedSidebarOpen === 'true'
+      }
+
+      // Zoom level
+      const storedZoomLevel = localStorage.getItem('airboard_zoom_level')
+      if (storedZoomLevel) {
+        zoomLevel.value = storedZoomLevel
       }
 
       // Appliquer le thème
@@ -218,17 +231,20 @@ export const useAppStore = defineStore('app', () => {
     appSettings,
     settingsLastUpdated,
     locale,
+    zoomLevel,
 
     // Getters
     hasNotifications,
     unreadNotifications,
     unreadCount,
+    zoomScale,
 
     // Actions
     toggleDarkMode,
     setDarkMode,
     toggleSidebar,
     setSidebarOpen,
+    setZoomLevel,
     setLoading,
     addNotification,
     removeNotification,
