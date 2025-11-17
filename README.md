@@ -110,6 +110,14 @@ Airboard transforms how organizations manage digital resources, internal communi
 **Main Dashboard with Applications**
 ![Dashboard](img/Screenshot_20251117_090240.png)
 
+
+
+</div>
+
+### Administration
+
+<div align="center">
+
 **Administration -  OverView**
 ![OverView pages](img/Screenshot_20251117_090338.png)
 
@@ -118,12 +126,6 @@ Airboard transforms how organizations manage digital resources, internal communi
 
 **Administration - Applications Management**
 ![Grid View](img/Screenshot_20251117_090356.png)
-
-</div>
-
-### Administration
-
-<div align="center">
 
 **User Management Interface**
 ![Users Management](img/Screenshot_20251117_090403.png)
@@ -166,27 +168,6 @@ Airboard transforms how organizations manage digital resources, internal communi
 **Rich Text Editor**
 ![Usage Stats](img/Screenshot_20251117_090503.png)
 
-
-</div>
-
-### Analytics Dashboard
-
-<div align="center">
-
-**Analytics Dashboard**
-
-
-**Application Usage Statistics**
-
-
-</div>
-
-### Groups Management
-
-<div align="center">
-
-**Groups & Organization Management**
-![Groups Management](img/Screenshot_20251117_090514.png)
 
 </div>
 
