@@ -131,7 +131,11 @@
     "confirmNewPasswordPlaceholder": "Confirma la nueva contraseña",
     "resetTitle": "Restablecer ajustes por defecto",
     "resetSubtitle": "¿Seguro que deseas restablecer todos los ajustes? Esta acción no se puede deshacer.",
-    "resetButton": "Restablecer"
+    "resetButton": "Restablecer",
+    "defaultGroupConfiguration": "Configuración del grupo predeterminado",
+    "defaultGroup": "Grupo predeterminado para nuevos usuarios",
+    "noDefaultGroup": "Sin grupo predeterminado (asignación manual)",
+    "defaultGroupHelp": "Seleccione el grupo que se asignará automáticamente a los nuevos usuarios durante el registro. Dejar vacío para requerir asignación manual."
   },
   "admin": {
     "overviewTitle": "Administración",

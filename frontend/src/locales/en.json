@@ -135,7 +135,11 @@
     "confirmNewPasswordPlaceholder": "Confirm new password",
     "resetTitle": "Reset to Default Settings",
     "resetSubtitle": "Are you sure you want to reset all settings to their default values? This action cannot be undone.",
-    "resetButton": "Reset Settings"
+    "resetButton": "Reset Settings",
+    "defaultGroupConfiguration": "Default Group Configuration",
+    "defaultGroup": "Default Group for New Users",
+    "noDefaultGroup": "No default group (manual assignment)",
+    "defaultGroupHelp": "Select the group that will be automatically assigned to new users during registration. Leave empty to require manual group assignment."
   },
   "admin": {
     "overviewTitle": "Administration",

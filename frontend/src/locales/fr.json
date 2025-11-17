@@ -131,7 +131,11 @@
     "confirmNewPasswordPlaceholder": "Confirmez le nouveau mot de passe",
     "resetTitle": "Réinitialiser les paramètres par défaut",
     "resetSubtitle": "Êtes-vous sûr de vouloir réinitialiser tous les paramètres ? Cette action est irréversible.",
-    "resetButton": "Réinitialiser"
+    "resetButton": "Réinitialiser",
+    "defaultGroupConfiguration": "Configuration du groupe par défaut",
+    "defaultGroup": "Groupe par défaut pour les nouveaux utilisateurs",
+    "noDefaultGroup": "Aucun groupe par défaut (attribution manuelle)",
+    "defaultGroupHelp": "Sélectionnez le groupe qui sera automatiquement attribué aux nouveaux utilisateurs lors de l'inscription. Laisser vide pour exiger une attribution manuelle."
   },
   "admin": {
     "overviewTitle": "Administration",

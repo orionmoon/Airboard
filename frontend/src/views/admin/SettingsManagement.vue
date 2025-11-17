@@ -114,7 +114,7 @@
               <Icon icon="mdi:view-dashboard-outline" class="section-icon" />
               <h4 class="section-title">{{ $t('settings.dashboardCustomization') }}</h4>
             </div>
-            
+
             <div class="space-y-4">
               <div class="form-group">
                 <label for="dashboard_title" class="form-label form-label-required">{{ $t('settings.dashboardTitle') }}</label>
@@ -143,6 +143,33 @@
                 <p v-if="errors.welcome_message" class="form-error">{{ errors.welcome_message }}</p>
                 <p class="form-help">Friendly message displayed below the dashboard title</p>
               </div>
+            </div>
+          </div>
+
+          <!-- Default Group Configuration -->
+          <div>
+            <div class="section-header">
+              <Icon icon="mdi:account-group" class="section-icon" />
+              <h4 class="section-title">{{ $t('settings.defaultGroupConfiguration') }}</h4>
+            </div>
+
+            <div class="form-group">
+              <label for="default_group" class="form-label">{{ $t('settings.defaultGroup') }}</label>
+              <select
+                id="default_group"
+                v-model="form.default_group_id"
+                class="form-input"
+              >
+                <option :value="null">{{ $t('settings.noDefaultGroup') }}</option>
+                <option
+                  v-for="group in groups"
+                  :key="group.id"
+                  :value="group.id"
+                >
+                  {{ group.name }}
+                </option>
+              </select>
+              <p class="form-help">{{ $t('settings.defaultGroupHelp') }}</p>
             </div>
           </div>
 
@@ -314,8 +341,11 @@ const form = reactive({
   app_name: '',
   app_icon: '',
   dashboard_title: '',
-  welcome_message: ''
+  welcome_message: '',
+  default_group_id: null
 })
+
+const groups = ref([])
 
 const passwordForm = reactive({
   oldPassword: '',
@@ -324,6 +354,16 @@ const passwordForm = reactive({
 })
 
 // Methods
+const loadGroups = async () => {
+  try {
+    const data = await adminService.getGroups()
+    groups.value = data
+  } catch (error) {
+    console.error('Error loading groups:', error)
+    appStore.showError('Failed to load groups')
+  }
+}
+
 const loadSettings = async () => {
   try {
     appStore.setLoading(true)
@@ -334,7 +374,8 @@ const loadSettings = async () => {
       app_name: data.app_name || 'Airboard',
       app_icon: data.app_icon || 'mdi:view-dashboard',
       dashboard_title: data.dashboard_title || 'Dashboard',
-      welcome_message: data.welcome_message || 'Welcome to your application portal'
+      welcome_message: data.welcome_message || 'Welcome to your application portal',
+      default_group_id: data.default_group_id || null
     })
   } catch (error) {
     console.error('Error loading settings:', error)
@@ -474,7 +515,7 @@ const closePasswordModal = () => {
 }
 
 // Lifecycle
-onMounted(() => {
-  loadSettings()
+onMounted(async () => {
+  await Promise.all([loadSettings(), loadGroups()])
 })
 </script>
