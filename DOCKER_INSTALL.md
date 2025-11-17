@@ -93,8 +93,8 @@ Ouvrez votre navigateur et allez sur :
 ### 7. Connexion
 
 **Comptes par défaut :**
-- **Admin** : admin@airboard.com / admin123
-- **Utilisateur** : user@airboard.com / user123
+- **Admin** : username `admin` / password `admin123`
+- **Utilisateur** : username `user` / password `user123`
 
 ## Commandes utiles
 

@@ -181,22 +181,33 @@ Airboard transforms how organizations manage digital resources, internal communi
 git clone https://github.com/orionmoon/airboard.git
 cd airboard
 
+# Start Docker service
+sudo systemctl start docker
+
 # Configure environment variables (optional)
 cp .env.example .env
-# Edit .env with your settings
+# Edit .env with your settings if needed
 
-# Start all services
+# Build and start all services
+docker-compose build
 docker-compose up -d
 
 # Check status
 docker-compose ps
 ```
 
-**Access:** http://localhost (frontend on port 80, backend on port 8080)
+**Access:** http://localhost
 
 **Default accounts:**
-- **Admin**: `admin@airboard.com` / `admin123`
-- **User**: `user@airboard.com` / `user123`
+- **Admin**: username `admin` / password `admin123`
+- **User**: username `user` / password `user123`
+
+**Architecture:**
+- Frontend (Nginx + Vue.js): Port 80
+- Backend (Go API): Proxied via Nginx at `/api/v1`
+- PostgreSQL: Internal network only
+
+For detailed instructions and troubleshooting, see [DOCKER_INSTALL.md](DOCKER_INSTALL.md)
 
 ### Option 2: Coolify Deployment (Cloud - Recommended for Production)
 
@@ -363,7 +374,7 @@ This guide covers:
 - 🔧 **Troubleshooting** - Solutions to common issues
 
 **Quick Start for Admins:**
-1. Login with `admin@airboard.com` / `admin123`
+1. Login with username `admin` / password `admin123`
 2. Change the default password immediately
 3. Create groups (e.g., "IT", "Sales", "Common")
 4. Add applications with icons and URLs
@@ -469,7 +480,7 @@ User visits directly or SSO disabled:
 #### Test 2: Without SSO (Fallback)
 1. Access directly: `http://localhost:3000` or `https://coolify-domain.com`
 2. Shows login page
-3. Use classic credentials: `admin@airboard.com` / `admin123`
+3. Use classic credentials: username `admin` / password `admin123`
 
 ---
 
