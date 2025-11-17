@@ -28,13 +28,20 @@ const props = defineProps({
 const renderedContent = computed(() => {
   if (!props.content) return ''
 
-  // If content is string, assume it's plain text
+  let contentObj = props.content
+
+  // If content is a string, try to parse it as JSON
   if (typeof props.content === 'string') {
-    return `<p>${props.content}</p>`
+    try {
+      contentObj = JSON.parse(props.content)
+    } catch (e) {
+      // If parsing fails, treat it as plain text
+      return `<p>${props.content}</p>`
+    }
   }
 
   // Generate HTML from Tiptap JSON
-  return generateHTML(props.content, [
+  return generateHTML(contentObj, [
     StarterKit.configure({
       codeBlock: false
     }),
