@@ -110,6 +110,9 @@ PROJECT-*.md
 QUICK-START-*.md
 RESUME-*.md
 
+# Documentation Claude Code (privée)
+CLAUDE.md
+
 # Répertoires temporaires
 docker-simple/
 releases/
