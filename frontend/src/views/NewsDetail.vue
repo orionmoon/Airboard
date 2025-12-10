@@ -57,6 +57,23 @@
             {{ $t('news.detail.pinned') }}
           </span>
 
+          <!-- Visibility Badge -->
+          <span
+            v-if="!news.target_groups || news.target_groups.length === 0"
+            class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+          >
+            <Icon icon="mdi:earth" class="inline h-4 w-4 mr-1" />
+            Public
+          </span>
+          <span
+            v-else
+            class="px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300"
+            :title="getGroupsTooltip(news.target_groups)"
+          >
+            <Icon icon="mdi:lock" class="inline h-4 w-4 mr-1" />
+            {{ getVisibilityLabel(news.target_groups) }}
+          </span>
+
           <!-- Category -->
           <span
             v-if="news.category"
@@ -284,6 +301,24 @@ const formatDate = (dateString) => {
 
 const editNews = () => {
   router.push({ name: 'AdminNewsEdit', params: { id: news.value.id } })
+}
+
+const getVisibilityLabel = (targetGroups) => {
+  if (!targetGroups || targetGroups.length === 0) {
+    return 'Public'
+  }
+  if (targetGroups.length === 1) {
+    return targetGroups[0].name
+  }
+  return `${targetGroups.length} groupes`
+}
+
+const getGroupsTooltip = (targetGroups) => {
+  if (!targetGroups || targetGroups.length === 0) {
+    return 'Visible par tous les utilisateurs'
+  }
+  const groupNames = targetGroups.map(g => g.name).join(', ')
+  return `Visible uniquement pour: ${groupNames}`
 }
 
 // Lifecycle

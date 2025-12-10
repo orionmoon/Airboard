@@ -6,9 +6,11 @@ import (
 	"strings"
 	"time"
 
+	"airboard/middleware"
+	"airboard/models"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"airboard/models"
 )
 
 type NewsHandler struct {
@@ -33,7 +35,8 @@ func (h *NewsHandler) GetNews(c *gin.Context) {
 		Preload("Author").
 		Preload("Category").
 		Preload("Tags").
-		Preload("Reactions")
+		Preload("Reactions").
+		Preload("TargetGroups")
 
 	// Filtres
 	if categoryID := c.Query("category_id"); categoryID != "" {
@@ -68,15 +71,56 @@ func (h *NewsHandler) GetNews(c *gin.Context) {
 		query = query.Where("title LIKE ? OR summary LIKE ?", "%"+search+"%", "%"+search+"%")
 	}
 
-	// Filtre published only (sauf pour admin/editor)
-	userRole := c.GetString("user_role")
-	if userRole != "admin" && userRole != "editor" {
+	// Filtre published only et visibilité par groupes selon le rôle
+	userRole := c.GetString("role")
+	userID := c.GetUint("user_id")
+
+	if userRole == "admin" {
+		// Admin voit tout (publié + brouillons)
+	} else if userRole == "group_admin" {
+		// Group admin voit :
+		// 1. Tous les articles publiés publics (sans groupes cibles)
+		// 2. Ses propres articles (publiés + brouillons)
+		// 3. Les articles publiés ciblant les groupes qu'il administre
+		managedGroupIDs := middleware.GetManagedGroupIDs(c)
+
+		query = query.Where(`
+			(author_id = ?) OR
+			(is_published = ? AND (published_at IS NULL OR published_at <= ?) AND (
+				(SELECT COUNT(*) FROM news_target_groups WHERE news_target_groups.news_id = news.id) = 0 OR
+				EXISTS (
+					SELECT 1 FROM news_target_groups
+					WHERE news_target_groups.news_id = news.id
+					AND news_target_groups.group_id IN (?)
+				)
+			))
+		`, userID, true, time.Now(), managedGroupIDs)
+	} else if userRole == "editor" {
+		// Editor voit : news publiques + ses propres brouillons
+		query = query.Where("(is_published = ? AND (published_at IS NULL OR published_at <= ?)) OR author_id = ?",
+			true, time.Now(), userID)
+	} else {
+		// User régulier voit : news publiques + news ciblant ses groupes
 		query = query.Where("is_published = ?", true).
 			Where("(published_at IS NULL OR published_at <= ?)", time.Now())
-	}
 
-	// Gestion de la visibilité par groupes
-	// TODO: Implémenter le filtrage par target_groups pour les users non-admin
+		var userGroupIDs []uint
+		h.db.Table("user_groups").Where("user_id = ?", userID).Pluck("group_id", &userGroupIDs)
+
+		if len(userGroupIDs) > 0 {
+			query = query.Where(`
+				(SELECT COUNT(*) FROM news_target_groups WHERE news_target_groups.news_id = news.id) = 0
+				OR EXISTS (
+					SELECT 1 FROM news_target_groups
+					WHERE news_target_groups.news_id = news.id
+					AND news_target_groups.group_id IN (?)
+				)
+			`, userGroupIDs)
+		} else {
+			// Si pas de groupes, voir seulement les news globales
+			query = query.Where("(SELECT COUNT(*) FROM news_target_groups WHERE news_target_groups.news_id = news.id) = 0")
+		}
+	}
 
 	// Tri
 	sortBy := c.DefaultQuery("sort", "published_at")
@@ -121,6 +165,7 @@ func (h *NewsHandler) GetNewsBySlug(c *gin.Context) {
 		Preload("Category").
 		Preload("Tags").
 		Preload("Reactions").
+		Preload("TargetGroups").
 		Where("slug = ?", slug).
 		First(&news).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -131,11 +176,89 @@ func (h *NewsHandler) GetNewsBySlug(c *gin.Context) {
 		return
 	}
 
-	// Vérifier si publié (sauf admin/editor)
-	userRole := c.GetString("user_role")
-	if userRole != "admin" && userRole != "editor" {
-		if !news.IsPublished {
-			c.JSON(http.StatusForbidden, gin.H{"error": "News not published"})
+	// Vérifier les permissions selon le rôle
+	userRole := c.GetString("role")
+	userID := c.GetUint("user_id")
+
+	if userRole == "admin" {
+		// Admin voit tout
+		c.JSON(http.StatusOK, news)
+		return
+	}
+
+	// Vérifier si publié
+	if !news.IsPublished {
+		// Seul l'auteur ou un editor/group_admin peut voir un brouillon
+		if userRole == "editor" && news.AuthorID == userID {
+			c.JSON(http.StatusOK, news)
+			return
+		}
+		if userRole == "group_admin" && news.AuthorID == userID {
+			c.JSON(http.StatusOK, news)
+			return
+		}
+		c.JSON(http.StatusForbidden, gin.H{"error": "News not published"})
+		return
+	}
+
+	// Article publié : vérifier les groupes cibles
+	if userRole == "group_admin" {
+		// Group admin peut voir :
+		// 1. News sans groupes cibles (publiques/globales)
+		// 2. News ciblant ses groupes administrés
+		managedGroupIDs := middleware.GetManagedGroupIDs(c)
+
+		// Si pas de groupes cibles, c'est une news globale (accessible à tous)
+		if len(news.TargetGroups) == 0 {
+			c.JSON(http.StatusOK, news)
+			return
+		}
+
+		// Vérifier si au moins un groupe cible est administré par ce group_admin
+		hasAccess := false
+		for _, targetGroup := range news.TargetGroups {
+			for _, managedID := range managedGroupIDs {
+				if targetGroup.ID == managedID {
+					hasAccess = true
+					break
+				}
+			}
+			if hasAccess {
+				break
+			}
+		}
+
+		if !hasAccess {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied to this news"})
+			return
+		}
+	} else {
+		// User régulier : vérifier s'il appartient à un groupe cible
+		var userGroupIDs []uint
+		h.db.Table("user_groups").Where("user_id = ?", userID).Pluck("group_id", &userGroupIDs)
+
+		// Si pas de groupes cibles, c'est une news globale
+		if len(news.TargetGroups) == 0 {
+			c.JSON(http.StatusOK, news)
+			return
+		}
+
+		// Vérifier si l'utilisateur appartient à au moins un groupe cible
+		hasAccess := false
+		for _, targetGroup := range news.TargetGroups {
+			for _, userGroupID := range userGroupIDs {
+				if targetGroup.ID == userGroupID {
+					hasAccess = true
+					break
+				}
+			}
+			if hasAccess {
+				break
+			}
+		}
+
+		if !hasAccess {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied to this news"})
 			return
 		}
 	}
@@ -188,8 +311,32 @@ func (h *NewsHandler) CreateNews(c *gin.Context) {
 		h.db.Model(&news).Association("Tags").Replace(tags)
 	}
 
-	// Associer les groupes cibles
+	// Associer les groupes cibles avec vérification pour group_admin
 	if len(req.TargetGroupIDs) > 0 {
+		userRole := c.GetString("role")
+
+		// Si group_admin, vérifier qu'il ne cible que ses groupes
+		if userRole == "group_admin" {
+			managedGroupIDs := middleware.GetManagedGroupIDs(c)
+			for _, targetGroupID := range req.TargetGroupIDs {
+				canManage := false
+				for _, managedID := range managedGroupIDs {
+					if targetGroupID == managedID {
+						canManage = true
+						break
+					}
+				}
+				if !canManage {
+					c.JSON(http.StatusForbidden, gin.H{
+						"error": "Vous ne pouvez cibler que les groupes que vous administrez",
+					})
+					// Supprimer la news créée
+					h.db.Delete(&news)
+					return
+				}
+			}
+		}
+
 		var groups []models.Group
 		h.db.Where("id IN ?", req.TargetGroupIDs).Find(&groups)
 		h.db.Model(&news).Association("TargetGroups").Replace(groups)
@@ -272,8 +419,28 @@ func (h *NewsHandler) UpdateNews(c *gin.Context) {
 		h.db.Model(&news).Association("Tags").Replace(tags)
 	}
 
-	// Mettre à jour les groupes cibles
+	// Mettre à jour les groupes cibles avec vérification pour group_admin
 	if req.TargetGroupIDs != nil {
+		// Si group_admin, vérifier qu'il ne cible que ses groupes
+		if userRole == "group_admin" && len(req.TargetGroupIDs) > 0 {
+			managedGroupIDs := middleware.GetManagedGroupIDs(c)
+			for _, targetGroupID := range req.TargetGroupIDs {
+				canManage := false
+				for _, managedID := range managedGroupIDs {
+					if targetGroupID == managedID {
+						canManage = true
+						break
+					}
+				}
+				if !canManage {
+					c.JSON(http.StatusForbidden, gin.H{
+						"error": "Vous ne pouvez cibler que les groupes que vous administrez",
+					})
+					return
+				}
+			}
+		}
+
 		var groups []models.Group
 		h.db.Where("id IN ?", req.TargetGroupIDs).Find(&groups)
 		h.db.Model(&news).Association("TargetGroups").Replace(groups)
@@ -305,7 +472,7 @@ func (h *NewsHandler) DeleteNews(c *gin.Context) {
 
 	// Vérifier les permissions
 	userID := c.GetUint("user_id")
-	userRole := c.GetString("user_role")
+	userRole := c.GetString("role")
 	if userRole != "admin" && news.AuthorID != userID {
 		c.JSON(http.StatusForbidden, gin.H{"error": "You can only delete your own news"})
 		return

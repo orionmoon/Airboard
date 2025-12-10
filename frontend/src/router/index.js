@@ -18,6 +18,13 @@ const AnnouncementsManagement = () => import('@/views/admin/AnnouncementsManagem
 const NewsManagement = () => import('@/views/admin/NewsManagement.vue')
 const NewsEditor = () => import('@/views/admin/NewsEditor.vue')
 
+// Group Admin views
+const GroupAdminDashboard = () => import('@/views/group-admin/GroupAdminDashboard.vue')
+const GroupAdminAppGroups = () => import('@/views/group-admin/AppGroupsManagement.vue')
+const GroupAdminApplications = () => import('@/views/group-admin/ApplicationsManagement.vue')
+const GroupAdminNews = () => import('@/views/group-admin/NewsManagement.vue')
+const GroupAdminNewsEditor = () => import('@/views/group-admin/NewsEditor.vue')
+
 // News views (public)
 const NewsCenter = () => import('@/views/NewsCenter.vue')
 const NewsDetail = () => import('@/views/NewsDetail.vue')
@@ -204,6 +211,67 @@ const routes = [
       title: 'New Article'
     }
   },
+  // Routes Group Admin
+  {
+    path: '/group-admin',
+    name: 'GroupAdminDashboard',
+    component: GroupAdminDashboard,
+    meta: {
+      requiresAuth: true,
+      requiresGroupAdmin: true,
+      title: 'Administration de Groupe'
+    }
+  },
+  {
+    path: '/group-admin/app-groups',
+    name: 'GroupAdminAppGroups',
+    component: GroupAdminAppGroups,
+    meta: {
+      requiresAuth: true,
+      requiresGroupAdmin: true,
+      title: 'Mes Groupes d\'Applications'
+    }
+  },
+  {
+    path: '/group-admin/applications',
+    name: 'GroupAdminApplications',
+    component: GroupAdminApplications,
+    meta: {
+      requiresAuth: true,
+      requiresGroupAdmin: true,
+      title: 'Mes Applications'
+    }
+  },
+  {
+    path: '/group-admin/news',
+    name: 'GroupAdminNews',
+    component: GroupAdminNews,
+    meta: {
+      requiresAuth: true,
+      requiresGroupAdmin: true,
+      title: 'News de Groupe'
+    }
+  },
+  {
+    path: '/group-admin/news/new',
+    name: 'GroupAdminNewsNew',
+    component: GroupAdminNewsEditor,
+    meta: {
+      requiresAuth: true,
+      requiresGroupAdmin: true,
+      title: 'Nouvel Article de Groupe'
+    }
+  },
+  {
+    path: '/group-admin/news/:slug/edit',
+    name: 'GroupAdminNewsEdit',
+    component: GroupAdminNewsEditor,
+    meta: {
+      requiresAuth: true,
+      requiresGroupAdmin: true,
+      title: 'Modifier l\'Article'
+    }
+  },
   {
     path: '/unauthorized',
     name: 'Unauthorized',
@@ -277,6 +345,15 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresEditor) {
     const userRole = authStore.user?.role
     if (userRole !== 'admin' && userRole !== 'editor') {
+      next({ name: 'Unauthorized' })
+      return
+    }
+  }
+
+  // Vérifier les droits group admin (admin ou group_admin)
+  if (to.meta.requiresGroupAdmin) {
+    const userRole = authStore.user?.role
+    if (userRole !== 'admin' && userRole !== 'group_admin') {
       next({ name: 'Unauthorized' })
       return
     }

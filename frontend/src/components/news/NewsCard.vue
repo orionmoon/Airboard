@@ -6,7 +6,7 @@
     <div class="p-6">
       <!-- Header with Type Badge and Priority -->
       <div class="flex items-start justify-between mb-3">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
           <!-- Type Badge -->
           <span
             :class="[
@@ -31,6 +31,23 @@
           >
             <Icon icon="mdi:star" class="inline h-3 w-3 mr-1" />
             {{ $t('news.priority.important') }}
+          </span>
+
+          <!-- Visibility Badge -->
+          <span
+            v-if="!news.target_groups || news.target_groups.length === 0"
+            class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+          >
+            <Icon icon="mdi:earth" class="inline h-3 w-3 mr-1" />
+            Public
+          </span>
+          <span
+            v-else
+            class="px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300"
+            :title="getGroupsTooltip(news.target_groups)"
+          >
+            <Icon icon="mdi:lock" class="inline h-3 w-3 mr-1" />
+            {{ getVisibilityLabel(news.target_groups) }}
           </span>
         </div>
 
@@ -168,5 +185,23 @@ const getReactionEmoji = (type) => {
 const handleReaction = (type) => {
   // This will be handled by the parent component or NewsDetail page
   console.log('Reaction clicked:', type)
+}
+
+const getVisibilityLabel = (targetGroups) => {
+  if (!targetGroups || targetGroups.length === 0) {
+    return 'Public'
+  }
+  if (targetGroups.length === 1) {
+    return targetGroups[0].name
+  }
+  return `${targetGroups.length} groupes`
+}
+
+const getGroupsTooltip = (targetGroups) => {
+  if (!targetGroups || targetGroups.length === 0) {
+    return 'Visible par tous les utilisateurs'
+  }
+  const groupNames = targetGroups.map(g => g.name).join(', ')
+  return `Visible uniquement pour: ${groupNames}`
 }
 </script>

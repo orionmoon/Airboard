@@ -229,6 +229,16 @@ export const adminService = {
     return response.data
   },
 
+  async getGroupAdmins(groupId) {
+    const response = await api.get(`/admin/groups/${groupId}/admins`)
+    return response.data
+  },
+
+  async assignGroupAdmins(groupId, userIds) {
+    const response = await api.put(`/admin/groups/${groupId}/admins`, { user_ids: userIds })
+    return response.data
+  },
+
   // App Settings
   async getAppSettings() {
     const response = await api.get('/admin/settings')
@@ -515,6 +525,94 @@ export const newsService = {
   // Admin - Get analytics
   async getAnalytics() {
     const response = await api.get('/admin/news/analytics')
+    return response.data
+  }
+}
+
+// Group Admin Service
+export const groupAdminService = {
+  // AppGroups (scoped to managed groups)
+  async getAppGroups(params = {}) {
+    const response = await api.get('/group-admin/app-groups', { params })
+    return response.data.data || response.data
+  },
+
+  async createAppGroup(data) {
+    const response = await api.post('/group-admin/app-groups', data)
+    return response.data
+  },
+
+  async updateAppGroup(id, data) {
+    const response = await api.put(`/group-admin/app-groups/${id}`, data)
+    return response.data
+  },
+
+  async deleteAppGroup(id) {
+    const response = await api.delete(`/group-admin/app-groups/${id}`)
+    return response.data
+  },
+
+  // Applications (scoped to managed groups)
+  async getApplications(params = {}) {
+    const response = await api.get('/group-admin/applications', { params })
+    return response.data.data || response.data
+  },
+
+  async createApplication(data) {
+    const response = await api.post('/group-admin/applications', data)
+    return response.data
+  },
+
+  async updateApplication(id, data) {
+    const response = await api.put(`/group-admin/applications/${id}`, data)
+    return response.data
+  },
+
+  async deleteApplication(id) {
+    const response = await api.delete(`/group-admin/applications/${id}`)
+    return response.data
+  },
+
+  // News (scoped to managed groups)
+  async getNews(params = {}) {
+    const response = await api.get('/group-admin/news', { params })
+    return response.data
+  },
+
+  async createNews(data) {
+    const response = await api.post('/group-admin/news', data)
+    return response.data
+  },
+
+  async updateNews(slugOrId, data) {
+    const response = await api.put(`/group-admin/news/${slugOrId}`, data)
+    return response.data
+  },
+
+  async deleteNews(id) {
+    const response = await api.delete(`/group-admin/news/${id}`)
+    return response.data
+  },
+
+  // Tags
+  async createTag(data) {
+    const response = await api.post('/group-admin/news/tags', data)
+    return response.data
+  },
+
+  async updateTag(id, data) {
+    const response = await api.put(`/group-admin/news/tags/${id}`, data)
+    return response.data
+  },
+
+  async deleteTag(id) {
+    const response = await api.delete(`/group-admin/news/tags/${id}`)
+    return response.data
+  },
+
+  // Managed Groups
+  async getManagedGroups() {
+    const response = await api.get('/group-admin/managed-groups')
     return response.data
   }
 }

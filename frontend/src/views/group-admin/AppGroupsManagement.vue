@@ -4,13 +4,27 @@
     <div class="page-header">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="page-title">{{ $t('common.appGroups') }}</h1>
-          <p class="page-subtitle">{{ $t('appGroups.subtitle') }}</p>
+          <h1 class="page-title">Groupes d'Applications</h1>
+          <p class="page-subtitle">Gérez les groupes d'applications de vos groupes administrés</p>
         </div>
-        <button @click="openCreateModal" class="btn btn-primary">
+        <button @click="openCreateModal" class="btn btn-primary" :disabled="managedGroups.length === 0">
           <Icon icon="mdi:plus" class="h-4 w-4 mr-2" />
-          {{ $t('appGroups.new') }}
+          Nouveau Groupe
         </button>
+      </div>
+    </div>
+
+    <!-- Info Alert -->
+    <div v-if="managedGroups.length === 0" class="mb-6 p-4 bg-yellow-900/20 border border-yellow-600 rounded-lg">
+      <div class="flex items-start">
+        <Icon icon="mdi:information" class="h-5 w-5 text-yellow-500 mr-3 mt-0.5" />
+        <div>
+          <h3 class="text-yellow-500 font-medium">Aucun groupe administré</h3>
+          <p class="text-sm text-yellow-200 mt-1">
+            Vous devez être administrateur d'au moins un groupe pour créer des groupes d'applications.
+            Contactez un administrateur système pour obtenir des droits d'administration de groupe.
+          </p>
+        </div>
       </div>
     </div>
 
@@ -21,19 +35,19 @@
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Search groups..."
+          placeholder="Rechercher des groupes..."
           class="form-input search-input"
         />
       </div>
       <select v-model="statusFilter" class="form-select w-full sm:w-auto">
-        <option value="">All Status</option>
-        <option value="active">Active Only</option>
-        <option value="inactive">Inactive Only</option>
+        <option value="">Tous les statuts</option>
+        <option value="active">Actifs uniquement</option>
+        <option value="inactive">Inactifs uniquement</option>
       </select>
     </div>
 
     <!-- Content -->
-    <div v-if="appStore.loading" class="flex items-center justify-center py-12">
+    <div v-if="loading" class="flex items-center justify-center py-12">
       <Icon icon="mdi:loading" class="h-8 w-8 animate-spin text-gray-400" />
     </div>
 
@@ -45,7 +59,7 @@
       >
         <div class="card-header">
           <div class="flex items-center space-x-3">
-            <div 
+            <div
               class="h-10 w-10 rounded-lg flex items-center justify-center"
               :style="{ backgroundColor: group.color || '#10b981' }"
             >
@@ -56,40 +70,32 @@
               <p class="text-sm text-gray-400">{{ group.applications?.length || 0 }} applications</p>
             </div>
           </div>
-          
+
           <div class="flex space-x-2">
-            <button @click="editGroup(group)" class="btn-ghost" title="Edit">
+            <button @click="editGroup(group)" class="btn-ghost" title="Modifier">
               <Icon icon="mdi:pencil" class="h-4 w-4" />
             </button>
-            <button @click="confirmDelete(group)" class="btn-ghost text-red-400 hover:text-red-300" title="Delete">
+            <button @click="confirmDelete(group)" class="btn-ghost text-red-400 hover:text-red-300" title="Supprimer">
               <Icon icon="mdi:delete" class="h-4 w-4" />
             </button>
           </div>
         </div>
-        
+
         <div class="card-content">
           <p v-if="group.description" class="text-sm mb-4">{{ group.description }}</p>
 
-          <div class="flex items-center justify-between text-sm mb-3">
+          <div class="flex items-center justify-between text-sm mb-2">
             <span :class="group.is_active ? 'badge badge-success' : 'badge badge-secondary'">
-              {{ group.is_active ? 'Active' : 'Inactive' }}
+              {{ group.is_active ? 'Actif' : 'Inactif' }}
             </span>
-            <span class="text-gray-500">Order: {{ group.order || 0 }}</span>
+            <span class="text-gray-500">Ordre: {{ group.order || 0 }}</span>
           </div>
 
-          <div v-if="group.is_private" class="flex items-center space-x-2 text-xs">
-            <span class="badge badge-info flex items-center space-x-1">
-              <Icon icon="mdi:lock" class="h-3 w-3" />
-              <span>Private</span>
-            </span>
-            <span v-if="group.owner_group" class="text-gray-400">
-              Owned by: <span class="text-gray-300">{{ group.owner_group.name }}</span>
-            </span>
-          </div>
-          <div v-else class="text-xs">
-            <span class="badge badge-default flex items-center space-x-1 w-fit">
-              <Icon icon="mdi:earth" class="h-3 w-3" />
-              <span>Public</span>
+          <!-- Owner Group Badge -->
+          <div v-if="group.is_private && group.owner_group" class="mt-2">
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-900/30 text-blue-300 border border-blue-700">
+              <Icon icon="mdi:shield-account" class="h-3 w-3 mr-1" />
+              Groupe: {{ group.owner_group.name }}
             </span>
           </div>
         </div>
@@ -99,24 +105,29 @@
     <!-- Empty States -->
     <div v-else-if="appGroups.length === 0" class="empty-state">
       <Icon icon="mdi:folder-multiple" class="empty-state-icon" />
-      <h3 class="empty-state-title">No App Groups</h3>
-      <p class="empty-state-description">Create your first application group to get started.</p>
-      <button @click="openCreateModal" class="btn btn-primary">
+      <h3 class="empty-state-title">Aucun groupe d'applications</h3>
+      <p class="empty-state-description">Créez votre premier groupe d'applications pour commencer.</p>
+      <button
+        @click="openCreateModal"
+        class="btn btn-primary"
+        :disabled="managedGroups.length === 0"
+      >
         <Icon icon="mdi:plus" class="h-4 w-4 mr-2" />
-        Create Group
+        Créer un groupe
       </button>
     </div>
 
     <div v-else class="empty-state">
       <Icon icon="mdi:magnify" class="empty-state-icon" />
-      <h3 class="empty-state-title">No Results</h3>
-      <p class="empty-state-description">No groups match your search criteria.</p>
+      <h3 class="empty-state-title">Aucun résultat</h3>
+      <p class="empty-state-description">Aucun groupe ne correspond à vos critères de recherche.</p>
     </div>
 
-    <!-- App Group Modal -->
-    <AppGroupModal
+    <!-- Group Admin App Group Modal -->
+    <GroupAdminAppGroupModal
       :show="showModal"
       :app-group="selectedAppGroup"
+      :managed-groups="managedGroups"
       @close="closeModal"
       @submit="handleSubmit"
     />
@@ -131,17 +142,17 @@
                 <Icon icon="mdi:alert" class="h-6 w-6 text-red-500" />
               </div>
               <div>
-                <h3 class="modal-title">Delete App Group</h3>
+                <h3 class="modal-title">Supprimer le groupe</h3>
                 <p class="modal-subtitle">
-                  Are you sure you want to delete "<strong>{{ appGroupToDelete?.name }}</strong>"? This action cannot be undone.
+                  Êtes-vous sûr de vouloir supprimer "<strong>{{ appGroupToDelete?.name }}</strong>" ? Cette action est irréversible.
                 </p>
               </div>
             </div>
           </div>
-          
+
           <div class="modal-footer">
             <button @click="closeDeleteModal" class="btn btn-secondary w-full sm:w-auto">
-              Cancel
+              Annuler
             </button>
             <button
               @click="deleteGroup"
@@ -149,7 +160,7 @@
               class="btn btn-danger w-full sm:w-auto"
             >
               <Icon v-if="deleteLoading" icon="mdi:loading" class="animate-spin h-4 w-4 mr-2" />
-              Delete
+              Supprimer
             </button>
           </div>
         </div>
@@ -161,14 +172,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { Icon } from '@iconify/vue'
-import { adminService } from '@/services/api'
-import { useAppStore } from '@/stores/app'
-import AppGroupModal from '@/components/admin/AppGroupModal.vue'
-
-const appStore = useAppStore()
+import { groupAdminService } from '@/services/api'
+import GroupAdminAppGroupModal from '@/components/group-admin/AppGroupModal.vue'
 
 // State
 const appGroups = ref([])
+const managedGroups = ref([])
+const loading = ref(false)
 const showModal = ref(false)
 const selectedAppGroup = ref(null)
 const showDeleteModal = ref(false)
@@ -188,7 +198,7 @@ const filteredAppGroups = computed(() => {
   // Filter by search query
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(group => 
+    filtered = filtered.filter(group =>
       group.name.toLowerCase().includes(query) ||
       group.description?.toLowerCase().includes(query)
     )
@@ -207,48 +217,58 @@ const filteredAppGroups = computed(() => {
 // Methods
 const loadAppGroups = async () => {
   try {
-    appStore.setLoading(true)
-    console.log('🔄 Starting to load app groups...')
-    const data = await adminService.getAppGroups()
-    console.log('📊 Raw API response:', data)
-    console.log('📊 Type of data:', typeof data)
-    console.log('📊 Is array?', Array.isArray(data))
-    
-    if (Array.isArray(data)) {
-      appGroups.value = data
-      console.log('✅ App groups set to:', appGroups.value)
-    } else if (data && Array.isArray(data.data)) {
-      appGroups.value = data.data
-      console.log('✅ App groups set from data.data:', appGroups.value)
-    } else {
-      console.warn('⚠️ Data is not an array, setting empty:', data)
-      appGroups.value = []
-    }
-    
-    console.log('📈 Final appGroups.value:', appGroups.value)
-    console.log('📈 Final appGroups.value length:', appGroups.value.length)
+    loading.value = true
+    const data = await groupAdminService.getAppGroups()
+    appGroups.value = Array.isArray(data) ? data : (data.data || [])
   } catch (error) {
-    console.error('❌ Error loading app groups:', error)
+    console.error('Error loading app groups:', error)
     appGroups.value = []
-    appStore.showError('Failed to load app groups')
   } finally {
-    appStore.setLoading(false)
+    loading.value = false
+  }
+}
+
+const loadManagedGroups = async () => {
+  try {
+    const data = await groupAdminService.getManagedGroups()
+    managedGroups.value = Array.isArray(data) ? data : (data.data || [])
+  } catch (error) {
+    console.error('Error loading managed groups:', error)
+    managedGroups.value = []
   }
 }
 
 const openCreateModal = () => {
+  if (managedGroups.value.length === 0) {
+    return
+  }
   selectedAppGroup.value = null
   showModal.value = true
 }
 
 const editGroup = (group) => {
-  selectedAppGroup.value = group
+  selectedAppGroup.value = { ...group }
   showModal.value = true
 }
 
 const closeModal = () => {
   showModal.value = false
   selectedAppGroup.value = null
+}
+
+const handleSubmit = async (formData) => {
+  try {
+    if (formData.id) {
+      await groupAdminService.updateAppGroup(formData.id, formData)
+    } else {
+      await groupAdminService.createAppGroup(formData)
+    }
+    closeModal()
+    await loadAppGroups()
+  } catch (error) {
+    console.error('Error saving app group:', error)
+    throw error
+  }
 }
 
 const confirmDelete = (group) => {
@@ -261,47 +281,24 @@ const closeDeleteModal = () => {
   appGroupToDelete.value = null
 }
 
-const handleSubmit = async (formData) => {
-  try {
-    appStore.setLoading(true)
-    
-    if (formData.id) {
-      await adminService.updateAppGroup(formData.id, formData)
-      appStore.showSuccess('App group updated successfully')
-    } else {
-      await adminService.createAppGroup(formData)
-      appStore.showSuccess('App group created successfully')
-    }
-    
-    closeModal()
-    await loadAppGroups()
-  } catch (error) {
-    console.error('Error saving app group:', error)
-    appStore.showError('Failed to save app group')
-  } finally {
-    appStore.setLoading(false)
-  }
-}
-
 const deleteGroup = async () => {
-  if (!appGroupToDelete.value || !appGroupToDelete.value.id) return
-  
+  if (!appGroupToDelete.value) return
+
   try {
     deleteLoading.value = true
-    await adminService.deleteAppGroup(appGroupToDelete.value.id)
-    appStore.showSuccess('App group deleted successfully')
+    await groupAdminService.deleteAppGroup(appGroupToDelete.value.id)
     closeDeleteModal()
     await loadAppGroups()
   } catch (error) {
     console.error('Error deleting app group:', error)
-    appStore.showError('Failed to delete app group')
+    alert('Erreur lors de la suppression du groupe')
   } finally {
     deleteLoading.value = false
   }
 }
 
-// Lifecycle
-onMounted(() => {
-  loadAppGroups()
+onMounted(async () => {
+  await loadManagedGroups()
+  await loadAppGroups()
 })
 </script>

@@ -50,13 +50,14 @@ func main() {
 	createInitialData(db, cfg)
 
 	// Initialisation des middlewares
-	authMiddleware := middleware.NewAuthMiddleware(cfg)
+	authMiddleware := middleware.NewAuthMiddleware(cfg, db)
 	ssoMiddleware := middleware.NewSSOMiddleware(db, cfg)
 
 	// Initialisation des handlers
 	authHandler := handlers.NewAuthHandler(db, authMiddleware)
 	dashboardHandler := handlers.NewDashboardHandler(db)
 	adminHandler := handlers.NewAdminHandler(db)
+	groupAdminHandler := handlers.NewGroupAdminHandler(db)
 	settingsHandler := handlers.NewSettingsHandler(db)
 	oauthHandler := handlers.NewOAuthHandler(db, authMiddleware)
 	favoritesHandler := handlers.NewFavoritesHandler(db)
@@ -178,6 +179,10 @@ func main() {
 			admin.PUT("/groups/:id", adminHandler.UpdateGroup)
 			admin.DELETE("/groups/:id", adminHandler.DeleteGroup)
 
+			// Gestion des group admins (admin uniquement)
+			admin.GET("/groups/:id/admins", adminHandler.GetGroupAdmins)
+			admin.PUT("/groups/:id/admins", adminHandler.AssignGroupAdmins)
+
 			// Gestion des paramètres de l'application
 			admin.GET("/settings", settingsHandler.GetAppSettings)
 			admin.PUT("/settings", settingsHandler.UpdateAppSettings)
@@ -227,6 +232,37 @@ func main() {
 			editor.POST("/news/tags", newsHandler.CreateTag)
 			editor.PUT("/news/tags/:id", newsHandler.UpdateTag)
 			editor.DELETE("/news/tags/:id", newsHandler.DeleteTag)
+		}
+
+		// Routes group-admin (gestion limitée au périmètre)
+		groupAdmin := protected.Group("/group-admin")
+		groupAdmin.Use(authMiddleware.RequireGroupAdmin())
+		{
+			// AppGroups (scoped)
+			groupAdmin.GET("/app-groups", groupAdminHandler.GetAppGroups)
+			groupAdmin.POST("/app-groups", adminHandler.CreateAppGroup)
+			groupAdmin.PUT("/app-groups/:id", adminHandler.UpdateAppGroup)
+			groupAdmin.DELETE("/app-groups/:id", adminHandler.DeleteAppGroup)
+
+			// Applications (scoped)
+			groupAdmin.GET("/applications", groupAdminHandler.GetApplications)
+			groupAdmin.POST("/applications", groupAdminHandler.CreateApplication)
+			groupAdmin.PUT("/applications/:id", groupAdminHandler.UpdateApplication)
+			groupAdmin.DELETE("/applications/:id", groupAdminHandler.DeleteApplication)
+
+			// News (scoped)
+			groupAdmin.GET("/news", newsHandler.GetNews) // Liste des news avec filtrage automatique par rôle
+			groupAdmin.POST("/news", newsHandler.CreateNews)
+			groupAdmin.PUT("/news/:id", newsHandler.UpdateNews)
+			groupAdmin.DELETE("/news/:id", newsHandler.DeleteNews)
+
+			// Tags
+			groupAdmin.POST("/news/tags", newsHandler.CreateTag)
+			groupAdmin.PUT("/news/tags/:id", newsHandler.UpdateTag)
+			groupAdmin.DELETE("/news/tags/:id", newsHandler.DeleteTag)
+
+			// Info sur les groupes administrés
+			groupAdmin.GET("/managed-groups", groupAdminHandler.GetManagedGroups)
 		}
 	}
 

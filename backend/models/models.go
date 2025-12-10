@@ -23,8 +23,9 @@ type User struct {
 	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`
 
 	// Relations
-	Groups    []Group       `json:"groups,omitempty" gorm:"many2many:user_groups;"`
-	Favorites []Application `json:"favorites,omitempty" gorm:"many2many:user_favorites;"`
+	Groups        []Group       `json:"groups,omitempty" gorm:"many2many:user_groups;"`
+	Favorites     []Application `json:"favorites,omitempty" gorm:"many2many:user_favorites;"`
+	AdminOfGroups []Group       `json:"admin_of_groups,omitempty" gorm:"many2many:group_admins;"` // Groupes administrés (pour group_admin)
 }
 
 // Group représente un groupe d'utilisateurs
@@ -59,6 +60,9 @@ type AppGroup struct {
 	// Relations
 	Applications []Application `json:"applications,omitempty"`
 	Groups       []Group       `json:"groups,omitempty" gorm:"many2many:group_app_groups;"`
+	OwnerGroupID *uint         `json:"owner_group_id"`                                        // Groupe propriétaire (pour AppGroups privés)
+	OwnerGroup   *Group        `json:"owner_group,omitempty" gorm:"foreignKey:OwnerGroupID"` // Relation avec le groupe propriétaire
+	IsPrivate    bool          `json:"is_private" gorm:"default:false"`                       // Flag pour AppGroups privés
 }
 
 // Application représente une application dans le portail
@@ -83,10 +87,11 @@ type Application struct {
 
 // JWT Claims structure
 type Claims struct {
-	UserID   uint   `json:"user_id"`
-	Username string `json:"username"`
-	Role     string `json:"role"`
-	Email    string `json:"email"`
+	UserID          uint   `json:"user_id"`
+	Username        string `json:"username"`
+	Role            string `json:"role"`
+	Email           string `json:"email"`
+	ManagedGroupIDs []uint `json:"managed_group_ids,omitempty"` // IDs des groupes administrés (pour group_admin)
 }
 
 // Request/Response structures

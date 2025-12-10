@@ -8,14 +8,14 @@
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="modal-title">
-                  {{ isEdit ? 'Edit App Group' : 'New App Group' }}
+                  {{ isEdit ? 'Modifier le groupe' : 'Nouveau groupe' }}
                 </h3>
                 <p class="modal-subtitle">
-                  {{ isEdit ? 'Modify the application group settings' : 'Create a new group to organize applications' }}
+                  {{ isEdit ? 'Modifier les paramètres du groupe d\'applications' : 'Créer un nouveau groupe pour organiser les applications' }}
                 </p>
               </div>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 @click="closeModal"
                 class="btn-ghost p-2"
               >
@@ -26,17 +26,52 @@
 
           <!-- Content -->
           <div class="modal-content space-y-6">
+            <!-- Owner Group Selection -->
+            <div>
+              <div class="section-header">
+                <Icon icon="mdi:shield-account" class="section-icon" />
+                <h4 class="section-title">Groupe propriétaire</h4>
+              </div>
+
+              <div class="form-group">
+                <label for="owner_group_id" class="form-label form-label-required">
+                  Groupe
+                </label>
+                <select
+                  id="owner_group_id"
+                  v-model="form.owner_group_id"
+                  required
+                  class="form-select"
+                  :disabled="isEdit"
+                >
+                  <option value="">Sélectionner un groupe</option>
+                  <option
+                    v-for="group in managedGroups"
+                    :key="group.id"
+                    :value="group.id"
+                  >
+                    {{ group.name }}
+                  </option>
+                </select>
+                <p class="text-xs text-gray-400 mt-1">
+                  Ce groupe d'applications sera privé et accessible uniquement par les membres de ce groupe.
+                  {{ isEdit ? 'Le groupe propriétaire ne peut pas être modifié.' : '' }}
+                </p>
+                <p v-if="errors.owner_group_id" class="form-error">{{ errors.owner_group_id }}</p>
+              </div>
+            </div>
+
             <!-- Basic Information -->
             <div>
               <div class="section-header">
                 <Icon icon="mdi:information-outline" class="section-icon" />
-                <h4 class="section-title">Basic Information</h4>
+                <h4 class="section-title">Informations de base</h4>
               </div>
-              
+
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="form-group">
                   <label for="name" class="form-label form-label-required">
-                    Group Name
+                    Nom du groupe
                   </label>
                   <input
                     id="name"
@@ -44,14 +79,14 @@
                     type="text"
                     required
                     class="form-input"
-                    placeholder="Development Tools"
+                    placeholder="Outils de développement"
                   />
                   <p v-if="errors.name" class="form-error">{{ errors.name }}</p>
                 </div>
 
                 <div class="form-group">
                   <label for="order" class="form-label">
-                    Display Order
+                    Ordre d'affichage
                   </label>
                   <input
                     id="order"
@@ -73,7 +108,7 @@
                   v-model="form.description"
                   rows="3"
                   class="form-textarea"
-                  placeholder="Describe this application group..."
+                  placeholder="Décrivez ce groupe d'applications..."
                 ></textarea>
               </div>
             </div>
@@ -82,23 +117,23 @@
             <div>
               <div class="section-header">
                 <Icon icon="mdi:palette-outline" class="section-icon" />
-                <h4 class="section-title">Appearance</h4>
+                <h4 class="section-title">Apparence</h4>
               </div>
-              
+
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Preview -->
                 <div class="form-group">
-                  <label class="form-label">Preview</label>
+                  <label class="form-label">Aperçu</label>
                   <div class="card p-4">
                     <div class="flex items-center space-x-3">
-                      <div 
+                      <div
                         class="h-12 w-12 rounded-lg flex items-center justify-center"
                         :style="{ backgroundColor: form.color }"
                       >
                         <Icon :icon="form.icon || 'mdi:folder'" class="h-6 w-6 text-white" />
                       </div>
                       <div>
-                        <div class="font-medium text-white">{{ form.name || 'Group Name' }}</div>
+                        <div class="font-medium text-white">{{ form.name || 'Nom du groupe' }}</div>
                         <div class="text-sm text-gray-400">{{ form.description || 'Description...' }}</div>
                       </div>
                     </div>
@@ -108,7 +143,7 @@
                 <!-- Color and Icon -->
                 <div class="space-y-4">
                   <div class="form-group">
-                    <label for="color" class="form-label">Color</label>
+                    <label for="color" class="form-label">Couleur</label>
                     <div class="flex items-center space-x-3">
                       <input
                         id="color"
@@ -128,58 +163,11 @@
                   <!-- Icon Input with free text -->
                   <IconInput
                     v-model="form.icon"
-                    label="Icon"
+                    label="Icône"
                     placeholder="mdi:folder, lucide:folder, heroicons:folder"
                     category="group"
                     :show-suggestions="true"
                   />
-                </div>
-              </div>
-            </div>
-
-            <!-- Access Control (Admin only) -->
-            <div v-if="userRole === 'admin'">
-              <div class="section-header">
-                <Icon icon="mdi:shield-lock-outline" class="section-icon" />
-                <h4 class="section-title">Access Control</h4>
-              </div>
-
-              <div class="card p-4 space-y-4">
-                <div>
-                  <label class="flex items-center space-x-3 cursor-pointer">
-                    <input
-                      v-model="form.is_private"
-                      type="checkbox"
-                      class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
-                    />
-                    <div>
-                      <span class="text-sm text-gray-300 font-medium">Private App Group</span>
-                      <p class="text-xs text-gray-400 mt-1">
-                        Private app groups can only be managed by their owner group admin
-                      </p>
-                    </div>
-                  </label>
-                </div>
-
-                <div v-if="form.is_private" class="form-group">
-                  <label for="owner_group_id" class="form-label form-label-required">
-                    Owner Group
-                  </label>
-                  <select
-                    id="owner_group_id"
-                    v-model.number="form.owner_group_id"
-                    required
-                    class="form-select"
-                  >
-                    <option :value="null" disabled>Select owner group...</option>
-                    <option v-for="group in groups" :key="group.id" :value="group.id">
-                      {{ group.name }}
-                    </option>
-                  </select>
-                  <p v-if="errors.owner_group_id" class="form-error">{{ errors.owner_group_id }}</p>
-                  <p v-else class="text-xs text-gray-400 mt-1">
-                    The group admin of this group will be able to manage this app group
-                  </p>
                 </div>
               </div>
             </div>
@@ -199,7 +187,7 @@
                     class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-600 rounded bg-gray-700"
                   />
                   <span class="text-sm text-gray-300">
-                    Active and visible to users
+                    Actif et visible pour les utilisateurs
                   </span>
                 </label>
               </div>
@@ -213,7 +201,7 @@
               @click="closeModal"
               class="btn-secondary w-full sm:w-auto"
             >
-              Cancel
+              Annuler
             </button>
             <button
               type="submit"
@@ -221,7 +209,7 @@
               class="btn-primary w-full sm:w-auto"
             >
               <Icon v-if="loading" icon="mdi:loading" class="animate-spin h-4 w-4 mr-2" />
-              {{ isEdit ? 'Update' : 'Create' }}
+              {{ isEdit ? 'Mettre à jour' : 'Créer' }}
             </button>
           </div>
         </form>
@@ -234,8 +222,6 @@
 import { ref, reactive, computed, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import IconInput from '@/components/ui/IconInput.vue'
-import { useAuthStore } from '@/stores/auth'
-import { adminService } from '@/services/api'
 
 const props = defineProps({
   show: {
@@ -245,17 +231,17 @@ const props = defineProps({
   appGroup: {
     type: Object,
     default: null
+  },
+  managedGroups: {
+    type: Array,
+    default: () => []
   }
 })
 
 const emit = defineEmits(['close', 'submit'])
 
-const authStore = useAuthStore()
-const userRole = computed(() => authStore.user?.role)
-
 const loading = ref(false)
 const errors = ref({})
-const groups = ref([])
 
 const form = reactive({
   name: '',
@@ -264,37 +250,21 @@ const form = reactive({
   icon: 'mdi:folder',
   order: 0,
   is_active: true,
-  is_private: false,
-  owner_group_id: null
+  owner_group_id: '',
+  is_private: true // Toujours privé pour les group admins
 })
 
 const isEdit = computed(() => !!props.appGroup)
 
-// Load groups for owner selection (admin only)
-const loadGroups = async () => {
-  if (userRole.value === 'admin') {
-    try {
-      const data = await adminService.getGroups()
-      groups.value = data || []
-    } catch (error) {
-      console.error('Failed to load groups:', error)
-    }
-  }
-}
-
 // Reset form when modal opens/closes
-watch(() => props.show, async (newVal) => {
+watch(() => props.show, (newVal) => {
   if (newVal) {
-    await loadGroups() // Load groups first before resetting form
     resetForm()
   }
 })
 
 watch(() => props.appGroup, (newVal) => {
-  if (newVal && props.show) {
-    // Ensure owner_group_id is properly typed (number or null)
-    const ownerGroupId = newVal.owner_group_id ? Number(newVal.owner_group_id) : null
-
+  if (newVal) {
     Object.assign(form, {
       name: newVal.name || '',
       description: newVal.description || '',
@@ -302,17 +272,14 @@ watch(() => props.appGroup, (newVal) => {
       icon: newVal.icon || 'mdi:folder',
       order: newVal.order || 0,
       is_active: newVal.is_active ?? true,
-      is_private: newVal.is_private ?? false,
-      owner_group_id: ownerGroupId
+      owner_group_id: newVal.owner_group_id || '',
+      is_private: true
     })
   }
 }, { immediate: true })
 
 const resetForm = () => {
   if (props.appGroup) {
-    // Ensure owner_group_id is properly typed (number or null)
-    const ownerGroupId = props.appGroup.owner_group_id ? Number(props.appGroup.owner_group_id) : null
-
     Object.assign(form, {
       name: props.appGroup.name || '',
       description: props.appGroup.description || '',
@@ -320,8 +287,8 @@ const resetForm = () => {
       icon: props.appGroup.icon || 'mdi:folder',
       order: props.appGroup.order || 0,
       is_active: props.appGroup.is_active ?? true,
-      is_private: props.appGroup.is_private ?? false,
-      owner_group_id: ownerGroupId
+      owner_group_id: props.appGroup.owner_group_id || '',
+      is_private: true
     })
   } else {
     Object.assign(form, {
@@ -331,8 +298,8 @@ const resetForm = () => {
       icon: 'mdi:folder',
       order: 0,
       is_active: true,
-      is_private: false,
-      owner_group_id: null
+      owner_group_id: props.managedGroups.length === 1 ? props.managedGroups[0].id : '',
+      is_private: true
     })
   }
   errors.value = {}
@@ -342,12 +309,11 @@ const validateForm = () => {
   errors.value = {}
 
   if (!form.name.trim()) {
-    errors.value.name = 'Name is required'
+    errors.value.name = 'Le nom est requis'
   }
 
-  // Validate owner group for private app groups (admin only)
-  if (userRole.value === 'admin' && form.is_private && !form.owner_group_id) {
-    errors.value.owner_group_id = 'Owner group is required for private app groups'
+  if (!form.owner_group_id) {
+    errors.value.owner_group_id = 'Le groupe propriétaire est requis'
   }
 
   return Object.keys(errors.value).length === 0
@@ -355,14 +321,14 @@ const validateForm = () => {
 
 const handleSubmit = async () => {
   if (!validateForm()) return
-  
+
   loading.value = true
   try {
     const formData = { ...form }
     if (isEdit.value) {
       formData.id = props.appGroup.id
     }
-    
+
     emit('submit', formData)
   } finally {
     loading.value = false

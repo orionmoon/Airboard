@@ -64,6 +64,7 @@
         <select v-model="roleFilter" class="form-select w-full sm:w-auto">
           <option value="">{{ $t('users.filter_all_roles') }}</option>
           <option value="admin">{{ $t('users.filter_admins') }}</option>
+          <option value="group_admin">Group Admins</option>
           <option value="editor">{{ $t('users.filter_editors') }}</option>
           <option value="user">{{ $t('users.filter_users') }}</option>
         </select>
@@ -120,11 +121,12 @@
                   <span
                     :class="{
                       'badge bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200': user.role === 'admin',
+                      'badge bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200': user.role === 'group_admin',
                       'badge bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': user.role === 'editor',
                       'badge bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200': user.role === 'user'
                     }"
                   >
-                    {{ user.role === 'admin' ? $t('users.role_admin') : user.role === 'editor' ? $t('users.role_editor') : $t('users.role_user') }}
+                    {{ user.role === 'admin' ? $t('users.role_admin') : user.role === 'group_admin' ? 'Group Admin' : user.role === 'editor' ? $t('users.role_editor') : $t('users.role_user') }}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">

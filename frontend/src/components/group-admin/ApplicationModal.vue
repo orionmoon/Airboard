@@ -14,8 +14,8 @@
                   {{ isEdit ? 'Modify application settings' : 'Add a new application to the portal' }}
                 </p>
               </div>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 @click="closeModal"
                 class="btn-ghost p-2"
               >
@@ -32,7 +32,7 @@
                 <Icon icon="mdi:information-outline" class="section-icon" />
                 <h4 class="section-title">Basic Information</h4>
               </div>
-              
+
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="form-group">
                   <label for="name" class="form-label form-label-required">
@@ -61,7 +61,7 @@
                   >
                     <option value="">Select a group</option>
                     <option
-                      v-for="group in props.appGroups"
+                      v-for="group in availableAppGroups"
                       :key="group.id"
                       :value="group.id"
                     >
@@ -69,6 +69,9 @@
                     </option>
                   </select>
                   <p v-if="errors.app_group_id" class="form-error">{{ errors.app_group_id }}</p>
+                  <p v-if="availableAppGroups.length === 0" class="form-help text-yellow-500">
+                    No private app groups available. Create a private app group first.
+                  </p>
                 </div>
               </div>
 
@@ -108,14 +111,14 @@
                 <Icon icon="mdi:palette-outline" class="section-icon" />
                 <h4 class="section-title">Appearance</h4>
               </div>
-              
+
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Preview -->
                 <div class="form-group">
                   <label class="form-label">Preview</label>
                   <div class="card p-4">
                     <div class="flex items-center space-x-4">
-                      <div 
+                      <div
                         class="h-12 w-12 rounded-lg flex items-center justify-center"
                         :style="{ backgroundColor: form.color }"
                       >
@@ -180,7 +183,7 @@
                 <Icon icon="mdi:tune" class="section-icon" />
                 <h4 class="section-title">Behavior Options</h4>
               </div>
-              
+
               <div class="space-y-3">
                 <div class="card p-4">
                   <label class="flex items-center space-x-3 cursor-pointer">
@@ -222,7 +225,7 @@
             </button>
             <button
               type="submit"
-              :disabled="loading"
+              :disabled="loading || availableAppGroups.length === 0"
               class="btn-primary w-full sm:w-auto"
             >
               <Icon v-if="loading" icon="mdi:loading" class="animate-spin h-4 w-4 mr-2" />
@@ -273,6 +276,11 @@ const form = reactive({
 })
 
 const isEdit = computed(() => !!props.application)
+
+// Filter to show only private app groups for group admins
+const availableAppGroups = computed(() => {
+  return props.appGroups.filter(group => group.is_private === true)
+})
 
 // Reset form when modal opens/closes
 watch(() => props.show, (newVal) => {
@@ -328,21 +336,21 @@ const resetForm = () => {
 
 const validateForm = () => {
   errors.value = {}
-  
+
   if (!form.name.trim()) {
     errors.value.name = 'Name is required'
   }
-  
+
   if (!form.url.trim()) {
     errors.value.url = 'URL is required'
   } else if (!isValidUrl(form.url)) {
     errors.value.url = 'Invalid URL format'
   }
-  
+
   if (!form.app_group_id) {
     errors.value.app_group_id = 'App group is required'
   }
-  
+
   return Object.keys(errors.value).length === 0
 }
 
@@ -357,14 +365,14 @@ const isValidUrl = (url) => {
 
 const handleSubmit = async () => {
   if (!validateForm()) return
-  
+
   loading.value = true
   try {
     const formData = { ...form }
     if (isEdit.value) {
       formData.id = props.application.id
     }
-    
+
     emit('submit', formData)
   } finally {
     loading.value = false

@@ -45,9 +45,9 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// Rechercher l'utilisateur
+	// Rechercher l'utilisateur avec ses relations
 	var user models.User
-	if err := h.db.Where("username = ? OR email = ?", req.Username, req.Username).First(&user).Error; err != nil {
+	if err := h.db.Preload("Groups").Preload("AdminOfGroups").Where("username = ? OR email = ?", req.Username, req.Username).First(&user).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
 			Error:   "Unauthorized",
 			Message: "Nom d'utilisateur ou mot de passe incorrect",
@@ -203,6 +203,9 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		}
 	}
 
+	// Recharger l'utilisateur avec ses relations
+	h.db.Preload("Groups").Preload("AdminOfGroups").First(&user, user.ID)
+
 	// Générer les tokens
 	token, err := h.authMiddleware.GenerateToken(&user)
 	if err != nil {
@@ -269,9 +272,9 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	// Récupérer l'utilisateur
+	// Récupérer l'utilisateur avec ses relations
 	var user models.User
-	if err := h.db.First(&user, claims.UserID).Error; err != nil {
+	if err := h.db.Preload("Groups").Preload("AdminOfGroups").First(&user, claims.UserID).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
 			Error:   "Unauthorized",
 			Message: "Utilisateur non trouvé",
@@ -341,7 +344,7 @@ func (h *AuthHandler) GetProfile(c *gin.Context) {
 	}
 
 	var user models.User
-	if err := h.db.Preload("Groups").First(&user, userID).Error; err != nil {
+	if err := h.db.Preload("Groups").Preload("AdminOfGroups").First(&user, userID).Error; err != nil {
 		c.JSON(http.StatusNotFound, models.ErrorResponse{
 			Error:   "Not Found",
 			Message: "Utilisateur non trouvé",
@@ -510,9 +513,9 @@ func (h *AuthHandler) SSOAutoLogin(c *gin.Context) {
 		return
 	}
 
-	// Recharger l'utilisateur avec les groupes
+	// Recharger l'utilisateur avec les groupes et les groupes administrés
 	var user models.User
-	if err := h.db.Preload("Groups").First(&user, ssoUser.ID).Error; err != nil {
+	if err := h.db.Preload("Groups").Preload("AdminOfGroups").First(&user, ssoUser.ID).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Error:   "Internal Server Error",
 			Message: "Erreur lors de la récupération des informations utilisateur",

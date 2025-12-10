@@ -53,6 +53,9 @@
             </div>
             
             <div class="flex space-x-2">
+              <button @click="manageGroupAdmins(group)" class="btn-ghost btn-sm" title="Gérer les administrateurs">
+                <Icon icon="mdi:shield-account" class="h-4 w-4" />
+              </button>
               <button @click="editGroup(group)" class="btn-ghost btn-sm" :title="$t('groups.edit')">
                 <Icon icon="mdi:pencil" class="h-4 w-4" />
               </button>
@@ -137,6 +140,109 @@
       @submit="handleSubmit"
     />
 
+    <!-- Group Admins Modal -->
+    <div v-if="showGroupAdminsModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeGroupAdminsModal"></div>
+        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+          <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="mb-6">
+              <div class="flex items-center">
+                <div class="h-10 w-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-3">
+                  <Icon icon="mdi:shield-account" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Administrateurs du groupe
+                  </h3>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ selectedGroupForAdmins?.name }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Sélectionnez les utilisateurs qui pourront administrer ce groupe et ses ressources.
+              </p>
+
+              <!-- Search -->
+              <div class="mb-4">
+                <input
+                  v-model="adminSearchQuery"
+                  type="text"
+                  placeholder="Rechercher un utilisateur..."
+                  class="form-input"
+                />
+              </div>
+
+              <!-- Loading -->
+              <div v-if="loadingUsers" class="flex justify-center py-8">
+                <Icon icon="mdi:loading" class="h-6 w-6 animate-spin text-gray-400" />
+              </div>
+
+              <!-- Users list -->
+              <div v-else class="max-h-96 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+                <div v-if="filteredUsersForAdmins.length === 0" class="p-4 text-center text-sm text-gray-500">
+                  Aucun utilisateur trouvé
+                </div>
+                <div
+                  v-for="user in filteredUsersForAdmins"
+                  :key="user.id"
+                  class="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+                >
+                  <input
+                    :id="`admin_${user.id}`"
+                    v-model="selectedAdminIds"
+                    :value="user.id"
+                    type="checkbox"
+                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  />
+                  <label :for="`admin_${user.id}`" class="ml-3 flex items-center flex-1 cursor-pointer">
+                    <div class="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center mr-3">
+                      <span class="text-sm font-medium text-white">{{ getUserInitials(user) }}</span>
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-gray-900 dark:text-white">{{ getUserDisplayName(user) }}</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">@{{ user.username }} • {{ user.email }}</p>
+                    </div>
+                    <span
+                      :class="{
+                        'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200': user.role === 'admin',
+                        'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200': user.role === 'group_admin',
+                        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': user.role === 'editor',
+                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200': user.role === 'user'
+                      }"
+                      class="badge text-xs"
+                    >
+                      {{ user.role === 'admin' ? 'Admin' : user.role === 'group_admin' ? 'Group Admin' : user.role === 'editor' ? 'Editor' : 'User' }}
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button
+              @click="saveGroupAdmins"
+              :disabled="savingAdmins"
+              class="btn-primary w-full sm:w-auto sm:ml-3"
+            >
+              <Icon v-if="savingAdmins" icon="mdi:loading" class="animate-spin h-4 w-4 mr-2" />
+              Enregistrer
+            </button>
+            <button
+              @click="closeGroupAdminsModal"
+              class="btn btn-secondary w-full sm:w-auto mt-3 sm:mt-0"
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteModal" class="fixed inset-0 z-50 overflow-y-auto">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -202,6 +308,15 @@ const deleteLoading = ref(false)
 const searchQuery = ref('')
 const statusFilter = ref('')
 
+// Group Admins Modal
+const showGroupAdminsModal = ref(false)
+const selectedGroupForAdmins = ref(null)
+const allUsers = ref([])
+const selectedAdminIds = ref([])
+const loadingUsers = ref(false)
+const savingAdmins = ref(false)
+const adminSearchQuery = ref('')
+
 // Computed
 const filteredGroups = computed(() => {
   let filtered = groups.value
@@ -209,7 +324,7 @@ const filteredGroups = computed(() => {
   // Filter by search query
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(group => 
+    filtered = filtered.filter(group =>
       group.name.toLowerCase().includes(query) ||
       group.description?.toLowerCase().includes(query)
     )
@@ -223,6 +338,22 @@ const filteredGroups = computed(() => {
   }
 
   return Array.isArray(filtered) ? filtered.sort((a, b) => a.name.localeCompare(b.name)) : []
+})
+
+const filteredUsersForAdmins = computed(() => {
+  let filtered = allUsers.value
+
+  if (adminSearchQuery.value) {
+    const query = adminSearchQuery.value.toLowerCase()
+    filtered = filtered.filter(user =>
+      user.username.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query) ||
+      user.first_name?.toLowerCase().includes(query) ||
+      user.last_name?.toLowerCase().includes(query)
+    )
+  }
+
+  return filtered
 })
 
 // Methods
@@ -307,7 +438,7 @@ const handleSubmit = async (formData) => {
 
 const deleteGroup = async () => {
   if (!groupToDelete.value) return
-  
+
   try {
     deleteLoading.value = true
     await adminService.deleteGroup(groupToDelete.value.id)
@@ -319,6 +450,55 @@ const deleteGroup = async () => {
     appStore.showError(t('groups.deleteError'))
   } finally {
     deleteLoading.value = false
+  }
+}
+
+// Group Admins Management
+const manageGroupAdmins = async (group) => {
+  selectedGroupForAdmins.value = group
+  showGroupAdminsModal.value = true
+  adminSearchQuery.value = ''
+
+  try {
+    loadingUsers.value = true
+
+    // Load all users
+    const usersData = await adminService.getUsers()
+    allUsers.value = Array.isArray(usersData) ? usersData : (usersData.data || [])
+
+    // Load current group admins
+    const adminsData = await adminService.getGroupAdmins(group.id)
+    const currentAdmins = Array.isArray(adminsData) ? adminsData : (adminsData.data || [])
+    selectedAdminIds.value = currentAdmins.map(admin => admin.id)
+  } catch (error) {
+    console.error('Error loading group admins:', error)
+    appStore.showError('Erreur lors du chargement des données')
+  } finally {
+    loadingUsers.value = false
+  }
+}
+
+const closeGroupAdminsModal = () => {
+  showGroupAdminsModal.value = false
+  selectedGroupForAdmins.value = null
+  allUsers.value = []
+  selectedAdminIds.value = []
+  adminSearchQuery.value = ''
+}
+
+const saveGroupAdmins = async () => {
+  if (!selectedGroupForAdmins.value) return
+
+  try {
+    savingAdmins.value = true
+    await adminService.assignGroupAdmins(selectedGroupForAdmins.value.id, selectedAdminIds.value)
+    appStore.showSuccess('Administrateurs de groupe mis à jour avec succès')
+    closeGroupAdminsModal()
+  } catch (error) {
+    console.error('Error saving group admins:', error)
+    appStore.showError('Erreur lors de la sauvegarde')
+  } finally {
+    savingAdmins.value = false
   }
 }
 

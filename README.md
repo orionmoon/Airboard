@@ -52,7 +52,8 @@ Airboard transforms how organizations manage digital resources, internal communi
 ### Core Features
 - 🔐 **Dual Authentication** - Classic login/password + SSO (Authentik/Microsoft 365)
 - 👥 **User Management** - Complete CRUD operations for users and groups
-- 🎯 **Application Portal** - Organize apps by groups with custom icons
+- 🎓 **Group Admin System** - Delegate management of private app groups and applications to group administrators
+- 🎯 **Application Portal** - Organize apps by groups with custom icons (public and private groups)
 - ⭐ **User Favorites** - Pin favorite applications for quick access
 - 📊 **Analytics Dashboard** - Track application usage and user activity
 - 📢 **Announcements System** - Display important messages on dashboard
@@ -74,6 +75,7 @@ Airboard transforms how organizations manage digital resources, internal communi
 
 ### User Roles & Permissions
 - 👑 **Admin Role** - Full system access and management
+- 🎓 **Group Admin Role** - Manage private app groups, applications, and news for specific groups
 - ✍️ **Editor Role** - Create and manage news articles
 - 👤 **User Role** - Access to assigned applications and content
 - 🎭 **Role-Based Access Control** - Fine-grained permissions for different features
@@ -721,6 +723,20 @@ airboard/
 | POST | `/api/v1/auth/refresh` | Refresh JWT token | No |
 | GET | `/api/v1/auth/sso/auto-login` | SSO auto-login | No (uses headers) |
 
+### Group Admin
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/group-admin/app-groups` | Get private app groups managed by user | Yes (group_admin/admin) |
+| GET | `/api/v1/group-admin/managed-groups` | Get groups managed by user | Yes (group_admin/admin) |
+| GET | `/api/v1/group-admin/applications` | Get applications in managed private app groups | Yes (group_admin/admin) |
+| POST | `/api/v1/group-admin/applications` | Create application in managed app group | Yes (group_admin/admin) |
+| PUT | `/api/v1/group-admin/applications/:id` | Update application in managed app group | Yes (group_admin/admin) |
+| DELETE | `/api/v1/group-admin/applications/:id` | Delete application in managed app group | Yes (group_admin/admin) |
+| POST | `/api/v1/group-admin/news` | Create news article | Yes (group_admin/admin) |
+| PUT | `/api/v1/group-admin/news/:id` | Update news article | Yes (group_admin/admin) |
+| DELETE | `/api/v1/group-admin/news/:id` | Delete news article | Yes (group_admin/admin) |
+
 ### Users
 
 | Method | Endpoint | Description | Auth Required |
@@ -909,6 +925,8 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 | SSO Integration (Authentik) | ✅ Complete |
 | User Management | ✅ Complete |
 | Group Management | ✅ Complete |
+| Group Admin Role | ✅ Complete |
+| Private/Public App Groups | ✅ Complete |
 | Application Portal | ✅ Complete |
 | User Favorites | ✅ Complete |
 | Analytics Dashboard | ✅ Complete |
@@ -926,7 +944,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 | Dark Mode | ✅ Complete |
 | API Documentation | ✅ Complete |
 | Automated Tests | 🔄 In Progress |
-| Advanced Permissions | 📋 Planned |
 | LDAP Integration | 📋 Planned |
 | Kubernetes Support | 📋 Planned |
 | Mobile App | 📋 Planned |

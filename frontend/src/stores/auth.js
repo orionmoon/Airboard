@@ -25,12 +25,31 @@ export const useAuthStore = defineStore('auth', () => {
 
   const userDisplayName = computed(() => {
     if (!user.value) return 'Utilisateur'
-    
+
     if (user.value.first_name && user.value.last_name) {
       return `${user.value.first_name} ${user.value.last_name}`
     }
-    
+
     return user.value.username
+  })
+
+  const isGroupAdmin = computed(() => {
+    // Un utilisateur est group admin s'il a le rôle group_admin ET qu'il administre au moins un groupe
+    if (user.value?.role !== 'group_admin') return false
+    return user.value?.admin_of_groups && user.value.admin_of_groups.length > 0
+  })
+  const isEditor = computed(() => user.value?.role === 'editor')
+  const canManageContent = computed(() =>
+    user.value?.role === 'admin' ||
+    user.value?.role === 'group_admin' ||
+    user.value?.role === 'editor'
+  )
+  const managedGroupIds = computed(() => {
+    // Récupérer les IDs des groupes administrés depuis la relation admin_of_groups
+    if (user.value?.admin_of_groups) {
+      return user.value.admin_of_groups.map(g => g.id)
+    }
+    return []
   })
 
   // Actions
@@ -185,6 +204,10 @@ export const useAuthStore = defineStore('auth', () => {
     // Getters
     isAuthenticated,
     isAdmin,
+    isGroupAdmin,
+    isEditor,
+    canManageContent,
+    managedGroupIds,
     userInitials,
     userDisplayName,
 

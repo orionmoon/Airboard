@@ -65,6 +65,34 @@ func (h *DashboardHandler) GetDashboard(c *gin.Context) {
 				Applications: apps,
 			})
 		}
+	} else if role == "group_admin" {
+		// Les group admins voient les AppGroups des groupes qu'ils administrent
+		var groupAdminAppGroups []models.AppGroup
+		if err := h.db.Table("app_groups").
+			Joins("JOIN group_app_groups ON app_groups.id = group_app_groups.app_group_id").
+			Joins("JOIN group_admins ON group_app_groups.group_id = group_admins.group_id").
+			Where("group_admins.user_id = ? AND app_groups.is_active = ?", userID, true).
+			Order("app_groups.\"order\" ASC, app_groups.name ASC").
+			Find(&groupAdminAppGroups).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+				Error:   "Internal Server Error",
+				Message: "Erreur lors de la récupération des groupes d'applications",
+				Code:    http.StatusInternalServerError,
+			})
+			return
+		}
+
+		for _, ag := range groupAdminAppGroups {
+			var apps []models.Application
+			h.db.Where("app_group_id = ? AND is_active = ?", ag.ID, true).
+				Order("\"order\" ASC, name ASC").
+				Find(&apps)
+
+			appGroups = append(appGroups, models.AppGroupWithApps{
+				AppGroup:     ag,
+				Applications: apps,
+			})
+		}
 	} else {
 		// Les utilisateurs normaux voient seulement leurs groupes autorisés
 		var userAppGroups []models.AppGroup

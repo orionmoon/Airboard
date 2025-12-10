@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"airboard/middleware"
 	"airboard/models"
 
 	"github.com/gin-gonic/gin"
@@ -40,8 +41,26 @@ func (h *AdminHandler) GetAppGroups(c *gin.Context) {
 	var appGroups []models.AppGroup
 	var total int64
 
-	h.db.Model(&models.AppGroup{}).Count(&total)
-	if err := h.db.Preload("Applications").
+	// Filtrage selon le rôle
+	role := c.GetString("role")
+	query := h.db.Model(&models.AppGroup{})
+
+	if role == "group_admin" {
+		// Group admin voit uniquement les AppGroups privés dont son groupe est propriétaire
+		managedGroupIDs := middleware.GetManagedGroupIDs(c)
+		if len(managedGroupIDs) > 0 {
+			// Filtrer uniquement les AppGroups privés avec OwnerGroupID dans managedGroupIDs
+			query = query.Where("is_private = ? AND owner_group_id IN ?", true, managedGroupIDs)
+		} else {
+			// Aucun groupe administré = aucun AppGroup visible
+			query = query.Where("1 = 0")
+		}
+	}
+	// Admin voit tout (pas de filtre)
+
+	query.Count(&total)
+	if err := query.Preload("Applications").
+		Preload("OwnerGroup").
 		Order("\"order\" ASC, name ASC").
 		Limit(limit).Offset(offset).
 		Find(&appGroups).Error; err != nil {
@@ -90,6 +109,27 @@ func (h *AdminHandler) CreateAppGroup(c *gin.Context) {
 		return
 	}
 
+	// Pour les group_admins, l'AppGroup est automatiquement privé et appartient au premier groupe administré
+	role := c.GetString("role")
+	if role == "group_admin" {
+		managedGroupIDs := middleware.GetManagedGroupIDs(c)
+		if len(managedGroupIDs) == 0 {
+			c.JSON(http.StatusForbidden, models.ErrorResponse{
+				Error:   "Forbidden",
+				Message: "Vous n'administrez aucun groupe",
+				Code:    http.StatusForbidden,
+			})
+			return
+		}
+
+		// Forcer IsPrivate = true et définir OwnerGroupID pour les group_admins
+		appGroup.IsPrivate = true
+		ownerID := managedGroupIDs[0]
+		appGroup.OwnerGroupID = &ownerID
+	}
+	// Admin global peut créer des AppGroups publics ou privés selon les données fournies
+
+	// Créer l'AppGroup
 	if err := h.db.Create(&appGroup).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Error:   "Internal Server Error",
@@ -97,6 +137,14 @@ func (h *AdminHandler) CreateAppGroup(c *gin.Context) {
 			Code:    http.StatusInternalServerError,
 		})
 		return
+	}
+
+	// Pour les group_admins, lier automatiquement l'AppGroup à leurs groupes administrés via group_app_groups
+	if role == "group_admin" {
+		managedGroupIDs := middleware.GetManagedGroupIDs(c)
+		for _, groupID := range managedGroupIDs {
+			h.db.Exec("INSERT INTO group_app_groups (group_id, app_group_id) VALUES (?, ?)", groupID, appGroup.ID)
+		}
 	}
 
 	c.JSON(http.StatusCreated, appGroup)
@@ -131,6 +179,17 @@ func (h *AdminHandler) UpdateAppGroup(c *gin.Context) {
 			Error:   "Not Found",
 			Message: "Groupe d'applications non trouvé",
 			Code:    http.StatusNotFound,
+		})
+		return
+	}
+
+	// Vérification des permissions pour group_admin
+	// Un group_admin peut modifier un AppGroup seulement si c'est un AppGroup privé appartenant à son groupe
+	if !middleware.CanManageAppGroupWithDB(c, appGroup.ID, h.db) {
+		c.JSON(http.StatusForbidden, models.ErrorResponse{
+			Error:   "Forbidden",
+			Message: "Vous ne pouvez pas modifier ce groupe d'applications. Seuls les AppGroups privés appartenant à votre groupe peuvent être modifiés.",
+			Code:    http.StatusForbidden,
 		})
 		return
 	}
@@ -177,6 +236,17 @@ func (h *AdminHandler) DeleteAppGroup(c *gin.Context) {
 		return
 	}
 
+	// Vérification des permissions pour group_admin
+	// Un group_admin peut supprimer un AppGroup seulement si c'est un AppGroup privé appartenant à son groupe
+	if !middleware.CanManageAppGroupWithDB(c, uint(id), h.db) {
+		c.JSON(http.StatusForbidden, models.ErrorResponse{
+			Error:   "Forbidden",
+			Message: "Vous ne pouvez pas supprimer ce groupe d'applications. Seuls les AppGroups privés appartenant à votre groupe peuvent être supprimés.",
+			Code:    http.StatusForbidden,
+		})
+		return
+	}
+
 	if err := h.db.Delete(&models.AppGroup{}, id).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Error:   "Internal Server Error",
@@ -215,6 +285,21 @@ func (h *AdminHandler) GetApplications(c *gin.Context) {
 	query := h.db.Model(&models.Application{})
 	if appGroupID != "" {
 		query = query.Where("app_group_id = ?", appGroupID)
+	}
+
+	// Filtrage selon le rôle pour group_admin
+	role := c.GetString("role")
+	if role == "group_admin" {
+		// Group admin voit uniquement les applications dans les AppGroups privés dont son groupe est propriétaire
+		managedGroupIDs := middleware.GetManagedGroupIDs(c)
+		if len(managedGroupIDs) > 0 {
+			// Filtrer uniquement les applications dans des AppGroups privés avec OwnerGroupID dans managedGroupIDs
+			query = query.Joins("JOIN app_groups ON applications.app_group_id = app_groups.id").
+				Where("app_groups.is_private = ? AND app_groups.owner_group_id IN ?", true, managedGroupIDs)
+		} else {
+			// Aucun groupe administré = aucune application visible
+			query = query.Where("1 = 0")
+		}
 	}
 
 	query.Count(&total)
@@ -264,6 +349,17 @@ func (h *AdminHandler) CreateApplication(c *gin.Context) {
 		return
 	}
 
+	// Vérification des permissions pour group_admin
+	// Un group_admin peut créer une application seulement dans un AppGroup privé qu'il possède
+	if !middleware.CanManageAppGroupWithDB(c, application.AppGroupID, h.db) {
+		c.JSON(http.StatusForbidden, models.ErrorResponse{
+			Error:   "Forbidden",
+			Message: "Vous ne pouvez pas créer d'application dans cet AppGroup. Seuls les AppGroups privés appartenant à votre groupe sont autorisés.",
+			Code:    http.StatusForbidden,
+		})
+		return
+	}
+
 	if err := h.db.Create(&application).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Error:   "Internal Server Error",
@@ -301,11 +397,31 @@ func (h *AdminHandler) UpdateApplication(c *gin.Context) {
 	}
 
 	var application models.Application
-	if err := h.db.First(&application, id).Error; err != nil {
+	if err := h.db.Preload("AppGroup").First(&application, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, models.ErrorResponse{
 			Error:   "Not Found",
 			Message: "Application non trouvée",
 			Code:    http.StatusNotFound,
+		})
+		return
+	}
+
+	// Vérification des permissions pour group_admin
+	// Un group_admin peut modifier une application seulement si elle est dans un AppGroup privé qu'il possède
+	if application.AppGroup == nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Error:   "Internal Server Error",
+			Message: "AppGroup introuvable pour cette application",
+			Code:    http.StatusInternalServerError,
+		})
+		return
+	}
+
+	if !middleware.CanManageAppGroupWithDB(c, application.AppGroup.ID, h.db) {
+		c.JSON(http.StatusForbidden, models.ErrorResponse{
+			Error:   "Forbidden",
+			Message: "Vous ne pouvez pas modifier cette application. Seules les applications des AppGroups privés appartenant à votre groupe sont autorisées.",
+			Code:    http.StatusForbidden,
 		})
 		return
 	}
@@ -353,6 +469,39 @@ func (h *AdminHandler) DeleteApplication(c *gin.Context) {
 		return
 	}
 
+	// Vérification des permissions pour group_admin
+	role := c.GetString("role")
+	if role == "group_admin" {
+		var application models.Application
+		if err := h.db.Preload("AppGroup").First(&application, id).Error; err != nil {
+			c.JSON(http.StatusNotFound, models.ErrorResponse{
+				Error:   "Not Found",
+				Message: "Application non trouvée",
+				Code:    http.StatusNotFound,
+			})
+			return
+		}
+
+		// Vérifier que l'application appartient à un AppGroup privé que le group_admin possède
+		if application.AppGroup == nil {
+			c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+				Error:   "Internal Server Error",
+				Message: "AppGroup introuvable pour cette application",
+				Code:    http.StatusInternalServerError,
+			})
+			return
+		}
+
+		if !middleware.CanManageAppGroupWithDB(c, application.AppGroup.ID, h.db) {
+			c.JSON(http.StatusForbidden, models.ErrorResponse{
+				Error:   "Forbidden",
+				Message: "Vous ne pouvez pas supprimer cette application. Seules les applications des AppGroups privés appartenant à votre groupe sont autorisées.",
+				Code:    http.StatusForbidden,
+			})
+			return
+		}
+	}
+
 	if err := h.db.Delete(&models.Application{}, id).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Error:   "Internal Server Error",
@@ -378,7 +527,7 @@ func (h *AdminHandler) DeleteApplication(c *gin.Context) {
 // @Router /admin/users [get]
 func (h *AdminHandler) GetUsers(c *gin.Context) {
 	var users []models.User
-	if err := h.db.Preload("Groups").Find(&users).Error; err != nil {
+	if err := h.db.Preload("Groups").Preload("AdminOfGroups").Find(&users).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Error:   "Internal Server Error",
 			Message: "Erreur lors de la récupération des utilisateurs",
@@ -1212,5 +1361,96 @@ func (h *AdminHandler) ResetDatabase(c *gin.Context) {
 		Data: map[string]interface{}{
 			"note": "Les données de démonstration seront recréées au prochain démarrage du serveur",
 		},
+	})
+}
+
+// ============ GESTION DES GROUP ADMINS ============
+
+// GetGroupAdmins récupère les admins d'un groupe
+func (h *AdminHandler) GetGroupAdmins(c *gin.Context) {
+	groupID := c.Param("id")
+
+	// Charger le groupe avec ses admins
+	var group models.Group
+	if err := h.db.Preload("Users", "users.id IN (SELECT user_id FROM group_admins WHERE group_id = ?)", groupID).First(&group, groupID).Error; err != nil {
+		c.JSON(http.StatusNotFound, models.ErrorResponse{
+			Error:   "Not Found",
+			Message: "Groupe non trouvé",
+			Code:    http.StatusNotFound,
+		})
+		return
+	}
+
+	// Récupérer les utilisateurs qui sont admins de ce groupe
+	var adminUsers []models.User
+	h.db.Table("users").
+		Select("users.*").
+		Joins("JOIN group_admins ON users.id = group_admins.user_id").
+		Where("group_admins.group_id = ?", groupID).
+		Find(&adminUsers)
+
+	// Masquer les mots de passe
+	for i := range adminUsers {
+		adminUsers[i].Password = ""
+	}
+
+	c.JSON(http.StatusOK, adminUsers)
+}
+
+// AssignGroupAdmins assigne des utilisateurs comme admins d'un groupe
+func (h *AdminHandler) AssignGroupAdmins(c *gin.Context) {
+	groupID := c.Param("id")
+
+	var request struct {
+		UserIDs []uint `json:"user_ids"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Error:   "Bad Request",
+			Message: "Format de requête invalide",
+			Code:    http.StatusBadRequest,
+		})
+		return
+	}
+
+	// Charger le groupe
+	var group models.Group
+	if err := h.db.First(&group, groupID).Error; err != nil {
+		c.JSON(http.StatusNotFound, models.ErrorResponse{
+			Error:   "Not Found",
+			Message: "Groupe non trouvé",
+			Code:    http.StatusNotFound,
+		})
+		return
+	}
+
+	// Charger les utilisateurs à assigner
+	var users []models.User
+	if len(request.UserIDs) > 0 {
+		if err := h.db.Where("id IN ?", request.UserIDs).Find(&users).Error; err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse{
+				Error:   "Bad Request",
+				Message: "Certains utilisateurs n'ont pas été trouvés",
+				Code:    http.StatusBadRequest,
+			})
+			return
+		}
+	}
+
+	// Utiliser l'association GORM pour remplacer les admins
+	// D'abord, supprimer toutes les associations existantes pour ce groupe
+	h.db.Exec("DELETE FROM group_admins WHERE group_id = ?", groupID)
+
+	// Puis ajouter les nouvelles associations
+	if len(users) > 0 {
+		for _, user := range users {
+			// Utiliser Replace sur l'association AdminOfGroups de chaque utilisateur
+			h.db.Model(&user).Association("AdminOfGroups").Append(&group)
+		}
+	}
+
+	c.JSON(http.StatusOK, models.SuccessResponse{
+		Message: "Administrateurs de groupe assignés avec succès",
 	})
 }

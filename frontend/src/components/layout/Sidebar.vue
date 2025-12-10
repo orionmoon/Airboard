@@ -130,6 +130,45 @@
           <span>News Articles</span>
         </router-link>
       </div>
+
+      <!-- Group Admin section (for admin and group_admin roles) -->
+      <div v-if="authStore.isGroupAdmin || authStore.isAdmin" class="sidebar-section">
+        <div class="sidebar-section-title">
+          Administration de Groupe
+        </div>
+
+        <router-link
+          to="/group-admin"
+          :class="getLinkClasses('/group-admin', true)"
+        >
+          <Icon icon="mdi:shield-account" class="h-4 w-4" />
+          <span>Tableau de bord</span>
+        </router-link>
+
+        <router-link
+          to="/group-admin/app-groups"
+          :class="getLinkClasses('/group-admin/app-groups')"
+        >
+          <Icon icon="mdi:folder-multiple" class="h-4 w-4" />
+          <span>Mes AppGroups</span>
+        </router-link>
+
+        <router-link
+          to="/group-admin/applications"
+          :class="getLinkClasses('/group-admin/applications')"
+        >
+          <Icon icon="mdi:apps" class="h-4 w-4" />
+          <span>Mes Applications</span>
+        </router-link>
+
+        <router-link
+          to="/group-admin/news"
+          :class="getLinkClasses('/group-admin/news')"
+        >
+          <Icon icon="mdi:newspaper-variant" class="h-4 w-4" />
+          <span>News de Groupe</span>
+        </router-link>
+      </div>
     </nav>
 
     <!-- Footer -->
