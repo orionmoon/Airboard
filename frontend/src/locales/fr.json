@@ -254,14 +254,28 @@
     "viewModes": {
       "grid": "Grille",
       "default": "Par Défaut",
-      "compact": "Compact"
+      "compact": "Compact",
+      "table": "Tableau"
     },
     "zoom": {
       "extraSmall": "Très petit",
       "small": "Petit",
       "normal": "Normal",
       "large": "Grand"
-    }
+    },
+    "searchApps": "Rechercher une application...",
+    "allCategories": "Toutes les catégories",
+    "sortByName": "Trier par nom",
+    "sortByCategory": "Trier par catégorie",
+    "sortByRecent": "Plus récentes",
+    "resetFilters": "Réinitialiser les filtres",
+    "applicationsFound": "application(s) trouvée(s)",
+    "application": "Application",
+    "description": "Description",
+    "category": "Catégorie",
+    "actions": "Actions",
+    "open": "Ouvrir",
+    "noApplicationsFound": "Aucune application trouvée"
   }
 
 }

@@ -60,7 +60,13 @@ onMounted(async () => {
     }
 
     // Appeler le backend pour échanger le code contre un token
-    console.log('📞 Calling backend callback...')
+    console.log('📞 Calling backend callback (POST)...')
+    console.log('📦 Sending:', {
+      provider: providerName.value,
+      codeLength: route.query.code?.length,
+      stateLength: route.query.state?.length
+    })
+
     const response = await oauthService.handleCallback(
       providerName.value,
       route.query.code,

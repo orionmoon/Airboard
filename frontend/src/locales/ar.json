@@ -254,14 +254,28 @@
     "viewModes": {
       "grid": "شبكة",
       "default": "افتراضي",
-      "compact": "مضغوط"
+      "compact": "مضغوط",
+      "table": "جدول"
     },
     "zoom": {
       "extraSmall": "صغير جدا",
       "small": "صغير",
       "normal": "عادي",
       "large": "كبير"
-    }
+    },
+    "searchApps": "البحث عن تطبيق...",
+    "allCategories": "جميع الفئات",
+    "sortByName": "الترتيب حسب الاسم",
+    "sortByCategory": "الترتيب حسب الفئة",
+    "sortByRecent": "الأحدث",
+    "resetFilters": "إعادة تعيين الفلاتر",
+    "applicationsFound": "تطبيق (تطبيقات) تم العثور عليها",
+    "application": "التطبيق",
+    "description": "الوصف",
+    "category": "الفئة",
+    "actions": "الإجراءات",
+    "open": "فتح",
+    "noApplicationsFound": "لم يتم العثور على تطبيقات"
   }
 }
 

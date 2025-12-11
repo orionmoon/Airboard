@@ -289,14 +289,28 @@
     "viewModes": {
       "grid": "Grid",
       "default": "Default",
-      "compact": "Compact"
+      "compact": "Compact",
+      "table": "Table"
     },
     "zoom": {
       "extraSmall": "Extra Small",
       "small": "Small",
       "normal": "Normal",
       "large": "Large"
-    }
+    },
+    "searchApps": "Search for an application...",
+    "allCategories": "All categories",
+    "sortByName": "Sort by name",
+    "sortByCategory": "Sort by category",
+    "sortByRecent": "Most recent",
+    "resetFilters": "Reset filters",
+    "applicationsFound": "application(s) found",
+    "application": "Application",
+    "description": "Description",
+    "category": "Category",
+    "actions": "Actions",
+    "open": "Open",
+    "noApplicationsFound": "No applications found"
   }
 
 }

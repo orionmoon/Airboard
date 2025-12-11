@@ -277,84 +277,94 @@
         </div>
       </div>
 
-      <!-- Regular App Groups -->
-      <div
-        v-for="appGroup in dashboard.app_groups"
-        :key="appGroup.id"
-        class="app-group-container fade-in"
-      >
-        <!-- En-tête du groupe (cliquable pour collapse) -->
+      <!-- Table View -->
+      <div v-if="viewMode === 'table'">
+        <TableView
+          :app-groups="dashboard.app_groups"
+          @toggle-favorite="handleToggleFavorite"
+        />
+      </div>
+
+      <!-- Regular App Groups (Grid Views) -->
+      <div v-else>
         <div
-          class="app-group-header"
-          @click="toggleGroup(appGroup.id)"
+          v-for="appGroup in dashboard.app_groups"
+          :key="appGroup.id"
+          class="app-group-container fade-in"
         >
-          <div class="flex items-center gap-2 flex-1">
-            <div
-              class="h-8 w-8 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0"
-              :style="{ backgroundColor: appGroup.color || '#10b981' }"
-            >
-              <Icon :icon="appGroup.icon || 'mdi:folder'" class="h-4 w-4 text-white" />
-            </div>
-            <div class="flex items-baseline gap-2 flex-1 min-w-0">
-              <h2 class="text-base font-semibold text-gray-900 dark:text-white truncate">
-                {{ appGroup.name }}
-              </h2>
-              <span v-if="appGroup.description" class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                - {{ appGroup.description }}
-              </span>
-            </div>
-          </div>
-          <Icon
-            :icon="isGroupCollapsed(appGroup.id) ? 'mdi:chevron-down' : 'mdi:chevron-up'"
-            class="h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform duration-300 flex-shrink-0"
-          />
-        </div>
-
-        <!-- Applications du groupe (collapsible) -->
-        <transition name="collapse">
-          <div v-show="!isGroupCollapsed(appGroup.id)" class="app-group-content">
-            <div :class="getGridClasses">
+          <!-- En-tête du groupe (cliquable pour collapse) -->
+          <div
+            class="app-group-header"
+            @click="toggleGroup(appGroup.id)"
+          >
+            <div class="flex items-center gap-2 flex-1">
               <div
-                v-for="app in appGroup.applications"
-                :key="app.id"
-                :class="getAppCardClasses"
-                @click="openApplication(app)"
+                class="h-8 w-8 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0"
+                :style="{ backgroundColor: appGroup.color || '#10b981' }"
               >
-                <!-- Star icon (bottom-right, absolute) -->
-                <button
-                  @click="toggleFavorite($event, app)"
-                  class="absolute bottom-2 right-2 z-10 p-1.5 rounded-full bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow-md"
-                  :title="favoritesStore.isFavorite(app.id) ? $t('common.removeFromFavorites') : $t('common.addToFavorites')"
-                >
-                  <Icon
-                    :icon="favoritesStore.isFavorite(app.id) ? 'mdi:star' : 'mdi:star-outline'"
-                    class="h-4 w-4"
-                    :class="favoritesStore.isFavorite(app.id) ? 'text-yellow-500' : 'text-gray-400'"
-                  />
-                </button>
-
-                <!-- Entête: icône + titre alignés -->
-                <div class="flex items-center gap-2">
-                  <div
-                    class="h-10 w-10 rounded-lg flex items-center justify-center"
-                    :style="{ backgroundColor: app.color || '#6366f1' }"
-                  >
-                    <Icon :icon="app.icon || 'mdi:application'" class="h-5 w-5 text-white" />
-                  </div>
-                  <h3 class="font-semibold text-gray-900 dark:text-white text-sm leading-tight flex-1 truncate pr-6">
-                    {{ app.name }}
-                  </h3>
-                  <Icon v-if="app.open_in_new_tab" icon="mdi:open-in-new" class="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                </div>
-
-                <!-- Description sous le titre -->
-                <p v-if="app.description" class="text-xs text-gray-600 dark:text-gray-400 mt-2">
-                  {{ app.description }}
-                </p>
+                <Icon :icon="appGroup.icon || 'mdi:folder'" class="h-4 w-4 text-white" />
+              </div>
+              <div class="flex items-baseline gap-2 flex-1 min-w-0">
+                <h2 class="text-base font-semibold text-gray-900 dark:text-white truncate">
+                  {{ appGroup.name }}
+                </h2>
+                <span v-if="appGroup.description" class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  - {{ appGroup.description }}
+                </span>
               </div>
             </div>
+            <Icon
+              :icon="isGroupCollapsed(appGroup.id) ? 'mdi:chevron-down' : 'mdi:chevron-up'"
+              class="h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform duration-300 flex-shrink-0"
+            />
           </div>
-        </transition>
+
+          <!-- Applications du groupe (collapsible) -->
+          <transition name="collapse">
+            <div v-show="!isGroupCollapsed(appGroup.id)" class="app-group-content">
+              <div :class="getGridClasses">
+                <div
+                  v-for="app in appGroup.applications"
+                  :key="app.id"
+                  :class="getAppCardClasses"
+                  @click="openApplication(app)"
+                >
+                  <!-- Star icon (bottom-right, absolute) -->
+                  <button
+                    @click="toggleFavorite($event, app)"
+                    class="absolute bottom-2 right-2 z-10 p-1.5 rounded-full bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow-md"
+                    :title="favoritesStore.isFavorite(app.id) ? $t('common.removeFromFavorites') : $t('common.addToFavorites')"
+                  >
+                    <Icon
+                      :icon="favoritesStore.isFavorite(app.id) ? 'mdi:star' : 'mdi:star-outline'"
+                      class="h-4 w-4"
+                      :class="favoritesStore.isFavorite(app.id) ? 'text-yellow-500' : 'text-gray-400'"
+                    />
+                  </button>
+
+                  <!-- Entête: icône + titre alignés -->
+                  <div class="flex items-center gap-2">
+                    <div
+                      class="h-10 w-10 rounded-lg flex items-center justify-center"
+                      :style="{ backgroundColor: app.color || '#6366f1' }"
+                    >
+                      <Icon :icon="app.icon || 'mdi:application'" class="h-5 w-5 text-white" />
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm leading-tight flex-1 truncate pr-6">
+                      {{ app.name }}
+                    </h3>
+                    <Icon v-if="app.open_in_new_tab" icon="mdi:open-in-new" class="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  </div>
+
+                  <!-- Description sous le titre -->
+                  <p v-if="app.description" class="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                    {{ app.description }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </transition>
+        </div>
       </div>
     </div>
   </div>
@@ -368,6 +378,7 @@ import { useAppStore } from '@/stores/app'
 import { useFavoritesStore } from '@/stores/favorites'
 import { dashboardService, adminService, analyticsService, announcementsService } from '@/services/api'
 import ViewModeSelector from '@/components/dashboard/ViewModeSelector.vue'
+import TableView from '@/components/dashboard/TableView.vue'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
@@ -665,6 +676,11 @@ const openApplication = async (app) => {
 // Toggle favorite
 const toggleFavorite = async (event, app) => {
   event.stopPropagation() // Empêcher l'ouverture de l'application
+  await favoritesStore.toggleFavorite(app.id)
+}
+
+// Handle toggle favorite from TableView
+const handleToggleFavorite = async (app) => {
   await favoritesStore.toggleFavorite(app.id)
 }
 

@@ -94,7 +94,9 @@ func main() {
 			{
 				oauth.GET("/providers", oauthHandler.GetEnabledProviders)
 				oauth.GET("/:provider/initiate", oauthHandler.InitiateOAuth)
+				// Accepter GET et POST pour le callback (Microsoft redirige en GET, frontend peut POST)
 				oauth.GET("/:provider/callback", oauthHandler.OAuthCallback)
+				oauth.POST("/:provider/callback", oauthHandler.OAuthCallback)
 			}
 		}
 	}

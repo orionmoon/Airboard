@@ -302,8 +302,10 @@ export const oauthService = {
   },
 
   async handleCallback(providerName, code, state) {
-    const response = await api.get(`/auth/oauth/${providerName}/callback`, {
-      params: { code, state }
+    // Utiliser POST au lieu de GET pour éviter les problèmes de proxy/cache en production
+    const response = await api.post(`/auth/oauth/${providerName}/callback`, {
+      code,
+      state
     })
     return response.data
   }

@@ -38,6 +38,7 @@ defineEmits(['update:modelValue'])
 const viewModes = computed(() => [
   { value: 'grid', label: t('dashboard.viewModes.grid'), icon: 'mdi:view-grid' },
   { value: 'default', label: t('dashboard.viewModes.default'), icon: 'mdi:grid-large' },
-  { value: 'compact', label: t('dashboard.viewModes.compact'), icon: 'mdi:view-compact' }
+  { value: 'compact', label: t('dashboard.viewModes.compact'), icon: 'mdi:view-compact' },
+  { value: 'table', label: t('dashboard.viewModes.table'), icon: 'mdi:table' }
 ])
 </script>

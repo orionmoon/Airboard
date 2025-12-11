@@ -164,8 +164,32 @@ func (h *OAuthHandler) InitiateOAuth(c *gin.Context) {
 // OAuthCallback gère le callback OAuth
 func (h *OAuthHandler) OAuthCallback(c *gin.Context) {
 	providerName := c.Param("provider")
-	code := c.Query("code")
-	// state := c.Query("state") // TODO: Validate state for CSRF protection
+
+	// Accepter le code et state depuis query params (GET) ou body (POST)
+	var code, state string
+	if c.Request.Method == "POST" {
+		var req struct {
+			Code  string `json:"code" binding:"required"`
+			State string `json:"state"`
+		}
+		if err := c.ShouldBindJSON(&req); err != nil {
+			log.Printf("[OAuth] Error parsing POST body: %v", err)
+			c.JSON(http.StatusBadRequest, models.ErrorResponse{
+				Error:   "bad_request",
+				Message: "Invalid request body",
+				Code:    http.StatusBadRequest,
+			})
+			return
+		}
+		code = req.Code
+		state = req.State
+	} else {
+		code = c.Query("code")
+		state = c.Query("state")
+	}
+
+	log.Printf("[OAuth] Callback received for provider %s - code present: %v, state: %s",
+		providerName, code != "", state)
 
 	if code == "" {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse{
@@ -175,6 +199,8 @@ func (h *OAuthHandler) OAuthCallback(c *gin.Context) {
 		})
 		return
 	}
+
+	// TODO: Validate state for CSRF protection
 
 	var provider models.OAuthProvider
 	if err := h.db.Where("provider_name = ? AND is_enabled = ?", providerName, true).First(&provider).Error; err != nil {
@@ -187,9 +213,10 @@ func (h *OAuthHandler) OAuthCallback(c *gin.Context) {
 	}
 
 	// Échanger le code contre un token
+	log.Printf("[OAuth] Exchanging code for token with %s...", provider.ProviderName)
 	token, err := h.exchangeCodeForToken(provider, code)
 	if err != nil {
-		log.Printf("Error exchanging code for token: %v", err)
+		log.Printf("[OAuth] ❌ Error exchanging code for token: %v", err)
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Error:   "oauth_error",
 			Message: "Failed to exchange code for token",
@@ -197,11 +224,13 @@ func (h *OAuthHandler) OAuthCallback(c *gin.Context) {
 		})
 		return
 	}
+	log.Printf("[OAuth] ✅ Token exchange successful")
 
 	// Récupérer les informations utilisateur
+	log.Printf("[OAuth] Fetching user info from %s...", provider.ProviderName)
 	userInfo, err := h.getUserInfo(provider, token)
 	if err != nil {
-		log.Printf("Error getting user info: %v", err)
+		log.Printf("[OAuth] ❌ Error getting user info: %v", err)
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Error:   "oauth_error",
 			Message: "Failed to get user information",
@@ -209,11 +238,13 @@ func (h *OAuthHandler) OAuthCallback(c *gin.Context) {
 		})
 		return
 	}
+	log.Printf("[OAuth] ✅ User info retrieved: %v", userInfo["mail"])
 
 	// Créer ou récupérer l'utilisateur
+	log.Printf("[OAuth] Finding or creating user...")
 	user, err := h.findOrCreateOAuthUser(provider.ProviderName, userInfo)
 	if err != nil {
-		log.Printf("Error finding or creating user: %v", err)
+		log.Printf("[OAuth] ❌ Error finding or creating user: %v", err)
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Error:   "database_error",
 			Message: "Failed to create or find user",
@@ -221,6 +252,7 @@ func (h *OAuthHandler) OAuthCallback(c *gin.Context) {
 		})
 		return
 	}
+	log.Printf("[OAuth] ✅ User found/created: %s (%s)", user.Username, user.Email)
 
 	// Générer les tokens JWT
 	jwtToken, err := h.authMiddleware.GenerateToken(&user)
