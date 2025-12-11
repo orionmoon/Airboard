@@ -1,16 +1,22 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "buildDate": "2025-12-11",
-  "gitCommit": "f28a436",
+  "gitCommit": "e1482ed",
   "changelog": [
     {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "date": "2025-12-11",
       "changes": [
+        "feat: add version management and auto-update system (v1.0.0)",
         "fix: preload AdminOfGroups relationship in SSO user sync",
         "feat: add table view mode and improve OAuth callback handling",
+        "chore: update .gitignore",
         "feat: add Group Admin role with delegated management capabilities",
-        "docs: add comprehensive Coolify deployment guide"
+        "docs: add comprehensive Coolify deployment guide",
+        "fix: add docker-compose.prod.yaml for Coolify deployment",
+        "chore: clean up repository and update .gitignore",
+        "docs: update installation instructions and fix admin credentials",
+        "docs: update Docker installation guide with API configuration notes"
       ]
     }
   ]
