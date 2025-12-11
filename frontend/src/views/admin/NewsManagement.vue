@@ -16,7 +16,7 @@
 
     <!-- Filters -->
     <div class="card mb-6">
-      <div class="flex flex-wrap gap-4">
+      <div class="flex flex-col sm:flex-row gap-4">
         <!-- Search -->
         <div class="flex-1 min-w-[200px]">
           <input
@@ -28,7 +28,7 @@
         </div>
 
         <!-- Category filter -->
-        <select v-model="filters.category" class="input w-48">
+        <select v-model="filters.category" class="input w-full sm:w-48">
           <option value="">All Categories</option>
           <option v-for="cat in categories" :key="cat.id" :value="cat.id">
             {{ cat.name }}
@@ -36,14 +36,14 @@
         </select>
 
         <!-- Status filter -->
-        <select v-model="filters.status" class="input w-40">
+        <select v-model="filters.status" class="input w-full sm:w-40">
           <option value="">All Status</option>
           <option value="published">Published</option>
           <option value="draft">Draft</option>
         </select>
 
         <!-- Priority filter -->
-        <select v-model="filters.priority" class="input w-40">
+        <select v-model="filters.priority" class="input w-full sm:w-40">
           <option value="">All Priority</option>
           <option value="urgent">Urgent</option>
           <option value="important">Important</option>

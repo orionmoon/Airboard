@@ -177,7 +177,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['toggleFavorite'])
+// No emits needed - favorites store handles reactivity
 
 const favoritesStore = useFavoritesStore()
 
@@ -269,8 +269,11 @@ const isFavorite = (appId) => {
 }
 
 const toggleFavorite = async (app) => {
-  await favoritesStore.toggleFavorite(app.id)
-  emit('toggleFavorite', app)
+  try {
+    await favoritesStore.toggleFavorite(app.id)
+  } catch (error) {
+    console.error('Error toggling favorite:', error)
+  }
 }
 
 const openApplication = async (app) => {

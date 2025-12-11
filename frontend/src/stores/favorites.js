@@ -46,8 +46,8 @@ export const useFavoritesStore = defineStore('favorites', () => {
       // Ajouter via l'API
       await favoritesService.addFavorite(applicationId)
 
-      // Ajouter localement
-      favorites.value.add(applicationId)
+      // Ajouter localement (créer un nouveau Set pour la réactivité)
+      favorites.value = new Set([...favorites.value, applicationId])
 
       // Sauvegarder dans localStorage
       saveFavoritesToLocalStorage()
@@ -70,8 +70,10 @@ export const useFavoritesStore = defineStore('favorites', () => {
       // Supprimer via l'API
       await favoritesService.removeFavorite(applicationId)
 
-      // Supprimer localement
-      favorites.value.delete(applicationId)
+      // Supprimer localement (créer un nouveau Set pour la réactivité)
+      const newFavorites = new Set(favorites.value)
+      newFavorites.delete(applicationId)
+      favorites.value = newFavorites
 
       // Sauvegarder dans localStorage
       saveFavoritesToLocalStorage()

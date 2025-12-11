@@ -147,7 +147,8 @@ body {
 
 .form-input,
 .form-select,
-.form-textarea {
+.form-textarea,
+.input {
   @apply w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors;
 }
 

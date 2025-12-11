@@ -142,7 +142,7 @@
     <!-- Groupes d'applications -->
     <div v-else class="space-y-6">
       <!-- Announcements Carousel -->
-      <div v-if="activeAnnouncements.length > 0" class="relative mb-6">
+      <div v-if="activeAnnouncements.length > 0" class="relative">
         <div class="announcement-carousel">
           <!-- Carousel Container -->
           <div class="relative overflow-hidden" @mouseenter="pauseAutoRotation" @mouseleave="resumeAutoRotation">
@@ -281,7 +281,6 @@
       <div v-if="viewMode === 'table'">
         <TableView
           :app-groups="dashboard.app_groups"
-          @toggle-favorite="handleToggleFavorite"
         />
       </div>
 
@@ -676,11 +675,6 @@ const openApplication = async (app) => {
 // Toggle favorite
 const toggleFavorite = async (event, app) => {
   event.stopPropagation() // Empêcher l'ouverture de l'application
-  await favoritesStore.toggleFavorite(app.id)
-}
-
-// Handle toggle favorite from TableView
-const handleToggleFavorite = async (app) => {
   await favoritesStore.toggleFavorite(app.id)
 }
 

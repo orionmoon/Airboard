@@ -98,8 +98,8 @@
                         <Icon :icon="form.icon || 'mdi:folder'" class="h-6 w-6 text-white" />
                       </div>
                       <div>
-                        <div class="font-medium text-white">{{ form.name || 'Group Name' }}</div>
-                        <div class="text-sm text-gray-400">{{ form.description || 'Description...' }}</div>
+                        <div class="font-medium text-gray-900 dark:text-white">{{ form.name || 'Group Name' }}</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">{{ form.description || 'Description...' }}</div>
                       </div>
                     </div>
                   </div>
@@ -150,11 +150,11 @@
                     <input
                       v-model="form.is_private"
                       type="checkbox"
-                      class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
+                      class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
                     />
                     <div>
-                      <span class="text-sm text-gray-300 font-medium">Private App Group</span>
-                      <p class="text-xs text-gray-400 mt-1">
+                      <span class="text-sm text-gray-700 dark:text-gray-300 font-medium">Private App Group</span>
+                      <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
                         Private app groups can only be managed by their owner group admin
                       </p>
                     </div>
@@ -177,7 +177,7 @@
                     </option>
                   </select>
                   <p v-if="errors.owner_group_id" class="form-error">{{ errors.owner_group_id }}</p>
-                  <p v-else class="text-xs text-gray-400 mt-1">
+                  <p v-else class="text-xs text-gray-600 dark:text-gray-400 mt-1">
                     The group admin of this group will be able to manage this app group
                   </p>
                 </div>
@@ -196,9 +196,9 @@
                   <input
                     v-model="form.is_active"
                     type="checkbox"
-                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-600 rounded bg-gray-700"
+                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
                   />
-                  <span class="text-sm text-gray-300">
+                  <span class="text-sm text-gray-700 dark:text-gray-300">
                     Active and visible to users
                   </span>
                 </label>

@@ -15,12 +15,12 @@
     </div>
 
     <!-- Info Alert -->
-    <div class="mb-6 p-4 bg-blue-900/20 border border-blue-600 rounded-lg">
+    <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-300 dark:border-blue-600 rounded-lg">
       <div class="flex items-start">
-        <Icon icon="mdi:information" class="h-5 w-5 text-blue-500 mr-3 mt-0.5" />
+        <Icon icon="mdi:information" class="h-5 w-5 text-blue-600 dark:text-blue-500 mr-3 mt-0.5" />
         <div>
-          <h3 class="text-blue-500 font-medium">Gestion des actualités de groupe</h3>
-          <p class="text-sm text-blue-200 mt-1">
+          <h3 class="text-blue-800 dark:text-blue-500 font-medium">Gestion des actualités de groupe</h3>
+          <p class="text-sm text-blue-700 dark:text-blue-200 mt-1">
             En tant que Group Admin, vous pouvez créer des actualités ciblées pour vos groupes administrés.
             Ces actualités seront visibles uniquement par les membres des groupes que vous sélectionnez.
           </p>
@@ -30,7 +30,7 @@
 
     <!-- Filters -->
     <div class="card mb-6">
-      <div class="flex flex-wrap gap-4">
+      <div class="flex flex-col sm:flex-row gap-4">
         <!-- Search -->
         <div class="flex-1 min-w-[200px]">
           <input
@@ -42,7 +42,7 @@
         </div>
 
         <!-- Category filter -->
-        <select v-model="filters.category" class="input w-48">
+        <select v-model="filters.category" class="input w-full sm:w-48">
           <option value="">Toutes les catégories</option>
           <option v-for="cat in categories" :key="cat.id" :value="cat.id">
             {{ cat.name }}
@@ -50,14 +50,14 @@
         </select>
 
         <!-- Status filter -->
-        <select v-model="filters.status" class="input w-40">
+        <select v-model="filters.status" class="input w-full sm:w-40">
           <option value="">Tous les statuts</option>
           <option value="published">Publié</option>
           <option value="draft">Brouillon</option>
         </select>
 
         <!-- Priority filter -->
-        <select v-model="filters.priority" class="input w-40">
+        <select v-model="filters.priority" class="input w-full sm:w-40">
           <option value="">Toutes les priorités</option>
           <option value="urgent">Urgent</option>
           <option value="important">Important</option>
