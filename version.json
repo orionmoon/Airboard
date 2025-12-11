@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "buildDate": "2025-12-11",
+  "gitCommit": "f28a436",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2025-12-11",
+      "changes": [
+        "fix: preload AdminOfGroups relationship in SSO user sync",
+        "feat: add table view mode and improve OAuth callback handling",
+        "feat: add Group Admin role with delegated management capabilities",
+        "docs: add comprehensive Coolify deployment guide"
+      ]
+    }
+  ]
+}

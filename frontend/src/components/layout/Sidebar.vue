@@ -2,13 +2,32 @@
   <aside :class="['sidebar', { 'sidebar-open': appStore.sidebarOpen }]">
     <!-- Header -->
     <div class="sidebar-header">
-      <div class="flex items-center gap-3">
-        <div class="h-8 w-8 bg-white rounded-lg flex items-center justify-center">
-          <Icon :icon="appStore.appSettings?.app_icon || 'mdi:view-dashboard'" class="h-5 w-5 text-black" />
+      <div class="flex-1">
+        <div class="flex items-center gap-3">
+          <div class="h-8 w-8 bg-white rounded-lg flex items-center justify-center">
+            <Icon :icon="appStore.appSettings?.app_icon || 'mdi:view-dashboard'" class="h-5 w-5 text-black" />
+          </div>
+          <div class="flex-1">
+            <h1 class="sidebar-brand">{{ appStore.appSettings?.app_name || 'Airboard' }}</h1>
+            <!-- Version info with update badge -->
+            <div class="flex items-center gap-2 mt-0.5">
+              <span class="text-xs text-gray-400">
+                v{{ versionStore.versionInfo.version }}
+              </span>
+              <button
+                v-if="versionStore.shouldShowUpdateBadge()"
+                @click="showUpdateModal = true"
+                class="relative inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors animate-pulse"
+                title="Nouvelle version disponible"
+              >
+                <Icon icon="mdi:update" class="h-3 w-3" />
+                <span>Mise à jour</span>
+              </button>
+            </div>
+          </div>
         </div>
-        <h1 class="sidebar-brand">{{ appStore.appSettings?.app_name || 'Airboard' }}</h1>
       </div>
-      
+
       <!-- Mobile close button -->
       <button
         @click="appStore.toggleSidebar()"
@@ -234,23 +253,126 @@
         </button>
       </div>
     </div>
+
+    <!-- Update Modal -->
+    <Teleport to="body">
+      <div
+        v-if="showUpdateModal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+        @click.self="showUpdateModal = false"
+      >
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+          <!-- Header -->
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-500 to-blue-600">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="h-10 w-10 bg-white rounded-lg flex items-center justify-center">
+                  <Icon icon="mdi:update" class="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Nouvelle version disponible</h3>
+                  <p class="text-sm text-blue-100">Une mise à jour est prête à être installée</p>
+                </div>
+              </div>
+              <button
+                @click="showUpdateModal = false"
+                class="text-white hover:text-gray-200 transition-colors"
+              >
+                <Icon icon="mdi:close" class="h-6 w-6" />
+              </button>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="px-6 py-4 overflow-y-auto max-h-[60vh]">
+            <div v-if="versionStore.updateDetails" class="space-y-4">
+              <!-- Version comparison -->
+              <div class="flex items-center justify-center gap-4 py-4">
+                <div class="text-center">
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Version actuelle</p>
+                  <div class="px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                    <p class="text-xl font-bold text-gray-900 dark:text-white">
+                      {{ versionStore.updateDetails.currentVersion }}
+                    </p>
+                  </div>
+                </div>
+                <Icon icon="mdi:arrow-right" class="h-8 w-8 text-gray-400" />
+                <div class="text-center">
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Nouvelle version</p>
+                  <div class="px-4 py-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                    <p class="text-xl font-bold text-green-600 dark:text-green-400">
+                      {{ versionStore.updateDetails.latestVersion }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Release date -->
+              <div v-if="versionStore.updateDetails.releaseDate" class="text-center text-sm text-gray-500 dark:text-gray-400">
+                Publiée le {{ formatDate(versionStore.updateDetails.releaseDate) }}
+              </div>
+
+              <!-- Release notes -->
+              <div v-if="versionStore.updateDetails.releaseNotes" class="mt-6">
+                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Notes de version</h4>
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 prose prose-sm dark:prose-invert max-w-none">
+                  <pre class="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">{{ versionStore.updateDetails.releaseNotes }}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center justify-between">
+            <button
+              @click="dismissUpdate"
+              class="btn-ghost text-sm"
+            >
+              Me le rappeler plus tard
+            </button>
+            <div class="flex gap-3">
+              <button
+                @click="showUpdateModal = false"
+                class="btn-secondary"
+              >
+                Fermer
+              </button>
+              <a
+                v-if="versionStore.updateDetails?.releaseURL"
+                :href="versionStore.updateDetails.releaseURL"
+                target="_blank"
+                class="btn-primary inline-flex items-center gap-2"
+              >
+                <Icon icon="mdi:github" class="h-5 w-5" />
+                Voir sur GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </aside>
 </template>
 
 <script setup>
-import { computed, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
+import { useVersionStore } from '@/stores/version'
 import ZoomControl from '@/components/dashboard/ZoomControl.vue'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
+const versionStore = useVersionStore()
 const route = useRoute()
 const router = useRouter()
 
-// Load app settings when component mounts
+// State for update modal
+const showUpdateModal = ref(false)
+
+// Load app settings and version when component mounts
 onMounted(async () => {
   if (!appStore.appSettings && authStore.isAuthenticated && authStore.isAdmin) {
     try {
@@ -258,6 +380,17 @@ onMounted(async () => {
     } catch (error) {
       console.error('Failed to load app settings in sidebar:', error)
     }
+  }
+
+  // Load version info
+  try {
+    await versionStore.fetchVersion()
+    // Initialize from cache
+    versionStore.initializeFromCache()
+    // Start periodic update checks
+    versionStore.startPeriodicUpdateCheck()
+  } catch (error) {
+    console.error('Failed to load version info:', error)
   }
 })
 
@@ -297,5 +430,20 @@ const handleLogout = async () => {
 
 const onChangeLocale = (loc) => {
   appStore.setAppLocale(loc)
+}
+
+const dismissUpdate = () => {
+  versionStore.dismissUpdate()
+  showUpdateModal.value = false
+}
+
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
 }
 </script>

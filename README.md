@@ -58,6 +58,7 @@ Airboard transforms how organizations manage digital resources, internal communi
 - 📊 **Analytics Dashboard** - Track application usage and user activity
 - 📢 **Announcements System** - Display important messages on dashboard
 - 📰 **News Hub** - Internal news and documentation management
+- 🔄 **Auto-Update System** - Automatic version checking with GitHub releases integration
 - 🌐 **Multi-language** - Support for French, English, Spanish, Arabic
 - 🎨 **Modern UI** - Clean, responsive design with dark mode
 
@@ -100,6 +101,7 @@ Airboard transforms how organizations manage digital resources, internal communi
 - 🔧 **Environment Variables** - Full externalization for Coolify/Docker
 - ⚡ **Fast** - Optimized Vue.js frontend with Go backend
 - 📦 **PostgreSQL Integrated** - Embedded database in docker-compose
+- 🔄 **Version Management** - Automatic update notifications from GitHub releases
 
 ---
 

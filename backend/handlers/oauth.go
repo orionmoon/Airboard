@@ -275,8 +275,8 @@ func (h *OAuthHandler) OAuthCallback(c *gin.Context) {
 		return
 	}
 
-	// Recharger l'utilisateur avec les groupes
-	if err := h.db.Preload("Groups").First(&user, user.ID).Error; err != nil {
+	// Recharger l'utilisateur avec les groupes et les groupes administrés
+	if err := h.db.Preload("Groups").Preload("AdminOfGroups").First(&user, user.ID).Error; err != nil {
 		log.Printf("Error loading user groups: %v", err)
 	}
 

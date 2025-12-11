@@ -95,7 +95,9 @@ test-*.sh
 fix-*.sh
 quick-*.sh
 dev-*.sh
+# Exclude all .sh except update-version.sh (needed for versioning)
 *.sh
+!update-version.sh
 
 # Documentation temporaire
 TEMP-*.md

@@ -64,6 +64,7 @@ func main() {
 	analyticsHandler := handlers.NewAnalyticsHandler(db)
 	announcementHandler := handlers.NewAnnouncementHandler(db)
 	newsHandler := handlers.NewNewsHandler(db)
+	versionHandler := handlers.NewVersionHandler()
 
 	// Configuration du routeur
 	router := gin.Default()
@@ -98,6 +99,13 @@ func main() {
 				oauth.GET("/:provider/callback", oauthHandler.OAuthCallback)
 				oauth.POST("/:provider/callback", oauthHandler.OAuthCallback)
 			}
+		}
+
+		// Routes version (publiques)
+		version := api.Group("/version")
+		{
+			version.GET("", versionHandler.GetVersion)
+			version.GET("/check-updates", versionHandler.CheckForUpdates)
 		}
 	}
 
