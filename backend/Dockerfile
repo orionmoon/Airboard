@@ -34,8 +34,11 @@ WORKDIR /app
 # Copie de l'exécutable depuis le stage de build
 COPY --from=builder /app/main .
 
+# Copie du fichier version.json
+COPY --from=builder /app/version.json .
+
 # Changement de propriétaire
-RUN chown airboard:airboard /app/main
+RUN chown airboard:airboard /app/main /app/version.json
 
 # Utilisation de l'utilisateur non-root
 USER airboard
