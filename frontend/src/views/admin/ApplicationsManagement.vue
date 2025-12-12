@@ -119,6 +119,7 @@
     <ApplicationModal
       :show="showModal"
       :application="selectedApplication"
+      :appGroups="appGroups"
       @close="closeModal"
       @submit="handleSubmit"
     />
