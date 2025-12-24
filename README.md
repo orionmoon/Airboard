@@ -43,29 +43,65 @@
 
 **Airboard** is a comprehensive internal portal platform designed to empower organizations with centralized access to applications, real-time communications, and actionable insights—all in one place.
 
-### Main Objective
+### 🎯 Problem Solved
 
-In a modern professional environment, organizations need more than just a link directory. **Airboard** addresses this by providing a complete digital workplace solution:
+Modern organizations face critical challenges with their digital workplace:
 
-- **Unified Application Portal** - Centralized dashboard with customizable access to all your tools
-- **News Hub** - Rich internal communication system with articles, tutorials, announcements, and FAQs
-- **Analytics Dashboard** - Track application usage, user engagement, and content performance
-- **Announcement System** - Broadcast important messages to teams instantly
-- **User Favorites** - Personalized experience with favorite apps and content
-- **Delegated Management** - Group Admin role for managing private app groups
-- **Role-Based Management** - Granular permissions for Admins, Group Admins, Editors, and Users
-- **Multi-Language Support** - Available in French, English, Spanish, and Arabic
-- **SSO Integration** - Seamless authentication with Authentik, Microsoft 365, LDAP, and more
-- **Docker-Ready** - Deploy in minutes with full containerization
+- **Scattered Tools** - Employees waste time searching for the right applications across multiple systems
+- **Fragmented Communication** - Important announcements and company news get lost in email overload
+- **No Visibility** - IT teams lack insights into which tools are actually being used
+- **Access Management Chaos** - Managing permissions across departments is time-consuming and error-prone
+- **Onboarding Friction** - New employees struggle to discover and access essential tools
+- **No Centralized Knowledge** - Documentation, tutorials, and FAQs are dispersed across various platforms
+- **No Employee Feedback** - Difficult to gather opinions and conduct internal surveys efficiently
 
-### Use Cases
+**Airboard solves these problems** by providing a single, unified portal that brings together applications, communications, polls & surveys, analytics, and access management—eliminating tool sprawl and improving productivity across your organization.
+
+### 👥 Who Is This For?
+
+Airboard is built for organizations of all sizes that need a modern internal portal:
+
+#### **Primary Users**
+- **Employees** - Quick access to all work applications, company news, announcements, and polls
+- **IT Administrators** - Centralized management of applications, users, groups, and access control
+- **Department Managers** - Self-service management of team-specific applications (Group Admin role)
+- **Content Editors** - Publishing company news, tutorials, announcements, and knowledge base articles
+- **HR & Internal Communications** - Broadcasting important messages, conducting surveys, and tracking engagement
+
+#### **Ideal For**
+- **Enterprises** (100+ employees) - Departmentalized access, SSO integration, delegated administration
+- **SMBs** (10-100 employees) - Simple application portal with news hub and analytics
+- **IT Services Teams** - Technical documentation, application catalog, usage insights
+- **Public Sector Organizations** - Secure internal portals with role-based access control
+- **Educational Institutions** - Faculty/student portals with resource management
+
+### ✨ Key Capabilities
+
+Airboard delivers a complete digital workplace solution with:
+
+- **🚀 Unified Application Portal** - Centralized dashboard with customizable access to all your tools
+- **📰 News Hub** - Rich internal communication system with articles, tutorials, announcements, and FAQs
+- **📊 Polls & Surveys** - Interactive voting system for gathering employee feedback and opinions
+- **📈 Analytics Dashboard** - Track application usage, user engagement, and content performance
+- **📢 Announcement System** - Broadcast important messages to teams instantly
+- **🔔 In-App Notifications** - Real-time notifications for news, announcements, and system events
+- **⭐ User Favorites** - Personalized experience with favorite apps and content
+- **👥 Delegated Management** - Group Admin role for managing departmental app groups
+- **🔐 Role-Based Permissions** - Granular access control (Admins, Group Admins, Editors, Users)
+- **🌍 Multi-Language Support** - Available in French, English, Spanish, and Arabic
+- **🔑 SSO Integration** - Seamless authentication with Authentik, Microsoft 365, Google, LDAP
+- **🐳 Docker-Ready** - Deploy in minutes with full containerization and Coolify support
+
+### 💼 Use Cases
 
 - **Enterprise Communication**: Publish company news, policy updates, and knowledge base articles
+- **Employee Engagement**: Conduct polls, surveys, and gather feedback on company initiatives
 - **IT Services**: Application portal + technical documentation + usage analytics
 - **HR & Internal Comms**: Share announcements, employee handbooks, tutorials, and FAQs
 - **Department Dashboards**: Customized views per team (HR, Finance, Sales) with relevant apps
 - **Project Collaboration**: Team-specific portals with apps, announcements, and documentation
 - **Analytics & Insights**: Track most-used applications, monitor engagement, understand user behavior
+- **Decision Making**: Gather employee opinions through polls before implementing changes
 
 Airboard transforms how organizations manage digital resources, internal communications, and user engagement.
 
@@ -167,7 +203,7 @@ Airboard transforms how organizations manage digital resources, internal communi
   - Pin important articles
 
 - **User Engagement**
-  - Reaction system (👍, ❤️, 🎉)
+  - Reaction system (👍)
   - Per-user view tracking
   - Unique view counters
   - Detailed analytics
@@ -1557,63 +1593,65 @@ docker-compose up -d
 
 ## Contributing
 
-Contributions are welcome! Follow these steps:
+We welcome contributions from the community! Whether you're fixing bugs, adding features, improving documentation, or translating the application, your help is appreciated.
 
-### 1. Fork & Clone
+### Quick Start for Contributors
 
-```bash
-# Fork on GitHub, then:
-git clone https://github.com/YOUR_USERNAME/airboard.git
-cd airboard
-```
+1. **Fork and clone** the repository
+2. **Create a feature branch**: `git checkout -b feature/my-feature`
+3. **Make your changes** following our code guidelines
+4. **Test thoroughly** - Run both backend and frontend locally
+5. **Commit** using conventional commits: `git commit -m "feat: add dark mode"`
+6. **Push and create a Pull Request** with a clear description
 
-### 2. Create a Branch
+### Commit Convention
 
-```bash
-git checkout -b feature/my-feature
-```
+We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
-### 3. Develop
-
-- Follow existing code style
-- Add tests if applicable
-- Update documentation
-
-### 4. Commit
-
-```bash
-git add .
-git commit -m "feat: Add my feature"
-```
-
-**Commit convention:**
 - `feat:` - New feature
 - `fix:` - Bug fix
-- `docs:` - Documentation
-- `style:` - Formatting
-- `refactor:` - Refactoring
-- `test:` - Tests
-- `chore:` - Maintenance
+- `docs:` - Documentation changes
+- `style:` - Code formatting (no logic change)
+- `refactor:` - Code refactoring
+- `test:` - Adding tests
+- `chore:` - Maintenance tasks
+- `perf:` - Performance improvements
 
-### 5. Push & PR
-
+**Example:**
 ```bash
-git push origin feature/my-feature
+git commit -m "feat(auth): add Google OAuth2 support"
+git commit -m "fix(news): resolve slug generation for special characters"
 ```
 
-Open a Pull Request on GitHub with:
-- Clear description
-- Screenshots if UI
-- Tests performed
+### Code Guidelines
 
-### Development Guidelines
+- **Backend (Go)**: Follow standard Go conventions, use GORM safely, validate all inputs
+- **Frontend (Vue.js)**: Use PascalCase for components, centralize API calls, run `npm run lint`
+- **Security**: Never commit secrets, validate user input, use parameterized queries
+- **Documentation**: Update README/CLAUDE.md when adding features
 
-- Clean and commented code
-- No hardcoded secrets
-- Environment variables for config
-- Server-side validation
-- Appropriate error handling
-- Informative logs
+### Pull Request Process
+
+1. Ensure your code follows project conventions
+2. Update documentation if needed
+3. Test your changes thoroughly (both backend and frontend)
+4. Create a PR with:
+   - Clear title (e.g., "feat: add dark mode")
+   - Detailed description (what, why, how)
+   - Screenshots for UI changes
+   - List of tests performed
+
+For detailed contribution guidelines, code standards, testing procedures, and best practices, please read our **[CONTRIBUTING.md](CONTRIBUTING.md)**.
+
+### Ways to Contribute
+
+- 🐛 **Report bugs** - Create an issue with reproduction steps
+- 💡 **Suggest features** - Open an issue with your ideas
+- 📝 **Improve docs** - Fix typos, clarify instructions, add examples
+- 💻 **Write code** - Fix bugs, implement features, add tests
+- 🌍 **Translate** - Help us support more languages (currently: fr, en, es, ar)
+
+**Need help?** Check our [documentation](HOW-TO-USE.md) or start a [discussion](../../discussions).
 
 ---
 
