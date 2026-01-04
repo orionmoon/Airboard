@@ -1538,15 +1538,6 @@ docker-compose up -d
   - Group Admin management
   - Best practices
 
-### Technical Documentation
-
-- [**CLAUDE.md**](CLAUDE.md) - Developer documentation
-  - Detailed architecture
-  - Development patterns
-  - Adding features
-  - Advanced configuration
-  - Development workflow
-
 ### Reference Files
 
 - `.env.example` - Environment variables template
