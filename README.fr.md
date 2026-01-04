@@ -1538,14 +1538,7 @@ docker-compose up -d
   - Gestion Group Admin
   - Bonnes pratiques
 
-### Documentation Technique
 
-- [**CLAUDE.md**](CLAUDE.md) - Documentation développeur
-  - Architecture détaillée
-  - Patterns de développement
-  - Ajout de fonctionnalités
-  - Configuration avancée
-  - Workflow de développement
 
 - [**DOCKER_INSTALL.md**](DOCKER_INSTALL.md) - Guide installation Docker
   - Installation détaillée Docker
